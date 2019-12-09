@@ -1,0 +1,177 @@
+struct car_data {
+	/*WARNING adding new (non-database) variables should also be add to the reset_car_data function!*/
+	/*---simdata--- */
+	double timestep = 0.0;
+	double ts_length = 0.0;
+	long count = 0;
+	long current_veh_id = 0;
+	long check_for_platoonlength = 0;
+	long check_for_leader = 0;
+	long i = 0;
+
+	/*-.-.-.-.-.-.-.-.-.-.-own vehicle-.-.-.-.-.-.-.-.-.-.-.*/
+	//=======================veh specs======================
+	long	veh_id = 0;
+	long    veh_color = RGB(0, 0, 0);
+	long    veh_type = 0; // vehicle type number (user defined)
+	long    veh_category = 0; // car = 1, truck = 2, bus = 3, tram = 4, pedestrian = 5, bike =6
+	double  veh_length = 0.0; // [m] vehicle length
+	double  veh_width = 0.0; // [m] vehicle width
+	double  veh_weight = 0.0; // [kg] vehicle weight
+
+	//======================= location=======================
+	double	veh_n_lanes = 1;
+	double  veh_x = 0.0; // world coordinate X (vehicle front end)
+	double  veh_y = 0.0; // world coordinate Y (vehicle front end)
+	long    veh_current_lane = 0; // current lane number
+
+	// signal data
+	long	veh_signal_ahead = 0; // 0 false, 1 is true
+	double	veh_signal_distance = 0.0; // -1 if not visable; otherwise distnce to signal in [m]
+	long	veh_signal_state = 0; //red = 1, amber = 2, green = 3, red/amber = 4, amber flashing = 5, off = 6, green arrow = 7  */
+	double	veh_signal_state_start = 0.0; //simulation time [s] when signal changed to current state
+
+	// ==============longitudinal============================
+	double	veh_distance_headway = 999.0;
+	double	veh_desired_velocity = 0.0; //goal velocity of the vehicle
+	double	veh_velocity = 0.0; // current velocity
+	double  veh_max_acceleration = 0.0; // [m/s^2] maximum possible acceleration based on current speed
+	double	veh_executed_acceleration = 0.0;
+
+	// ----------Operational controller-----------------
+	
+	double  veh_setspeed = 0.0; 
+	
+
+	// ---------- Tactical controller ------------------
+	double  veh_autonomous_tactical_speed = 99.0;
+	double 	veh_autonomous_tactical_acceleration = 0.0;
+
+	//==============lateral=========================================
+	double  veh_manual_lane_angle = 0.0;
+	long    veh_current_active_lane_change = 0; // currently busyg to do a lane change
+	long    veh_manual_active_lane_change = 0; // currently willing to do a lane change
+	long    veh_rel_target_lane = 0;
+	long    veh_turning_indicator = 0; // left = 1, right = -1, none = 0, both = 2;
+	long	veh_preferred_rel_lane = 0; // direction of desired mandatory lane change, left = 1, right = -1, none = 0, both = 2;
+	long	veh_use_preferred_lane = 0; // mandatory lane change = 1, discretionary lane change = 0;
+	
+	
+	// state calculations
+	long	veh_automation_state = HumanTakeOver; // 1 is human, 2 is critical, 3 is automated system
+	long	veh_automation_system = 0; // Inactivated = 0, ACC = 1, CACC = 2; 
+	long	veh_automation_mode = 0; //Inactivated = 0, cruising = 1, gap-regulating = 2, gap-closing = 3;
+	long	veh_isInPlatoon = 0;  // 0 is not in a platoon (by default), a non-zero number is the vehicle sequence in a platoon;
+	double	veh_reactionTimer = -99.0; // A timer to record the driver's reaction time
+	double  veh_inactivatedTimer = -99.0; // A timer to record the inactivated time period
+	long	veh_AT_DDD_RNG = 0;
+
+
+	/* -.-.-.-.-.-.-.-.-.-.-Near vehicles-.-.-.-.-.-.-.-.-.-.-*/
+	double  lead_veh_distance = 999.0;
+	double  lead_veh_rel_velocity = 0.0;
+	double	lead_veh_velocity = 999.0;
+	double  lead_veh_acceleration = 0.0;
+	double  lead_veh_length = 0.0;
+	long	lead_veh_id = 0;
+	long	lead_veh_type = 0;
+	double	lead_veh_manual_acceleration = 999.0;
+	long	lead_veh_autonomous_operational_warning = 0;
+	long	rear_veh_id = 0;
+
+	// ==================Authority Transition variables==============
+
+
+	//=========================Platoon manager =============================
+
+	// vehicle member data
+	long veh_platoon_state = 10; // ALONE, LEAD, REAR, MIDDLE, MANUAL_MERGE, ERRORSTATE
+	long veh_connect_request = 0; // if this vehicle would like to connect make this one
+	long veh_connect_open = 0; // if this vehicle is poen to be connected to make this 1
+	long veh_connected = 0; // is one if your leader accepted you as a member
+	long veh_connected_request_accepted = 0; // if you accept a request to join from behind make this 1
+
+	// platoon data
+	long platoon_lead_id = 0;
+	long platoon_rear_id = 0;
+	long platoon_lc_id = 0;
+	long* platoon_ids = NULL; // save as a pointer to empty memory
+	long platoon_state_lock = 0;
+	long platoon_lc_target_lane = 0;
+	long platoon_lc_origin_lane = 0;
+	long platoon_RFM_state = 0; //Synchronisation, gapcreation
+	double platoon_target_vel = 0.0;
+	long platoon_sync_veh_id = 0;
+	long rw_message_active = 0;
+	double platoon_rw_distance = 0.0;
+
+
+
+ /*-------------------------------Databases---------------------------*/
+
+ // data base on lead vehicle, required to model delay in ACC saves up to 30 timesteps (2 sec on default) 
+	double	veh_used_rel_vel = 999.0;
+	double	veh_past_rel_vel_1 = 999.0;
+	double	veh_past_rel_vel_2 = 999.0;
+	double	veh_past_rel_vel_3 = 999.0;
+	double	veh_past_rel_vel_4 = 999.0;
+	double	veh_past_rel_vel_5 = 999.0;
+	double	veh_past_rel_vel_6 = 999.0;
+	double	veh_past_rel_vel_7 = 999.0;
+	double	veh_past_rel_vel_8 = 999.0;
+	double	veh_past_rel_vel_9 = 999.0;
+	double	veh_past_rel_vel_10 = 999.0;
+	double	veh_past_rel_vel_11 = 999.0;
+	double	veh_past_rel_vel_12 = 999.0;
+	double	veh_past_rel_vel_13 = 999.0;
+	double	veh_past_rel_vel_14 = 999.0;
+	double	veh_past_rel_vel_15 = 999.0;
+	double	veh_past_rel_vel_16 = 999.0;
+	double	veh_past_rel_vel_17 = 999.0;
+	double	veh_past_rel_vel_18 = 999.0;
+	double	veh_past_rel_vel_19 = 999.0;
+	double	veh_past_rel_vel_20 = 999.0;
+	double	veh_past_rel_vel_21 = 999.0;
+	double	veh_past_rel_vel_22 = 999.0;
+	double	veh_past_rel_vel_23 = 999.0;
+	double	veh_past_rel_vel_24 = 999.0;
+	double	veh_past_rel_vel_25 = 999.0;
+	double	veh_past_rel_vel_26 = 999.0;
+	double	veh_past_rel_vel_27 = 999.0;
+	double	veh_past_rel_vel_28 = 999.0;
+	double	veh_past_rel_vel_29 = 999.0;
+	double	veh_past_rel_vel_30 = 999.0;
+
+	double  veh_used_distance_headway = 999.0;
+	double	veh_past_distance_headway_1 = 999.0;
+	double	veh_past_distance_headway_2 = 999.0;
+	double	veh_past_distance_headway_3 = 999.0;
+	double	veh_past_distance_headway_4 = 999.0;
+	double	veh_past_distance_headway_5 = 999.0;
+	double	veh_past_distance_headway_6 = 999.0;
+	double	veh_past_distance_headway_7 = 999.0;
+	double	veh_past_distance_headway_8 = 999.0;
+	double	veh_past_distance_headway_9 = 999.0;
+	double	veh_past_distance_headway_10 = 999.0;
+	double	veh_past_distance_headway_11 = 999.0;
+	double	veh_past_distance_headway_12 = 999.0;
+	double	veh_past_distance_headway_13 = 999.0;
+	double	veh_past_distance_headway_14 = 999.0;
+	double	veh_past_distance_headway_15 = 999.0;
+	double	veh_past_distance_headway_16 = 999.0;
+	double	veh_past_distance_headway_17 = 999.0;
+	double	veh_past_distance_headway_18 = 999.0;
+	double	veh_past_distance_headway_19 = 999.0;
+	double	veh_past_distance_headway_20 = 999.0;
+	double	veh_past_distance_headway_21 = 999.0;
+	double	veh_past_distance_headway_22 = 999.0;
+	double	veh_past_distance_headway_23 = 999.0;
+	double	veh_past_distance_headway_24 = 999.0;
+	double	veh_past_distance_headway_25 = 999.0;
+	double	veh_past_distance_headway_26 = 999.0;
+	double	veh_past_distance_headway_27 = 999.0;
+	double	veh_past_distance_headway_28 = 999.0;
+	double	veh_past_distance_headway_29 = 999.0;
+	double	veh_past_distance_headway_30 = 999.0;
+
+};
