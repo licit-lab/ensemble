@@ -5,13 +5,13 @@ Welcome to Ensemble Truck Platooning's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   installation
-   usage
-   modules
-   contributing
-   authors
-   history
+   readme.md
+   installation.rst
+   usage.rst
+   modules.rst
+   contributing.rst
+   authors.rst
+   history.md
 
 Indices and tables
 ==================
