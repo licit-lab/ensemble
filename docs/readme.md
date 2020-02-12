@@ -4,7 +4,7 @@
 
 ![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) 
 
-<img src="docs/img/logo.png" alt="drawing" align="middle" width="200" />
+![](img/logo.png)
 
 ## Overview 
 
@@ -20,7 +20,7 @@ Here we describe how we think the structure of the joint algorithm should be. Th
 
 In order to install run in your command line tool:
 
-```{bash}
+```
 git clone https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel.git
 ```
 Or obtain direct download [here](https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel/-/archive/master/ensemble_drivermodel-master.zip). 
@@ -35,7 +35,7 @@ You can try and test functionalities by installing the package in testing mode.
 cd ensemble_driver_model 
 pip install --editable . 
 ```
-**Note:** Be sure to be in the folder before launching the `pip` instruction
+**Note:** Be sure to be in the folder before launching the `pip` instruction 
 
 ## Usage 
 
@@ -43,6 +43,14 @@ In order to use this tool
 
 ```
 ensemble launch scenario -f path/to/simulation_file_1 path/to_simulation_file_2 -p path/to_platform/
+```
+## Documentation 
+
+Documentation is available in the `docs` folder. In order to construct the documentation 
+
+```
+cd docs
+make html 
 ```
 
 ## License 
