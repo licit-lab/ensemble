@@ -28,7 +28,7 @@ Or obtain direct download [here](https://ci.tno.nl/gitlab/paco.hamers-tno/ensemb
 
 ## Install 
 
-** Developer environment**
+**Developer environment**
 
 Be sure to obtain `python` and `pip`.  This repository as a standard python package with support for CLI interfacing to improve the interaction. 
 You can try and test functionalities by installing the package in testing mode.
@@ -45,7 +45,7 @@ pip install --editable .
 In order to use this tool 
 
 ```
-ensemble launch scenario -f path/to/simulation_file_1 path/to_simulation_file_2 -p path/to_platform/
+ensemble launch scenario -f path/to/simulation_scenario.[inpx/layx/xml] -p path/to_platform/
 ```
 
 ## License 
