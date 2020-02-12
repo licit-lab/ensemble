@@ -21,8 +21,11 @@ def main(args=None):
 
 
 @main.command()
-@options.commad
-def launch():
+@click.option(
+    "-s", "--scenario", default="", help="Scenario file under analysis."
+)
+@click.option("-l", "--library", default="", help="Full path towards library.")
+def launch(scenario, library_path):
     """ Launch a given scenario in a specific platform 
     """
     click.echo("Launching Scenario")
