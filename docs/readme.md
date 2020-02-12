@@ -28,11 +28,14 @@ Or obtain direct download [here](https://ci.tno.nl/gitlab/paco.hamers-tno/ensemb
 
 ## Install 
 
+** Developer environment**
+
 Be sure to obtain `python` and `pip`.  This repository as a standard python package with support for CLI interfacing to improve the interaction. 
 You can try and test functionalities by installing the package in testing mode.
 
 ```
 cd ensemble_driver_model 
+pip install -r requirements_dev.txt 
 pip install --editable . 
 ```
 **Note:** Be sure to be in the folder before launching the `pip` instruction 
