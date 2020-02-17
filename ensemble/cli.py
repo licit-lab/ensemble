@@ -21,15 +21,11 @@ def main(args=None):
 
 
 @main.command()
-<<<<<<< HEAD
-def launch():
-=======
-# @click.option(
-#     "-s", "--scenario", default="", help="Scenario file under analysis."
-# )
-# @click.option("-l", "--library", default="", help="Full path towards library.")
+
+#def launch():
+
+
 def launch():  # scenario, library_path):
->>>>>>> 73290e5903c97f1d0698f7ec4f307cb025a9e77d
     """ Launch a given scenario in a specific platform 
     """
 	#launch_simulation()

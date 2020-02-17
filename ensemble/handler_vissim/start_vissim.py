@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 def start_vissim():
     import win32com.client as com
     import os
@@ -157,7 +157,7 @@ def start_vissim():
 X=start_vissim()
 #print (X)
 	# Vissim 10 - 64 bit version
-=======
+
 # import win32com.client as com
 import os
 
@@ -165,4 +165,4 @@ import os
 def another_function():
     Vissim = "my thing"
     return Vissim
->>>>>>> 73290e5903c97f1d0698f7ec4f307cb025a9e77d
+
