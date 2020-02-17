@@ -1,3 +1,7 @@
+def my_func():
+    "Hello"
+    print("Hello world")
+
 # Input: simulator path (Relative/Absolute)
 simulator_path = "libSymuVia.dylib"
 
