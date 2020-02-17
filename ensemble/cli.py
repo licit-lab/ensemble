@@ -7,7 +7,7 @@
 import sys
 import click
 
-# from .ensemble import launch_simulation():
+from .ensemble import launch_simulation
 
 
 @click.group()
@@ -21,13 +21,10 @@ def main(args=None):
 
 
 @main.command()
-@click.option(
-    "-s", "--scenario", default="", help="Scenario file under analysis."
-)
-@click.option("-l", "--library", default="", help="Full path towards library.")
-def launch(scenario, library_path):
+def launch():
     """ Launch a given scenario in a specific platform 
     """
+	#launch_simulation()
     click.echo("Launching Scenario")
 
 
