@@ -5,8 +5,8 @@
 """
 import click
 
-from .handler_symuvia.new_file import my_func
-from .handler_vissim.start_vissim import another_function
+from ensemble.handler_symuvia.new_file import my_func
+from ensemble.handler_vissim.start_vissim import another_function
 
 # Config files
 
