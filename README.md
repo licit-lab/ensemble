@@ -1,4 +1,4 @@
-**| [Overview](#overview) | [Download](#download) | [License](#license) | [Contact](#contact) |**
+**| [Overview](#overview) | [Download](#download) | [Install](#install) | [Use](#use) | [License](#license) | [Contact](#contact) |**
 
 # ENSEMBLE Launch 
 
@@ -40,12 +40,44 @@ pip install --editable .
 ```
 **Note:** Be sure to be in the folder before launching the `pip` instruction
 
-## Usage 
+## Use 
 
-In order to use this tool 
+In order to use this tool, first check the help options via:
 
 ```
-ensemble launch scenario -f path/to/simulation_scenario.[inpx/layx/xml] -p path/to_platform/
+ensemble --help
+```
+
+Which should print the available options 
+
+```
+❯ ensemble --help
+Usage: ensemble [OPTIONS] COMMAND [ARGS]...
+
+  Scenario launcher for ENSEMBLE simulations
+
+Options:
+  --verbose
+  --platform TEXT  'symuvia' or 'vissim'
+  --help           Show this message and exit.
+
+Commands:
+  check   Diagnoses files consistancy and simulator availability
+  launch  Launches an escenario for a specific platform
+```
+
+Check possible options by typing `ensemble launch` or `ensemble check`. Execute an scenario via 
+
+```
+ensemble launch -s file_scenario.inpx -s file_layout.layx -l C:\my\path\to\vissim
+```
+
+## Documentation 
+
+Documentation is available in the `docs` folder. In order to construct the documentation 
+
+```
+make docs 
 ```
 
 ## License 
