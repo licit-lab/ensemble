@@ -2,36 +2,29 @@
 
 """Tests for `ensemble` package."""
 
-import pytest
-
+import unittest
 from click.testing import CliRunner
 
 from ensemble import ensemble
 from ensemble import cli
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
+class TestAPI(unittest.TestCase):
+    def setUp(self):
+        self.runner = CliRunner()
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    def test_cli_01_main(self):
+        """ Run basic call ensemble"""
+        result = self.runner.invoke(cli.main)
+        self.assertEqual(result.exit_code, 0)
 
+    def test_cli_02_help(self):
+        """ Run help call ensemble """
+        result = self.runner.invoke(cli.main, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("--help", result.output)
+        self.assertIn("Show this message and exit", result.output)
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
-
-
-def test_command_line_interface():
-    """Test the CLI."""
-    runner = CliRunner()
-    result = runner.invoke(cli.main)
-    assert result.exit_code == 0
-    assert 'ensemble.cli.main' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
-    assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    def test_cli_03_check(self):
+        """ Run check command ensemble """
+        result = self.runner.invoke(cli.main, ["check --help"])

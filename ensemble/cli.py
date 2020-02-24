@@ -11,6 +11,29 @@ import typing
 from .ensemble import launch_simulation, check_scenario_consistancy
 
 # ------------------------------ Configurator ----------------------------------
+
+# Constant values
+
+# Default simulator per platform
+
+DCT_SIMULATORS = {
+    "Darwin": "symuvia",
+    "Linux": "symuvia",
+    "Windows": "vissim",
+}
+
+# Default path simulators
+
+DCT_DEFAULT_PATHS = {
+    (
+        "symuvia",
+        "Darwin",
+    ): "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib",
+    ("symuvia", "Linux"): "/home/build-symuvia/build/symuvia/libSymuVia.dylib",
+    ("visim", "Windows"): "Vissim.Vissim-64.10",
+}
+
+
 class Configurator(object):
     """ 
         This class stores some simulation configurations. 
@@ -34,13 +57,56 @@ class Configurator(object):
         if simulation_platform:
             self.simulation_platform = simulation_platform
             return
-        dct_simp = {
-            "Darwin": "symuvia",
-            "Linux": "symuvia",
-            "Windows": "vissim",
-        }
-        self.simulation_platform = dct_simp.get(self.platform, "")
+
+        click.echo(click.style("Solving platform ", fg="blue", bold=True))
+
+        self.simulation_platform = DCT_SIMULATORS.get(self.platform, "")
+
+        click.echo(
+            click.style(
+                f"Setting default simulation platform platform {(self.simulation_platform, self.platform)}",
+                fg="yellow",
+            )
+        )
+
+        self.library_path = DCT_DEFAULT_PATHS.get(
+            (self.simulation_platform, self.platform)
+        )
+
+        click.echo(
+            click.style(
+                f"Simulator path set to default value:\n \t {self.library_path}",
+                fg="green",
+            )
+        )
         return
+
+    def update_values(self, **kwargs) -> None:
+        """ Configurator updater, pass a with keyword arguments to update
+        """
+
+        if kwargs.get("library_path"):
+
+            self.library_path = kwargs.get("library_path", self.library_path)
+
+            click.echo(
+                click.style(
+                    f"Setting new library path to user input:\n \t{self.library_path}",
+                    fg="yellow",
+                )
+            )
+
+        if kwargs.get("scenario_files"):
+            self.scenario_files = kwargs.get(
+                "scenario_files", self.scenario_files
+            )
+
+            click.echo(
+                click.style(
+                    f"Setting new scenario file(s) path to user input:  {self.library_path}",
+                    fg="yellow",
+                )
+            )
 
 
 pass_config = click.make_pass_decorator(Configurator)
@@ -80,17 +146,28 @@ def main(ctx, verbose: bool, platform: str) -> int:
     multiple=True,
     help="Scenario file(s) under analysis.",
 )
-@click.option("-l", "--library", default="", help="Full path towards library.")
+@click.option(
+    "-l", "--library", default="", type=str, help="Full path towards library."
+)
+@click.option("--check", default=False, help="Enable check flag")
 @pass_config
-def launch(config: Configurator, scenario: str, library: str) -> None:
+def launch(
+    config: Configurator, scenario: str, library: str, check: bool
+) -> None:
     """ Launches an escenario for a specific platform 
     """
     click.echo(
         "Launching Scenario on platform: "
         + click.style((f"{config.platform}"), fg="green")
     )
-    config.library_path = library
-    config.scenario_files = scenario
+
+    # Update configurator
+    config.update_values(library_path=library, scenario_files=scenario)
+
+    # Run optional check
+    if check:
+        check_scenario_consistancy(config)
+
     launch_simulation(config)
 
 
@@ -103,14 +180,19 @@ def launch(config: Configurator, scenario: str, library: str) -> None:
     multiple=True,
     help="Scenario file under analysis.",
 )
-@click.option("-l", "--library", default="", help="Full path towards library.")
+@click.option(
+    "-l", "--library", default="", type=str, help="Full path towards library."
+)
 @pass_config
 def check(config: Configurator, scenario: str, library: str) -> None:
     """ Diagnoses files consistancy and simulator availability
     """
-    config.library_path = library
-    config.scenario_files = scenario
-    check_scenario_consistancy(config)
+
+    # Update configurator
+    click.echo(scenario)
+    click.echo(library)
+    config.update_values(library_path=library, scenario_files=scenario)
+    return not check_scenario_consistancy(config)
 
 
 if __name__ == "__main__":
