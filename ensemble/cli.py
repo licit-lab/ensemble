@@ -80,17 +80,28 @@ def main(ctx, verbose: bool, platform: str) -> int:
     multiple=True,
     help="Scenario file(s) under analysis.",
 )
-@click.option("-l", "--library", default="", help="Full path towards library.")
+@click.option(
+    "-l", "--library", default="", type=str, help="Full path towards library."
+)
+@click.option("--check", default=False, help="Enable check flag")
 @pass_config
-def launch(config: Configurator, scenario: str, library: str) -> None:
+def launch(
+    config: Configurator, scenario: str, library: str, check: bool
+) -> None:
     """ Launches an escenario for a specific platform 
     """
     click.echo(
         "Launching Scenario on platform: "
         + click.style((f"{config.platform}"), fg="green")
     )
-    config.library_path = library
-    config.scenario_files = scenario
+
+    # Update configurator
+    config.update_values(library_path=library, scenario_files=scenario)
+
+    # Run optional check
+    if check:
+        check_scenario_consistancy(config)
+
     launch_simulation(config)
 
 
@@ -103,14 +114,17 @@ def launch(config: Configurator, scenario: str, library: str) -> None:
     multiple=True,
     help="Scenario file under analysis.",
 )
-@click.option("-l", "--library", default="", help="Full path towards library.")
+@click.option(
+    "-l", "--library", default="", type=str, help="Full path towards library."
+)
 @pass_config
 def check(config: Configurator, scenario: str, library: str) -> None:
     """ Diagnoses files consistancy and simulator availability
     """
-    config.library_path = library
-    config.scenario_files = scenario
-    check_scenario_consistancy(config)
+
+    # Update configurator
+    config.update_values(library_path=library, scenario_files=scenario)
+    return not check_scenario_consistancy(config)
 
 
 if __name__ == "__main__":
