@@ -11,6 +11,29 @@ import typing
 from .ensemble import launch_simulation, check_scenario_consistancy
 
 # ------------------------------ Configurator ----------------------------------
+
+# Constant values
+
+# Default simulator per platform
+
+DCT_SIMULATORS = {
+    "Darwin": "symuvia",
+    "Linux": "symuvia",
+    "Windows": "vissim",
+}
+
+# Default path simulators
+
+DCT_DEFAULT_PATHS = {
+    (
+        "symuvia",
+        "Darwin",
+    ): "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib",
+    ("symuvia", "Linux"): "/home/build-symuvia/build/symuvia/libSymuVia.dylib",
+    ("visim", "Windows"): "Vissim.Vissim-64.10",
+}
+
+
 class Configurator(object):
     """ 
         This class stores some simulation configurations. 
@@ -34,13 +57,56 @@ class Configurator(object):
         if simulation_platform:
             self.simulation_platform = simulation_platform
             return
-        dct_simp = {
-            "Darwin": "symuvia",
-            "Linux": "symuvia",
-            "Windows": "vissim",
-        }
-        self.simulation_platform = dct_simp.get(self.platform, "")
+
+        click.echo(click.style("Solving platform ", fg="blue", bold=True))
+
+        self.simulation_platform = DCT_SIMULATORS.get(self.platform, "")
+
+        click.echo(
+            click.style(
+                f"Setting default simulation platform platform {(self.simulation_platform, self.platform)}",
+                fg="yellow",
+            )
+        )
+
+        self.library_path = DCT_DEFAULT_PATHS.get(
+            (self.simulation_platform, self.platform)
+        )
+
+        click.echo(
+            click.style(
+                f"Simulator path set to default value:\n \t {self.library_path}",
+                fg="green",
+            )
+        )
         return
+
+    def update_values(self, **kwargs) -> None:
+        """ Configurator updater, pass a with keyword arguments to update
+        """
+
+        if kwargs.get("library_path"):
+
+            self.library_path = kwargs.get("library_path", self.library_path)
+
+            click.echo(
+                click.style(
+                    f"Setting new library path to user input:\n \t{self.library_path}",
+                    fg="yellow",
+                )
+            )
+
+        if kwargs.get("scenario_files"):
+            self.scenario_files = kwargs.get(
+                "scenario_files", self.scenario_files
+            )
+
+            click.echo(
+                click.style(
+                    f"Setting new scenario file(s) path to user input:  {self.library_path}",
+                    fg="yellow",
+                )
+            )
 
 
 pass_config = click.make_pass_decorator(Configurator)
