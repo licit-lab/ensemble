@@ -69,7 +69,7 @@ Commands:
 Check possible options by typing `ensemble launch` or `ensemble check`. Execute an scenario via 
 
 ```
-ensemble launch -s file_scenario.inpx -s file_layout.layx -l C:\my\path\to\vissim
+ensemble launch -s 'file_scenario.inpx' -s 'file_layout.layx' -l 'C:\my\path\to\vissim'
 ```
 
 ## Documentation 
