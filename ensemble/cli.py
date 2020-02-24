@@ -189,6 +189,8 @@ def check(config: Configurator, scenario: str, library: str) -> None:
     """
 
     # Update configurator
+    click.echo(scenario)
+    click.echo(library)
     config.update_values(library_path=library, scenario_files=scenario)
     return not check_scenario_consistancy(config)
 
