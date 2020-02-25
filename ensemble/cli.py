@@ -8,30 +8,10 @@ import sys
 import click
 import typing
 
+import ensemble.tools.constants as ct
 from .ensemble import launch_simulation, check_scenario_consistancy
 
 # ------------------------------ Configurator ----------------------------------
-
-# Constant values
-
-# Default simulator per platform
-
-DCT_SIMULATORS = {
-    "Darwin": "symuvia",
-    "Linux": "symuvia",
-    "Windows": "vissim",
-}
-
-# Default path simulators
-
-DCT_DEFAULT_PATHS = {
-    (
-        "symuvia",
-        "Darwin",
-    ): "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib",
-    ("symuvia", "Linux"): "/home/build-symuvia/build/symuvia/libSymuVia.dylib",
-    ("visim", "Windows"): "Vissim.Vissim-64.10",
-}
 
 
 class Configurator(object):
@@ -60,7 +40,7 @@ class Configurator(object):
 
         click.echo(click.style("Solving platform ", fg="blue", bold=True))
 
-        self.simulation_platform = DCT_SIMULATORS.get(self.platform, "")
+        self.simulation_platform = ct.DCT_SIMULATORS.get(self.platform, "")
 
         click.echo(
             click.style(
@@ -69,7 +49,7 @@ class Configurator(object):
             )
         )
 
-        self.library_path = DCT_DEFAULT_PATHS.get(
+        self.library_path = ct.DCT_DEFAULT_PATHS.get(
             (self.simulation_platform, self.platform)
         )
 
