@@ -153,7 +153,7 @@ def check(config: Configurator, scenario: str, library: str) -> None:
     click.echo(scenario)
     click.echo(library)
     config.update_values(library_path=library, scenario_files=scenario)
-    return check_scenario_consistancy(config)
+    return check_scenario_consistency(config)
 
 
 # ------------------------------------------------- Main command--------------------------------------------------------
