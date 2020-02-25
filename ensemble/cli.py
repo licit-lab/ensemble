@@ -89,14 +89,27 @@ def main(ctx, verbose: bool, platform: str) -> int:
     ctx.obj.set_simulation_platform(platform)
     if ctx.obj.verbose:
         click.echo(
-            """ENSEMBLE Platooning
+            click.style(
+                """
+                ENSEMBLE Platooning
 
-               Platform for Simulation of Multibrand Truck Platooning
-            """
+                Platform for Simulation of Multibrand Truck Platooning
+
+                This is a Command Line Interface to simulate multibrand truck platooning 
+                in a traffic live environment, with the aim to examine impact on traffic 
+                flow.
+
+                Please visit: https://platooningensemble.eu for more information.
+
+                """,
+                fg="green",
+            )
         )
         click.echo(
-            """See click documentation at:
+            """
+                See click documentation at:
 
+                file://ensemble/docs/_build/html/index.html
             """
         )
     return 0
