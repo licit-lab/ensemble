@@ -63,12 +63,12 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/ensemble.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ ensemble
+	rm -f docs/source/ensemble.rst
+	rm -f docs/source/modules.rst
+	sphinx-apidoc -o docs/source ensemble
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+	$(BROWSER) docs/build/html/index.html
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
@@ -80,6 +80,9 @@ dist: clean ## builds source and wheel package
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
+
+develop: clean ## install developer mode
+	pip install --editable .
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
