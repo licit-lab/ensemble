@@ -117,7 +117,9 @@ def main(ctx, verbose: bool, platform: str) -> int:
     return 0
 
 
-# Launch command
+# ------------------------------ Launch command---------------------------------
+
+
 @main.command()
 @click.option(
     "-s",
@@ -151,7 +153,9 @@ def launch(
     launch_simulation(config)
 
 
-# Check command
+# ------------------------------ Check command----------------------------------
+
+
 @main.command()
 @click.option(
     "-s",
@@ -172,7 +176,10 @@ def check(config: Configurator, scenario: str, library: str) -> None:
     click.echo(scenario)
     click.echo(library)
     config.update_values(library_path=library, scenario_files=scenario)
-    return not check_scenario_consistancy(config)
+    return check_scenario_consistancy(config)
+
+
+# ------------------------------ Check command----------------------------------
 
 
 if __name__ == "__main__":
