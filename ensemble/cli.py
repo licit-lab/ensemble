@@ -9,7 +9,8 @@ import click
 import typing
 
 import ensemble.tools.constants as ct
-from .ensemble import launch_simulation, check_scenario_consistancy
+from .ensemble import launch_simulation
+from ensemble.tools.checkers import check_scenario_consistency
 
 # ------------------------------ Configurator ------------------------------------------------------
 
@@ -119,7 +120,7 @@ def launch(config: Configurator, scenario: str, library: str, check: bool) -> No
 
     # Run optional check
     if check:
-        check_scenario_consistancy(config)
+        check_scenario_consistency(config)
 
     launch_simulation(config)
 
