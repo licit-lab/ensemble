@@ -101,16 +101,13 @@ def main(ctx, verbose: bool, platform: str) -> int:
 
                 Please visit: https://platooningensemble.eu for more information.
 
-                """,
-                fg="green",
-            )
-        )
-        click.echo(
-            """
                 See click documentation at:
 
                 file://ensemble/docs/_build/html/index.html
-            """
+
+                """,
+                fg="green",
+            )
         )
     return 0
 
