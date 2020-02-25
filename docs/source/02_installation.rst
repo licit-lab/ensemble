@@ -12,7 +12,7 @@ To install Ensemble Truck Platooning, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install ensemble
+    $ pip install -e .
 
 This is the preferred method to install Ensemble Truck Platooning, as it will always install the most recent stable release.
 
@@ -32,19 +32,19 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/andres.ladino-ifsttar/ensemble
+    $ git clone git@ci.tno.nl:paco.hamers-tno/ensemble_drivermodel.git
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/andres.ladino-ifsttar/ensemble/tarball/master
+    $ curl -OJL https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel/-/archive/master/ensemble_drivermodel-master.tar.gz
 
 Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ pip install -e .   
 
 
 .. _Github repo: https://github.com/andres.ladino-ifsttar/ensemble
