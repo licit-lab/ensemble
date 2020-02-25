@@ -29,3 +29,34 @@ DCT_PARAMETERS = {
     "sampling_time_operational": 1 / 10,
     "sampling_time_tactical": 5,
 }
+
+# Paremeters Vehicles
+
+DCT_VEH_PARAM = {
+    "mass": 1,  # Mass [Kg]
+    "lenght": 1,  # Vehicle length [m]
+    "max_speed": 25,  # Maximum Vehicle speed [m/s]
+    "cong_speed": -6.25,  # Vehicle speed [m/s]
+}
+
+# Dynamic Vehicle Data
+
+DCT_VEH_DATA = {
+    "abscisa": 0.0,  #  x coordinate [m]
+    "acceleration": 0.0,  #  acceleration [m/s2]
+    "distance": 0.0,  #  distance [m]
+    "vehid": 0,  #  unique identifier [int]
+    "ordinate": 0,  # y coorindate [m]
+    "link": "",  # link [string]
+    "veh_type": "",  # vehicle type [string1]
+    "speed": 0.0,  # speed [m/s]
+}
+
+# Dynamic Platoon Data
+
+DCT_PLT_DATA = {
+    "plt_id": 0,  # Platoon id
+    "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
+    "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
+    "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
+}
