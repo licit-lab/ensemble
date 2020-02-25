@@ -11,7 +11,7 @@ import typing
 import ensemble.tools.constants as ct
 from .ensemble import launch_simulation, check_scenario_consistancy
 
-# ------------------------------ Configurator ----------------------------------
+# ------------------------------ Configurator ------------------------------------------------------
 
 
 class Configurator(object):
@@ -42,23 +42,17 @@ class Configurator(object):
 
         self.simulation_platform = ct.DCT_SIMULATORS.get(self.platform, "")
 
-        click.echo(
-            click.style(
-                f"Setting default simulation platform platform {(self.simulation_platform, self.platform)}",
-                fg="yellow",
+        if self.verbose:
+            click.echo(
+                click.style(
+                    f"Setting default simulation platform platform {(self.  simulation_platform, self.platform)}",
+                    fg="yellow",
+                )
             )
-        )
 
-        self.library_path = ct.DCT_DEFAULT_PATHS.get(
-            (self.simulation_platform, self.platform)
-        )
+        self.library_path = ct.DCT_DEFAULT_PATHS.get((self.simulation_platform, self.platform))
 
-        click.echo(
-            click.style(
-                f"Simulator path set to default value:\n \t {self.library_path}",
-                fg="green",
-            )
-        )
+        click.echo(click.style(f"Simulator path set to default value:\n \t {self.library_path}", fg="green",))
         return
 
     def update_values(self, **kwargs) -> None:
@@ -69,29 +63,19 @@ class Configurator(object):
 
             self.library_path = kwargs.get("library_path", self.library_path)
 
-            click.echo(
-                click.style(
-                    f"Setting new library path to user input:\n \t{self.library_path}",
-                    fg="yellow",
-                )
-            )
+            click.echo(click.style(f"Setting new library path to user input:\n \t{self.library_path}", fg="yellow",))
 
         if kwargs.get("scenario_files"):
-            self.scenario_files = kwargs.get(
-                "scenario_files", self.scenario_files
-            )
+            self.scenario_files = kwargs.get("scenario_files", self.scenario_files)
 
             click.echo(
-                click.style(
-                    f"Setting new scenario file(s) path to user input:  {self.library_path}",
-                    fg="yellow",
-                )
+                click.style(f"Setting new scenario file(s) path to user input:  {self.library_path}", fg="yellow",)
             )
 
 
 pass_config = click.make_pass_decorator(Configurator)
 
-# ------------------------------ CLI interface ---------------------------------
+# ------------------------------ CLI interface -----------------------------------------------------
 
 
 @click.group()
@@ -117,31 +101,18 @@ def main(ctx, verbose: bool, platform: str) -> int:
     return 0
 
 
-# ------------------------------ Launch command---------------------------------
+# ------------------------------ Launch command-----------------------------------------------------
 
 
 @main.command()
-@click.option(
-    "-s",
-    "--scenario",
-    default="",
-    multiple=True,
-    help="Scenario file(s) under analysis.",
-)
-@click.option(
-    "-l", "--library", default="", type=str, help="Full path towards library."
-)
+@click.option("-s", "--scenario", default="", multiple=True, help="Scenario file(s) under analysis.")
+@click.option("-l", "--library", default="", type=str, help="Full path towards library.")
 @click.option("--check", default=False, help="Enable check flag")
 @pass_config
-def launch(
-    config: Configurator, scenario: str, library: str, check: bool
-) -> None:
+def launch(config: Configurator, scenario: str, library: str, check: bool) -> None:
     """ Launches an escenario for a specific platform 
     """
-    click.echo(
-        "Launching Scenario on platform: "
-        + click.style((f"{config.platform}"), fg="green")
-    )
+    click.echo("Launching Scenario on platform: " + click.style((f"{config.platform}"), fg="green"))
 
     # Update configurator
     config.update_values(library_path=library, scenario_files=scenario)
@@ -153,20 +124,12 @@ def launch(
     launch_simulation(config)
 
 
-# ------------------------------ Check command----------------------------------
+# ------------------------------------------------- Check command-------------------------------------------------------
 
 
 @main.command()
-@click.option(
-    "-s",
-    "--scenario",
-    default="",
-    multiple=True,
-    help="Scenario file under analysis.",
-)
-@click.option(
-    "-l", "--library", default="", type=str, help="Full path towards library."
-)
+@click.option("-s", "--scenario", default="", multiple=True, help="Scenario file under analysis.")
+@click.option("-l", "--library", default="", type=str, help="Full path towards library.")
 @pass_config
 def check(config: Configurator, scenario: str, library: str) -> None:
     """ Diagnoses files consistancy and simulator availability
@@ -179,7 +142,7 @@ def check(config: Configurator, scenario: str, library: str) -> None:
     return check_scenario_consistancy(config)
 
 
-# ------------------------------ Check command----------------------------------
+# ------------------------------------------------- Main command--------------------------------------------------------
 
 
 if __name__ == "__main__":
