@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for Ensemble Truck Platooning can be downloaded from the `Github repo`_.
+The sources for Ensemble Truck Platooning can be downloaded from the `Gitlab repo`_.
 
 You can either clone the public repository:
 
@@ -46,6 +46,12 @@ Once you have a copy of the source, you can install it with:
 
     $ pip install -e .   
 
+You can run as well 
 
-.. _Github repo: https://github.com/andres.ladino-ifsttar/ensemble
-.. _tarball: https://github.com/andres.ladino-ifsttar/ensemble/tarball/master
+.. code-block:: console
+
+    $ make develop       
+
+
+.. _Gitlab repo: https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel
+.. _tarball: https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel/-/archive/master/ensemble_drivermodel-master.tar.gz

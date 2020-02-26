@@ -2,12 +2,15 @@
 
 # Default simulator per platform
 
+# -------------------------------------- DEFAULT PATHS TO FIND SIMULATOR PLATFORMS--------------------------------------
+
 DEFAULT_LIB_OSX = "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib"
 
 DEFAULT_LIB_LINUX = "/home/build-symuvia/build/symuvia/libSymuVia.so"
 
 DEFAULT_LIB_WINDOWS = "Vissim.Vissim-64.10"
 
+# ------------------------------------- DEFAULT SIMULATOR/ OS ASSOCIATION ----------------------------------------------
 
 DCT_SIMULATORS = {
     "Darwin": "symuvia",
@@ -23,14 +26,18 @@ DCT_DEFAULT_PATHS = {
     ("visim", "Windows"): DEFAULT_LIB_WINDOWS,
 }
 
-DCT_PARAMETERS = {
+# -------------------------------------- DEFAULT SCENARIO PARAMETERS ---------------------------------------------------
+
+# Runtime Parameters
+
+DCT_RUNTIME_PARAM = {
     "sampling_time": 1,
     "total_steps": 60,
     "sampling_time_operational": 1 / 10,
     "sampling_time_tactical": 5,
 }
 
-# Paremeters Vehicles
+# Vehicles Parameters
 
 DCT_VEH_PARAM = {
     "mass": 1,  # Mass [Kg]

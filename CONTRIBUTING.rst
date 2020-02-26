@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/andres.ladino-ifsttar/ensemble/issues.
+The best way to send feedback is to file an issue at https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel/issues.
 
 If you are proposing a feature:
 

@@ -1,5 +1,5 @@
-ensemble
-========
+Ensemble API
+============
 
 .. toctree::
    :maxdepth: 4

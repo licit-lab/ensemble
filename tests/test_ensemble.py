@@ -34,3 +34,12 @@ class TestAPI(unittest.TestCase):
         """Run: ensemble check --help"""
         result = self.runner.invoke(cli.main, ["check", "--help"])
         self.assertIn("Show this message and exit", result.output)
+
+    def test_cli_05_launch(self):
+        """Run: ensemble launch"""
+        result = self.runner.invoke(cli.main, ["launch"])
+
+    def test_cli_06_launch_help(self):
+        """Run: ensemble check --help"""
+        result = self.runner.invoke(cli.main, ["launch", "--help"])
+        self.assertIn("Show this message and exit", result.output)
