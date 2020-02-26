@@ -18,8 +18,8 @@ end_seq = [
 class RuntimeDevice(object):
     """ This class defines the runtime device describing a series of cyclic states required to be run 
 
-    :param object: [description]
-    :type object: [type]
+    :param object: Runtime Device for controlling states of the simulation runtime
+    :type object: Class with internal logic
     """
 
     def __init__(self, configurator):
