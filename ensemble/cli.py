@@ -28,6 +28,7 @@ class Configurator(object):
         self.simulation_platform = ""
         self.scenario_files = []
         self.library_path = []
+        self.simulation_parameters = ct.DCT_RUNTIME_PARAM
 
     def set_simulation_platform(self, simulation_platform: str = "") -> None:
         """ A simpler setter for the simulation platform based on OS
@@ -72,6 +73,10 @@ class Configurator(object):
             click.echo(
                 click.style(f"Setting new scenario file(s) path to user input:  {self.library_path}", fg="yellow",)
             )
+
+    @property
+    def total_steps(self):
+        return self.simulation_parameters.get("total_steps")
 
 
 pass_config = click.make_pass_decorator(Configurator)
