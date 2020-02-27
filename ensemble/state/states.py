@@ -33,10 +33,10 @@ class Compliance(State):
         :rtype: Connect
         """
         # try:
-        self.perform_check()
+        # self.perform_check()
         if event == "connect":
             return Connect()
-        #     return self
+        return self
         # except :
         #     s
 
