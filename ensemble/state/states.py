@@ -14,6 +14,9 @@
 """
 
 from .base import State
+import click
+
+from ensemble.tools.checkers import check_scenario_consistency
 
 # Start of our states
 class Compliance(State):
@@ -21,11 +24,29 @@ class Compliance(State):
     The state which declares an status to check file compliance .
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str) -> None:
+        """ Returns next state 
+        
+        :param event: Event keyword for next state "connect"
+        :type event: str
+        :return: Connect object in case of switch
+        :rtype: Connect
+        """
+        # try:
+        self.perform_check()
         if event == "connect":
             return Connect()
+        #     return self
+        # except :
+        #     s
 
-        return self
+    def perform_check(self, configurator):
+        """ This function triggers the check validation for the files raises errors in case files are not found 
+        
+        :param configurator: Configuration descriptor 
+        :type configurator: Configurator
+        """
+        return check_scenario_consistency(configurator)
 
 
 class Connect(State):
