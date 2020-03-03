@@ -123,7 +123,7 @@ def main(ctx, verbose: bool, platform: str) -> int:
 @main.command()
 @click.option("-s", "--scenario", default="", multiple=True, help="Scenario file(s) under analysis.")
 @click.option("-l", "--library", default="", type=str, help="Full path towards library.")
-@click.option("--check", default=False, help="Enable check flag")
+@click.option("--check", is_flag=True, help="Enable check flag")
 @pass_config
 def launch(config: Configurator, scenario: str, library: str, check: bool) -> None:
     """ Launches an escenario for a specific platform 
