@@ -33,10 +33,11 @@ def check_scenario_path(configurator) -> bool:
     if configurator.scenario_files:
         for file in configurator.scenario_files:
             if Path(file).exists():
+                click.echo("Input File: " + click.style(f"{file} Found", fg="green", bold=True))
                 temp = True
             else:
                 temp = False
-                EnsembleAPIWarning(f"Input File : {file}. Not Found ")
+                EnsembleAPIWarning(f"Input File: {file}. Not Found ")
         return scenario and temp
     raise click.UsageError("Scenario file(s) is an empty list")
 

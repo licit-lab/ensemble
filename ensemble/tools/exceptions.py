@@ -10,5 +10,5 @@ class EnsembleAPIWarning(Exception):
     """
 
     def __init__(self, warning_message: str) -> None:
-        click.echo(click.style(warning_message, fg="red"))
+        click.echo(click.style(warning_message, fg="red", bold=True))
         warnings.warn(warning_message)
