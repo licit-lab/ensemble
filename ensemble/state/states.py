@@ -24,7 +24,7 @@ class Compliance(State):
     The state which declares an status to check file compliance .
     """
 
-    def on_event(self, event: str) -> None:
+    def on_event(self, event: str, configurator) -> None:
         """ Returns next state 
         
         :param event: Event keyword for next state "connect"
@@ -32,13 +32,13 @@ class Compliance(State):
         :return: Connect object in case of switch
         :rtype: Connect
         """
-        # try:
-        # self.perform_check()
-        if event == "connect":
-            return Connect()
-        return self
-        # except :
-        #     s
+        try:
+            self.perform_check(configurator)
+            if event == "connect":
+                return Connect()
+            return self
+        except:
+            click.echo("Something happened with the files")
 
     def perform_check(self, configurator):
         """ This function triggers the check validation for the files raises errors in case files are not found 
