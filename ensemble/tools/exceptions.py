@@ -1,3 +1,7 @@
+"""
+    A module containing basic exception handlers for better error detection
+"""
+
 import warnings, click
 
 
