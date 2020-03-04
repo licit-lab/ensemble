@@ -3,13 +3,19 @@
 """
 
 
-from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
 import click
+import win32com.client as com
 
 from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 
 class VissimConnector(object):
+    """ 
+        This models a connector and interactions from the API with the Vissim library. 
+
+        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    """
+
     def __init__(self, path: str) -> None:
         self._path = path
         self.load_vissim()
