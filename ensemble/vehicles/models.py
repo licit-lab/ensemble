@@ -43,9 +43,9 @@ class Vehicle(object):
         elevation=0.0,
         dynamic=None,
         itinerary=None,
-        max_speed=None,
+        ff_speed=None,
         swh_speed=None,
-        max_density=None,
+        jam_density=None,
     ):
         """  Vehicle data container 
 
