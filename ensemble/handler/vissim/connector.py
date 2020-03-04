@@ -4,7 +4,11 @@
 
 
 import click
-import win32com.client as com
+
+try:
+    import win32com.client as com
+except ModuleNotFoundError:
+    click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
 from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
