@@ -4,13 +4,15 @@
 
 
 from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
+import click
 
 from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 
 class SymuviaConnector(object):
     def __init__(self, path: str) -> None:
-        self.load_symuvia(path)
+        self._path = path
+        self.load_symuvia()
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.libraryname})"
@@ -19,6 +21,7 @@ class SymuviaConnector(object):
         """ load SymuVia shared library """
         try:
             lib_symuvia = cdll.LoadLibrary(self._path)
+            click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
         except OSError:
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_symuvia
