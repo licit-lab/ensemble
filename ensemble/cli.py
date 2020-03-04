@@ -12,6 +12,9 @@ import ensemble.tools.constants as ct
 from .ensemble import launch_simulation
 from ensemble.tools.checkers import check_scenario_consistency
 
+# Connectors
+from ensemble.handler.symuvia.connector import SymuviaConnector
+
 # ------------------------------ Configurator ------------------------------------------------------
 
 
@@ -73,6 +76,14 @@ class Configurator(object):
             click.echo(
                 click.style(f"Setting new scenario file(s) path to user input:  {self.library_path}", fg="yellow",)
             )
+
+    def find_socket(self):
+        """ Determines simulation platform to connect """
+        if self.simulation_platform == "symuvia":
+            self.connector = SymuviaConnector(self.library_path)
+        else:
+            # TODO: Add Connector for Vissim.
+            self.connector = None
 
     @property
     def total_steps(self):
