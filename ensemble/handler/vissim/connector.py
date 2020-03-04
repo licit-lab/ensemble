@@ -3,8 +3,8 @@
 """
 
 
-from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
 import click
+import win32com.client as com
 
 from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
