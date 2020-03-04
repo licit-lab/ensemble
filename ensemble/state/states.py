@@ -24,7 +24,7 @@ class Compliance(State):
     The state which declares an status to check file compliance .
     """
 
-    def on_event(self, event: str) -> None:
+    def on_event(self, event: str, configurator) -> None:
         """ Returns next state 
         
         :param event: Event keyword for next state "connect"
@@ -32,13 +32,13 @@ class Compliance(State):
         :return: Connect object in case of switch
         :rtype: Connect
         """
-        # try:
-        # self.perform_check()
-        if event == "connect":
-            return Connect()
-        return self
-        # except :
-        #     s
+        try:
+            # REVIEW: This logic is too simplistic. Double check conditions for continuing
+            if event == "connect" and self.perform_check(configurator):
+                return Connect()
+            return self
+        except:
+            click.echo("Something happened with the files")
 
     def perform_check(self, configurator):
         """ This function triggers the check validation for the files raises errors in case files are not found 
@@ -54,7 +54,7 @@ class Connect(State):
     The state which declares the creation of a connection with the simulator
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "initialize":
             return Initialize()
 
@@ -66,7 +66,7 @@ class Initialize(State):
     The state which initializes values for the scenario simulation
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "preroutine":
             return PreRoutine()
 
@@ -78,7 +78,7 @@ class PreRoutine(State):
     The state which performs task previous to the interaction with the simulator
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "query":
             return Query()
 
@@ -90,7 +90,7 @@ class Query(State):
     The state which retrieves information from the simulator
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "control":
             return Control()
 
@@ -102,7 +102,7 @@ class Control(State):
     The state which computes the control decision  
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "push":
             return Push()
 
@@ -114,7 +114,7 @@ class Push(State):
     The state which pushes data back to the simulator
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "postroutine":
             return PostRoutine()
 
@@ -126,10 +126,10 @@ class PostRoutine(State):
     The state which logs information or compute step indicators 
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
         if event == "preroutine":
             return PreRoutine()
-        elif event == "end":
+        elif event == "terminate":
             return Terminate()
 
         return self
@@ -140,7 +140,8 @@ class Terminate(State):
     The state which declares the end of a simulation
     """
 
-    def on_event(self, event):
+    def on_event(self, event: str, configurator):
+        click.echo(click.style("Succesfully accomplished ⏱", fg="magenta"))
         return self
 
 

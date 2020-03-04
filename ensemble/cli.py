@@ -12,6 +12,9 @@ import ensemble.tools.constants as ct
 from .ensemble import launch_simulation
 from ensemble.tools.checkers import check_scenario_consistency
 
+# Connectors
+from ensemble.handler.symuvia.connector import SymuviaConnector
+
 # ------------------------------ Configurator ------------------------------------------------------
 
 
@@ -74,6 +77,14 @@ class Configurator(object):
                 click.style(f"Setting new scenario file(s) path to user input:  {self.library_path}", fg="yellow",)
             )
 
+    def load_socket(self):
+        """ Determines simulation platform to connect """
+        if self.simulation_platform == "symuvia":
+            self.connector = SymuviaConnector(self.library_path)
+        else:
+            # TODO: Add Connector for Vissim.
+            self.connector = None
+
     @property
     def total_steps(self):
         return self.simulation_parameters.get("total_steps")
@@ -123,7 +134,7 @@ def main(ctx, verbose: bool, platform: str) -> int:
 @main.command()
 @click.option("-s", "--scenario", default="", multiple=True, help="Scenario file(s) under analysis.")
 @click.option("-l", "--library", default="", type=str, help="Full path towards library.")
-@click.option("--check", default=False, help="Enable check flag")
+@click.option("--check", is_flag=True, help="Enable check flag")
 @pass_config
 def launch(config: Configurator, scenario: str, library: str, check: bool) -> None:
     """ Launches an escenario for a specific platform 
@@ -152,8 +163,6 @@ def check(config: Configurator, scenario: str, library: str) -> None:
     """
 
     # Update configurator
-    click.echo(scenario)
-    click.echo(library)
     config.update_values(library_path=library, scenario_files=scenario)
     return check_scenario_consistency(config)
 

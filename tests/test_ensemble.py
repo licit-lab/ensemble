@@ -43,3 +43,15 @@ class TestAPI(unittest.TestCase):
         """Run: ensemble check --help"""
         result = self.runner.invoke(cli.main, ["launch", "--help"])
         self.assertIn("Show this message and exit", result.output)
+
+    def test_cli_07_check_files_not_found(self):
+        """Run: ensemble check -s fileA.csv -s fileB.xml"""
+        result = self.runner.invoke(cli.main, ["check", "-s", "fileA.csv", "-s", "fileB.xml"])
+        self.assertIn("Input File: fileA.csv. Not Found ", result.output)
+        self.assertIn("Input File: fileB.xml. Not Found ", result.output)
+
+    def test_cli_08_launch_files_check_files_not_found(self):
+        """Run: ensemble lauch -s fileA.csv -s fileB.xml --check"""
+        result = self.runner.invoke(cli.main, ["launch", "-s", "fileA.csv", "-s", "fileB.xml", "--check"])
+        self.assertIn("Input File: fileA.csv. Not Found ", result.output)
+        self.assertIn("Input File: fileB.xml. Not Found ", result.output)

@@ -35,16 +35,18 @@ class RuntimeDevice(object):
         ccycle = 0
         for event in full_seq:
             self.on_event(event)
-            if isinstance(self.state, PreRoutine):  # Step counted on PreRoutine
+            if isinstance(self.state, PostRoutine):  # Step counted on PreRoutine
                 ccycle = ccycle + 1
                 click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
+
+        self.on_event(event)  # Run Terminate sequence
 
         return self
 
     def __exit__(self, type, value, traceback) -> bool:
         return False
 
-    def on_event(self, event):
+    def on_event(self, event: str):
         """ Action to consider on event:
 
         * compliance
@@ -58,6 +60,8 @@ class RuntimeDevice(object):
         * terminate
         
         :param event: 
-        :type event: [type]
+        :type event: str 
+        :param configurator:
+        :type configurator: Configurator
         """
-        self.state = self.state.on_event(event)
+        self.state = self.state.on_event(event, self.configurator)

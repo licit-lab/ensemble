@@ -16,7 +16,7 @@ def launch_simulation(configurator) -> None:
     click.echo(click.style("Initializing scenario ⏱", fg="magenta"))
 
     with RuntimeDevice(configurator) as rt:
-        print(click.style("Succesfully accomplished ⏱", fg="magenta"))
+        pass
 
 
 def configure_scenario():
