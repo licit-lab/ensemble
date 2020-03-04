@@ -10,6 +10,12 @@ from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 
 class SymuviaConnector(object):
+    """ 
+        This models a connector and interactions from the API with the Symuvia library. 
+
+        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    """
+
     def __init__(self, path: str) -> None:
         self._path = path
         self.load_symuvia()

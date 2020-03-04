@@ -10,6 +10,12 @@ from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 
 class VissimConnector(object):
+    """ 
+        This models a connector and interactions from the API with the Vissim library. 
+
+        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    """
+
     def __init__(self, path: str) -> None:
         self._path = path
         self.load_vissim()
