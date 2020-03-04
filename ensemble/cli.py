@@ -14,6 +14,7 @@ from ensemble.tools.checkers import check_scenario_consistency
 
 # Connectors
 from ensemble.handler.symuvia.connector import SymuviaConnector
+from ensemble.handler.vissim.connector import VissimConnector
 
 # ------------------------------ Configurator ------------------------------------------------------
 
@@ -83,7 +84,7 @@ class Configurator(object):
             self.connector = SymuviaConnector(self.library_path)
         else:
             # TODO: Add Connector for Vissim.
-            self.connector = None
+            self.connector = VissimConnector(self.library_path)
 
     @property
     def total_steps(self):
