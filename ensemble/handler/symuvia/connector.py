@@ -71,3 +71,15 @@ class SymuviaConnector(object):
         except OSError:
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_symuvia
+    
+    def load_scenario(self, scenario):
+        """ checks existance and load scenario into 
+        """
+        if isinstance(scenario, ScenarioSymuVia):
+            try:
+                self._library.SymLoadNetworkEx(self.filename_encoded)
+                return 
+            except: 
+                raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
+                raise click.Abort()
+        EnsembleAPIWarning(f"\tSimulation could not be loaded.")
