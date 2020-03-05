@@ -31,6 +31,17 @@ class EnsembleAPILoadLibraryError(EnsembleAPIError):
         return f"{self.__class__.__name__}({self.get_messsage},{self._target_dir})"
 
 
+class EnsembleAPILoadFileError(EnsembleAPIError):
+    def __init__(self, error_message: str, target_dir: str = "") -> None:
+        super().__init__(error_message, target_dir)
+
+    def __str__(self) -> str:
+        return f"{self.get_messsage}, at: {self._target_dir}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.get_messsage},{self._target_dir})"
+
+
 class EnsembleAPIWarning(Exception):
     """ General Warnining
     """
