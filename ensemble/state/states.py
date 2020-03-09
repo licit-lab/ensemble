@@ -40,6 +40,7 @@ class Compliance(State):
             return self
         except:
             click.echo("Something happened with the files")
+            return Terminate()
 
     def perform_check(self, configurator):
         """ This function triggers the check validation for the files raises errors in case files are not found 
@@ -60,7 +61,7 @@ class Connect(State):
         try:
             configurator.load_socket()
         except EnsembleAPILoadLibraryError:
-            click.echo(click.style(f"\tLibrary could not be loaded.\n\tEnding simulation", color="yellow",))
+            click.echo(click.style(f"\tLibrary could not be loaded.\n\tEnding simulation", fg="yellow",))
             return Terminate()
 
         if event == "initialize":

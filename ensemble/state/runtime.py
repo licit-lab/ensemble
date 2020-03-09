@@ -38,6 +38,8 @@ class RuntimeDevice(object):
             if isinstance(self.state, PostRoutine):  # Step counted on PreRoutine
                 ccycle = ccycle + 1
                 click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
+            if isinstance(self.state, Terminate):
+                break
 
         self.on_event(event)  # Run Terminate sequence
 

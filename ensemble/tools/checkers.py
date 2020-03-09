@@ -23,7 +23,6 @@ def check_library_path(configurator) -> bool:
         return True
     elif configurator.simulation_platform == "symuvia":
         click.echo("Given Library Path: " + click.style(f"{configurator.library_path}", fg="red") + " does not exist")
-        raise click.Abort()
     else:
         click.echo(
             f"Platform and path: "
@@ -48,8 +47,6 @@ def check_scenario_path(configurator) -> bool:
                 EnsembleAPIWarning(f"Input File: {file}. Not Found ")
         return scenario and temp
     raise click.UsageError("Scenario file(s) is an empty list")
-
-    return False
 
 
 def check_scenario_consistency(configurator) -> bool:
