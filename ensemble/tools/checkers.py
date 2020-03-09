@@ -22,7 +22,7 @@ def check_library_path(configurator) -> bool:
     if configurator.simulation_platform == "symuvia" and Path(configurator.library_path).exists():
         return True
     elif configurator.simulation_platform == "symuvia":
-        click.echo("Given Library Path: " + click.style(f"{configurator.library_path}", fg="red") + "does not exist")
+        click.echo("Given Library Path: " + click.style(f"{configurator.library_path}", fg="red") + " does not exist")
         raise click.Abort()
     else:
         click.echo(
