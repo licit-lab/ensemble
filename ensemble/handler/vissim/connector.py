@@ -10,6 +10,7 @@ from ensemble.tools.exceptions import EnsembleAPIWarning, EnsembleAPILoadFileErr
 
 try:
     import win32com.client as com
+    from pywintypes import com_error
 except ModuleNotFoundError:
     click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
@@ -73,7 +74,7 @@ class VissimConnector(object):
     """
 
     def __init__(self, path: str) -> None:
-        self._path = path
+        self._path = path #"Vissim.Vissim-64.10"# path
         self.load_vissim()
 
     def __repr__(self):
@@ -86,6 +87,10 @@ class VissimConnector(object):
             click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
         except OSError:
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
+        except com_error:
+            #raise EnsembleAPILoadLibraryError("Library not found", self._path)
+            pass
+
         self._library = lib_vissim
 
     def load_scenario(self, scenario):
