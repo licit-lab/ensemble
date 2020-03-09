@@ -12,6 +12,7 @@ from ensemble.input.scenario import Scenario
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
+    EnsembleAPILoadLibraryError,
 )
 
 
@@ -76,6 +77,7 @@ class SymuviaConnector(object):
             lib_symuvia = cdll.LoadLibrary(self._path)
             click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
         except OSError:
+            click.echo(click.style(f"\t SymuVia is currently unavailable!", fg="red", bold=True,))
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_symuvia
 
@@ -88,5 +90,4 @@ class SymuviaConnector(object):
                 return
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
-                raise click.Abort()
         EnsembleAPIWarning(f"\tSimulation could not be loaded.")
