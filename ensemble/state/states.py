@@ -17,6 +17,7 @@ from .base import State
 import click
 
 from ensemble.tools.checkers import check_scenario_consistency
+from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 # Start of our states
 class Compliance(State):
@@ -55,6 +56,13 @@ class Connect(State):
     """
 
     def on_event(self, event: str, configurator):
+
+        try:
+            configurator.load_socket()
+        except EnsembleAPILoadLibraryError:
+            click.echo(click.style(f"\tLibrary could not be loaded.\n\tEnding simulation", color="yellow",))
+            return Terminate()
+
         if event == "initialize":
             return Initialize()
 
