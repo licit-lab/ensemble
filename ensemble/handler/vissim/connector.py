@@ -110,7 +110,7 @@ class VissimConnector(object):
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation network could not be loaded")
             try:
-                self._library.LoadLayout(self.filename)
+                self._library.LoadLayout(self.filename_layx)
                 return
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation layout could not be loaded")
