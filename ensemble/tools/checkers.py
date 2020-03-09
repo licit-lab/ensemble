@@ -19,16 +19,18 @@ def check_library_path(configurator) -> bool:
     click.echo("Looking for library path: " + click.style(f"{configurator.library_path}", fg="blue"))
 
     # Check Path existance for symuvia
-    if configurator.simulation_platform == "symuvia" and  
-        Path(configurator.library_path).exists(): 
+    if configurator.simulation_platform == "symuvia" and Path(configurator.library_path).exists():
         return True
     elif configurator.simulation_platform == "symuvia":
         click.echo("Given Library Path: " + click.style(f"{configurator.library_path}", fg="red") + "does not exist")
-        raise click.Abort() 
-    else: 
-        click.echo(f"Platform and path: " click.style(f"{configurator.platform} -- {configurator.library_path}", fg="red") + " were not verified.")
+        raise click.Abort()
+    else:
+        click.echo(
+            f"Platform and path: "
+            + click.style(f"{configurator.platform} -- {configurator.library_path}", fg="red",)
+            + " were not verified."
+        )
         return True
-    
 
 
 def check_scenario_path(configurator) -> bool:

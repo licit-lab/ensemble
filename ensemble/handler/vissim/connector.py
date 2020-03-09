@@ -15,14 +15,16 @@ try:
     import win32com.client as com
     from pywintypes import com_error
 except ModuleNotFoundError:
-    click.echo(
-        click.style("\t Platform non compatible with Windows", fg="yellow")
-    )
+    click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
 from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
 
 
 class ScenarioVissim(Scenario):
+    """ 
+        Scenario class for Vissim
+    """
+
     @classmethod
     def create_vissim_input(cls, *args):
         """ Looks for indicated vissim scenario paths and performs validation create the scenario"""
@@ -30,12 +32,8 @@ class ScenarioVissim(Scenario):
         existing_files = [file for file in args if Path(file).exists()]
 
         # Filter
-        find_inpx = lambda files: [
-            x for x in files if Path(x).suffix == ".inpx"
-        ]
-        find_layx = lambda files: [
-            x for x in files if Path(x).suffix == ".layx"
-        ]
+        find_inpx = lambda files: [x for x in files if Path(x).suffix == ".inpx"]
+        find_layx = lambda files: [x for x in files if Path(x).suffix == ".layx"]
         find_csv = lambda files: [x for x in files if Path(x).suffix == ".csv"]
 
         if existing_files:
@@ -43,15 +41,11 @@ class ScenarioVissim(Scenario):
             try:
                 inpx_path = find_inpx(existing_files)[0]
             except IndexError:
-                raise EnsembleAPILoadFileError(
-                    f"\tProvided files do not match expected input. Provide an INPX file"
-                )
+                raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an INPX file")
             try:
                 layx_path = find_layx(existing_files)[0]
             except IndexError:
-                raise EnsembleAPILoadFileError(
-                    f"\tProvided files do not match expected input. Provide an LAYX file"
-                )
+                raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an LAYX file")
             try:
                 platooncsv_path = find_csv(existing_files)[0]
             except IndexError:
@@ -95,19 +89,11 @@ class VissimConnector(object):
         """ load Vissim COM interface"""
         try:
             lib_vissim = com.gencache.EnsureDispatch(self._path)
-            click.echo(
-                click.style(
-                    f"\t Library successfully loaded!", fg="green", bold=True
-                )
-            )
+            click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
         except OSError:
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         except com_error:
-            click.echo(
-                click.style(
-                    f"\t Visssim is currently unavailable!", fg="red", bold=True
-                )
-            )
+            click.echo(click.style(f"\t Visssim is currently unavailable!", fg="red", bold=True))
             lib_vissim = None
             # raise EnsembleAPILoadLibraryError("Library not found", self._path)
             pass

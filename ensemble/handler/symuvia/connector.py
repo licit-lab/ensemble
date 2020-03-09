@@ -9,33 +9,40 @@ import click
 from pathlib import Path
 
 from ensemble.input.scenario import Scenario
-from ensemble.tools.exceptions import EnsembleAPIWarning, EnsembleAPILoadFileError
+from ensemble.tools.exceptions import (
+    EnsembleAPIWarning,
+    EnsembleAPILoadFileError,
+)
 
-class ScenarioSymuVia(Scenario)
+
+class ScenarioSymuVia(Scenario):
+    """ 
+        Scenario class for Vissim
+    """
 
     @classmethod
     def create_symuvia_input(cls, *args):
         """ Looks for indicated symuvia scenario paths and performs validation create the scenario"""
-        
+
         existing_files = [file for file in args if Path(file).exists()]
 
         # Filter
-        find_xml = lambda files: [x for x in files if Path(x).suffix=='.xml']        
-        find_csv = lambda files: [x for x in files if Path(x).suffix=='.csv']
+        find_xml = lambda files: [x for x in files if Path(x).suffix == ".xml"]
+        find_csv = lambda files: [x for x in files if Path(x).suffix == ".csv"]
 
         if existing_files:
             # Takes first element by default
             try:
-                xml_path = find_xml(existing_files)[0] 
+                xml_path = find_xml(existing_files)[0]
             except IndexError:
                 raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an XML file")
-            try: 
+            try:
                 platooncsv_path = find_csv(existing_files)[0]
             except IndexError:
                 EnsembleAPIWarning(f"\tNo Platoon information provided.")
                 platooncsv_path = None
 
-            return cls(xml_path, None, platooncsv_path) 
+            return cls(xml_path, None, platooncsv_path)
         raise EnsembleAPILoadFileError(f"Provided files are not found", args)
 
     @property
@@ -71,15 +78,15 @@ class SymuviaConnector(object):
         except OSError:
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_symuvia
-    
+
     def load_scenario(self, scenario):
         """ checks existance and load scenario into 
         """
         if isinstance(scenario, ScenarioSymuVia):
             try:
                 self._library.SymLoadNetworkEx(self.filename_encoded)
-                return 
-            except: 
+                return
+            except:
                 raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
                 raise click.Abort()
         EnsembleAPIWarning(f"\tSimulation could not be loaded.")
