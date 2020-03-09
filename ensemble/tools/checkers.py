@@ -26,7 +26,7 @@ def check_library_path(configurator) -> bool:
         click.echo("Given Library Path: " + click.style(f"{configurator.library_path}", fg="red") + "does not exist")
         raise click.Abort() 
     else: 
-        click.echo(click.style(f"Platform is: {configurator.platform} and  path {configurator.library_path}", fg="red") + "was not verified")
+        click.echo(f"Platform and path: " click.style(f"{configurator.platform} -- {configurator.library_path}", fg="red") + " were not verified.")
         return True
     
 
