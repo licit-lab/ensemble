@@ -9,6 +9,7 @@ from ensemble.input.scenario import Scenario
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
+    EnsembleAPILoadLibraryError,
 )
 
 try:
@@ -17,13 +18,14 @@ try:
 except ModuleNotFoundError:
     click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
-from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
-
 
 class ScenarioVissim(Scenario):
     """ 
         Scenario class for Vissim
     """
+
+    def __init__(self):
+        self.bread_additional = False
 
     @classmethod
     def create_vissim_input(cls, *args):
@@ -95,6 +97,21 @@ class VissimConnector(object):
         except com_error:
             click.echo(click.style(f"\t Visssim is currently unavailable!", fg="red", bold=True))
             lib_vissim = None
-            # raise EnsembleAPILoadLibraryError("Library not found", self._path)
-            pass
+            raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_vissim
+
+    def load_scenario(self, scenario):
+        """ checks existance and load scenario into 
+        """
+        if isinstance(scenario, ScenarioVissim):
+            try:
+                self._library.LoadNet(self.filename, scenario.bread_additional)
+                return
+            except:
+                raise EnsembleAPILoadFileError(f"\t Simulation network could not be loaded")
+            try:
+                self._library.LoadLayout(self.filename)
+                return
+            except:
+                raise EnsembleAPILoadFileError(f"\t Simulation layout could not be loaded")
+        EnsembleAPIWarning(f"\tSimulation could not be loaded.")
