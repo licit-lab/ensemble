@@ -23,7 +23,7 @@ DCT_SIMULATORS = {
 DCT_DEFAULT_PATHS = {
     ("symuvia", "Darwin"): DEFAULT_LIB_OSX,
     ("symuvia", "Linux"): DEFAULT_LIB_LINUX,
-    ("visim", "Windows"): DEFAULT_LIB_WINDOWS,
+    ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
 }
 
 # -------------------------------------- DEFAULT SCENARIO PARAMETERS ---------------------------------------------------
