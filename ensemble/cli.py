@@ -13,8 +13,8 @@ from .ensemble import launch_simulation
 from ensemble.tools.checkers import check_scenario_consistency
 
 # Connectors
-from ensemble.handler.symuvia.connector import SymuviaConnector
-from ensemble.handler.vissim.connector import VissimConnector
+from ensemble.handler.symuvia.connector import SymuviaConnector, ScenarioSymuVia
+from ensemble.handler.vissim.connector import VissimConnector, ScenarioVissim
 
 # ------------------------------ Configurator ------------------------------------------------------
 
@@ -83,8 +83,17 @@ class Configurator(object):
         if self.simulation_platform == "symuvia":
             self.connector = SymuviaConnector(self.library_path)
         else:
-            # TODO: Add Connector for Vissim.
             self.connector = VissimConnector(self.library_path)
+
+    def load_scenario(self):
+        self.scenario_files = tuple(self.scenario_files)
+        if self.simulation_platform == "symuvia":
+            scenario = ScenarioSymuVia.create_input(*self.scenario_files)  # expected input (fileA,fileB)
+        else:
+            scenario = ScenarioVissim.create_input(*self.scenario_files)  # expected input (fileA,fileB)
+
+        # Call connector (automatic dispatch)
+        self.connector.load_scenario(scenario)
 
     @property
     def total_steps(self):

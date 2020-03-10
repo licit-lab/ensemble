@@ -28,7 +28,7 @@ class ScenarioVissim(Scenario):
         self.bread_additional = False
 
     @classmethod
-    def create_vissim_input(cls, *args):
+    def create_input(cls, *args):
         """ Looks for indicated vissim scenario paths and performs validation create the scenario"""
 
         existing_files = [file for file in args if Path(file).exists()]
