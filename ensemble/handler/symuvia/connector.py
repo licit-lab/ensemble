@@ -22,7 +22,7 @@ class ScenarioSymuVia(Scenario):
     """
 
     @classmethod
-    def create_symuvia_input(cls, *args):
+    def create_input(cls, *args):
         """ Looks for indicated symuvia scenario paths and performs validation create the scenario"""
 
         existing_files = [file for file in args if Path(file).exists()]
