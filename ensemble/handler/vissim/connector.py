@@ -28,7 +28,7 @@ class ScenarioVissim(Scenario):
         self.bread_additional = False
 
     @classmethod
-    def create_vissim_input(cls, *args):
+    def create_input(cls, *args):
         """ Looks for indicated vissim scenario paths and performs validation create the scenario"""
 
         existing_files = [file for file in args if Path(file).exists()]
@@ -105,12 +105,12 @@ class VissimConnector(object):
         """
         if isinstance(scenario, ScenarioVissim):
             try:
-                self._library.LoadNet(self.filename, scenario.bread_additional)
+                self._library.LoadNet(scenario.filename, scenario.bread_additional)
                 return
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation network could not be loaded")
             try:
-                self._library.LoadLayout(self.filename_layx)
+                self._library.LoadLayout(scenario.filename_layx)
                 return
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation layout could not be loaded")

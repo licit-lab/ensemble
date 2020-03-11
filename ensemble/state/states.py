@@ -17,7 +17,7 @@ from .base import State
 import click
 
 from ensemble.tools.checkers import check_scenario_consistency
-from ensemble.tools.exceptions import EnsembleAPILoadLibraryError
+from ensemble.tools.exceptions import EnsembleAPILoadLibraryError, EnsembleAPILoadFileError
 
 # Start of our states
 class Compliance(State):
@@ -76,6 +76,13 @@ class Initialize(State):
     """
 
     def on_event(self, event: str, configurator):
+
+        try:
+            configurator.load_scenario()
+        except EnsembleAPILoadFileError:
+            click.echo(click.style(f"\tScenario could not be loaded.\n\tEnding simulation", fg="yellow",))
+            return Terminate()
+
         if event == "preroutine":
             return PreRoutine()
 
