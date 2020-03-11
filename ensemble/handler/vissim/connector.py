@@ -26,6 +26,7 @@ class ScenarioVissim(Scenario):
 
     def __init__(self, *args):
         self.bread_additional = False
+        super().__init__(*args)
 
     @classmethod
     def create_input(cls, *args):
