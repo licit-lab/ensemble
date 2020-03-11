@@ -24,7 +24,7 @@ class ScenarioVissim(Scenario):
         Scenario class for Vissim
     """
 
-    def __init__(self):
+    def __init__(self, *args):
         self.bread_additional = False
 
     @classmethod
