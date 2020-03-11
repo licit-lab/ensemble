@@ -86,7 +86,7 @@ class SymuviaConnector(object):
         """
         if isinstance(scenario, ScenarioSymuVia):
             try:
-                self._library.SymLoadNetworkEx(self.filename_encoded)
+                self._library.SymLoadNetworkEx(scenario.filename_encoded)
                 return
             except:
                 raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
