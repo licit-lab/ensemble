@@ -94,3 +94,9 @@ class Vehicle(object):
     def __str__(self):
         data_dct = ", ".join(f"{k}:{v}" for k, v in self.__dict__.items())
         return f"{self.__class__.__name__}({data_dct})"
+    def leader(self):
+        leader=get_leader(self.id)
+        return leader
+    def is_platoon_vehicle(self):
+        if self.vehtype=='ensembletruck':
+         return True
