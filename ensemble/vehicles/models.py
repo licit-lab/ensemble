@@ -74,7 +74,7 @@ class Vehicle(object):
             :param itinerary: [description], defaults to None
             :type itinerary: [type], optional
         """
-        self.abscisa = abscisa
+        self.abscissa = abscissa
         self.acceleration = acceleration
         self.distance = distance
         self.vehid = vehid
@@ -95,7 +95,7 @@ class Vehicle(object):
         data_dct = ", ".join(f"{k}:{v}" for k, v in self.__dict__.items())
         return f"{self.__class__.__name__}({data_dct})"
     def leader(self):
-        leader=get_leader(self.id)
+        leader=Vehicle(self.id)
         return leader
     def is_platoon_vehicle(self):
         if self.vehtype=='ensembletruck':

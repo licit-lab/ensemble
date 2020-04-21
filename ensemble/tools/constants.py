@@ -67,3 +67,8 @@ DCT_PLT_DATA = {
     "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
     "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
+#platoon constants
+DCT_PLT_CONST={
+    "max_platoon_length":7, # maximum number of vehicles allowed in platoon
+    "max_connection_distance":100 # maximum distance for communication(metres)
+}

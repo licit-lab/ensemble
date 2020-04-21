@@ -51,7 +51,7 @@ class Platoon(PlatoonState):
 
     def switchto(self, event):
 
-        if event=="split": 
+        if event=="split":
             return Split()
         else:
             return self
