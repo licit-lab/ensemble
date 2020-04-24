@@ -1,8 +1,30 @@
 """
-    This module contains and store constants important for default values
-    required to run the simulations. 
+    This module contains a **constants** and **default** parameters. These parameters can be accessed    at any time by whatever of the modules. 
 
     Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values. 
+
+    Example:
+        To use the ``Constants`` import the module as::
+
+            >>> import ensemble.tools.constants as ct
+            >>> ct.BUFFER_STRING # access the buffer size 
+
+
+    ============================  ======================================
+     **Variable**                 **Description**
+    ----------------------------  --------------------------------------
+    ``BUFFER_STRING``              Buffer size
+    ``DEFAULT_LIB_OSX``            Default OS X library path (SymuVia)
+    ``DEFAULT_LIB_LINUX``          Default Linux library path  
+    ``DEFAULT_LIB_WINDOWS``        Default Windows library path (Vissim)
+    ``DCT_SIMULATORS``             Simulator according to SO 
+    ``DCT_DEFAULT_PATHS``          Available combinations SO/simulator
+    ``DCT_RUNTIME_PARAM``          Runtime default parameters 
+    ``DCT_VEH_PARAM``              Vehicle default parameters 
+    ``DCT_VEH_DATA``               Vehicle data default parameters
+    ``DCT_PLT_DATA``               Platoon parameters
+    ============================  ======================================
+
 """
 
 # Default simulator per platform
