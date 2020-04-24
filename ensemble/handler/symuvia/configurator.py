@@ -19,7 +19,7 @@ import ensemble.tools.constants as CT
 # ============================================================================
 
 
-class Configurator:
+class SymuviaConfigurator:
     """ Configurator class for containing specific simulator parameters
     
         Example:
@@ -66,7 +66,7 @@ class Configurator:
         self.libraryPath = libraryPath
         self.totalSteps = totalSteps
         self.stepLaunchMode = stepLaunchMode
-        super(Configurator, self).__init__()
+        super(SymuviaConfigurator, self).__init__()
 
     def __repr__(self):
         data_dct = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
