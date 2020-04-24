@@ -1,16 +1,29 @@
-# Constant values
+"""
+    This module contains and store constants important for default values
+    required to run the simulations. 
+
+    Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values. 
+"""
 
 # Default simulator per platform
 
-# -------------------------------------- DEFAULT PATHS TO FIND SIMULATOR PLATFORMS--------------------------------------
+# *****************************************************************************
+# DEFAULT PATHS TO FIND SIMULATOR PLATFORMS
+# *****************************************************************************
 
-DEFAULT_LIB_OSX = "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib"
+# DEFAULT_LIB_OSX = "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib"
+
+DEFAULT_LIB_OSX = "/Users/andresladino/Documents/01-Code/04-Platforms/dev-symuvia/build/lib/libSymuVia.dylib"
 
 DEFAULT_LIB_LINUX = "/home/build-symuvia/build/symuvia/libSymuVia.so"
 
 DEFAULT_LIB_WINDOWS = "Vissim.Vissim-64.10"
 
-# ------------------------------------- DEFAULT SIMULATOR/ OS ASSOCIATION ----------------------------------------------
+
+# *****************************************************************************
+# DEFAULT SIMULATOR/ OS ASSOCIATION
+# *****************************************************************************
+
 
 DCT_SIMULATORS = {
     "Darwin": "symuvia",
@@ -26,7 +39,9 @@ DCT_DEFAULT_PATHS = {
     ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
 }
 
-# -------------------------------------- DEFAULT SCENARIO PARAMETERS ---------------------------------------------------
+# *****************************************************************************
+# DEFAULT SCENARIO PARAMETERS
+# *****************************************************************************
 
 # Runtime Parameters
 
@@ -67,3 +82,18 @@ DCT_PLT_DATA = {
     "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
     "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
+
+
+# *****************************************************************************
+# SYMUVIA CONSTANTS
+# *****************************************************************************
+
+# *****************************************************************************
+# CONNECTOR
+# *****************************************************************************
+# Buffer string size
+BUFFER_STRING = 1000000
+
+# *****************************************************************************
+# VISSIM CONSTANTS
+# *****************************************************************************
