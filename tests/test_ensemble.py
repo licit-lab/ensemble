@@ -28,7 +28,7 @@ class TestAPI(unittest.TestCase):
     def test_cli_03_check(self):
         """Run: ensemble check"""
         result = self.runner.invoke(cli.main, ["check"])
-        self.assertIn("Error: Scenario file(s) is an empty list", result.output)
+        self.assertIn("Error: \tScenario file(s) is an empty list", result.output)
 
     def test_cli_04_check_help(self):
         """Run: ensemble check --help"""
