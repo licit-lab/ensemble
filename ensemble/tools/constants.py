@@ -27,6 +27,18 @@
 
 """
 
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
+from datetime import date, datetime, timedelta
+from numpy import array, float64, int32
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
+
+
 # Default simulator per platform
 
 # *****************************************************************************
@@ -105,6 +117,52 @@ DCT_PLT_DATA = {
     "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
 
+# *****************************************************************************
+# STREAM CONSTANTS
+# *****************************************************************************
+
+FIELD_DATA = {
+    "@abs": "abscisa",
+    "@acc": "acceleration",
+    "@dst": "distance",
+    "@id": "vehid",
+    "@ord": "ordinate",
+    "@tron": "link",
+    "@type": "vehtype",
+    "@vit": "speed",
+    "@voie": "lane",
+    "@z": "elevation",
+}
+
+FIELD_FORMAT = {
+    "@abs": float,
+    "@acc": float,
+    "@dst": float,
+    "@id": int,
+    "@ord": float,
+    "@tron": str,
+    "@type": str,
+    "@vit": float,
+    "@voie": int,
+    "@z": float,
+}
+
+FLOAT_SELECT = float64
+INT_SELECT = int32
+
+FIELD_FORMATAGG = {
+    "abscisa": (array, FLOAT_SELECT),
+    "acceleration": (array, FLOAT_SELECT),
+    "distance": (array, FLOAT_SELECT),
+    "vehid": (array, INT_SELECT),
+    "ordinate": (array, FLOAT_SELECT),
+    "link": (list, None),
+    "vehtype": (list, None),
+    "speed": (array, FLOAT_SELECT),
+    "lane": (array, INT_SELECT),
+    "elevation": (array, FLOAT_SELECT),
+}
+
 
 # *****************************************************************************
 # SYMUVIA CONSTANTS
@@ -115,6 +173,12 @@ DCT_PLT_DATA = {
 # *****************************************************************************
 # Buffer string size
 BUFFER_STRING = 1000000
+
+# *****************************************************************************
+# SCENARIO
+# *****************************************************************************
+# Format time from xml file
+HOUR_FORMAT = "%H:%M:%S"
 
 # *****************************************************************************
 # VISSIM CONSTANTS
