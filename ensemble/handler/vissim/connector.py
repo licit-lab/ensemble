@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
 
-class ScenarioVissim(Scenario):
+class VissimScenario(Scenario):
     """ 
         Scenario class for Vissim
     """
