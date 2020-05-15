@@ -180,6 +180,34 @@ BUFFER_STRING = 1000000
 # Format time from xml file
 HOUR_FORMAT = "%H:%M:%S"
 
+# DATE/TIME INFORMATION
+DELTA_TIME = timedelta(minutes=1)
+TIME_STEP = timedelta(seconds=1).total_seconds()
+today = date.today().strftime("%Y-%m-%d")
+st_time = datetime.now()
+ed_time = st_time + DELTA_TIME
+st_time_str = st_time.strftime("%H:%M:%S")
+ed_time_str = ed_time.strftime("%H:%M:%S")
+
+DCT_SIMULATION_INFO = {
+    "id": "simID",
+    "pasdetemps": f"TIME_STEP",
+    "debut": f"st_time_str",
+    "fin": f"ed_time_str",
+    "loipoursuite": "exacte",
+    "comportementflux": "iti",
+    "date": f"today",
+    "titre": "default_simulation",
+    "proc_deceleration": "false",
+    "seed": "1",
+}
+
 # *****************************************************************************
 # VISSIM CONSTANTS
 # *****************************************************************************
+
+
+# *****************************************************************************
+# DATA VEHICLE DYNAMICS
+# *****************************************************************************
+ENGINE_CONSTANT = 0.2
