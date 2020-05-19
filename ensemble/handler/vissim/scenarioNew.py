@@ -14,16 +14,15 @@ import os
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
-import click
-from pathlib import Path
 from ensemble.input.scenario import Scenario
+
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
     EnsembleAPILoadLibraryError,
 )
 
-
+from ensemble.tools import constants as ct
 
 
 # ============================================================================
@@ -31,14 +30,10 @@ from ensemble.tools.exceptions import (
 # ============================================================================
 
 
-"""
-    This module contains objects for modeling a simplified connector to handle vissim
-"""
-
 class VissimScenario(Scenario):
     """
-        Scenario class for Vissim
-    """
+           Scenario class for Vissim
+       """
 
     def __init__(self, *args):
         self.bread_additional = False
@@ -88,3 +83,16 @@ class VissimScenario(Scenario):
     def filename_encoded(self):
         """ Symuvia property shortcut for loading"""
         return self.scn_file.encode("UTF8")
+
+    def filename(self, encoding: str = None):
+        """
+            This method returns the value of encoding of the simulation scenario under consideration
+
+            :param encoding: enconder UTF8, defaults to None
+            :type encoding: string, optional
+            :return: Full path of scenario
+            :rtype: string
+        """
+        if encoding == "UTF8":
+            return self.scn_file.encode(encoding)
+        return self.scn_file

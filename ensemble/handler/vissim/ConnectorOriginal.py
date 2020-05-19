@@ -1,19 +1,8 @@
 """
-**Scenario Module**
-
-    This module contains descriptions that stablish a traffic scenario. A traffic scenario for SymuVia  is regularly described by a simulation object that points towards properties of the simulation file in this case an XML.
+    This module contains objects for modeling a simplified connector to handle vissim
 """
 
-# ============================================================================
-# STANDARD  IMPORTS
-# ============================================================================
-from pathlib import Path
-from datetime import datetime
-import os
 
-# ============================================================================
-# INTERNAL IMPORTS
-# ============================================================================
 import click
 from pathlib import Path
 from ensemble.input.scenario import Scenario
@@ -23,19 +12,14 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadLibraryError,
 )
 
+try:
+    import win32com.client as com
+    from pywintypes import com_error
+except ModuleNotFoundError:
+    click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
 
 
-
-# ============================================================================
-# CLASS AND DEFINITIONS
-# ============================================================================
-
-
-"""
-    This module contains objects for modeling a simplified connector to handle vissim
-"""
-
-class VissimScenario(Scenario):
+class ScenarioVissim(Scenario):
     """
         Scenario class for Vissim
     """
@@ -88,3 +72,47 @@ class VissimScenario(Scenario):
     def filename_encoded(self):
         """ Symuvia property shortcut for loading"""
         return self.scn_file.encode("UTF8")
+
+
+class VissimConnector(object):
+    """
+        This models a connector and interactions from the API with the Vissim library.
+
+        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    """
+
+    def __init__(self, path: str) -> None:
+        self._path = path  # "Vissim.Vissim-64.10"# path
+        self.load_vissim()
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.libraryname})"
+
+    def load_vissim(self) -> None:
+        """ load Vissim COM interface"""
+        try:
+            lib_vissim = com.gencache.EnsureDispatch(self._path)
+            click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
+        except OSError:
+            raise EnsembleAPILoadLibraryError("Library not found", self._path)
+        except com_error:
+            click.echo(click.style(f"\t Visssim is currently unavailable!", fg="red", bold=True))
+            lib_vissim = None
+            raise EnsembleAPILoadLibraryError("Library not found", self._path)
+        self._library = lib_vissim
+
+    def load_scenario(self, scenario):
+        """ checks existance and load scenario into
+        """
+        if isinstance(scenario, ScenarioVissim):
+            try:
+                self._library.LoadNet(scenario.filename, scenario.bread_additional)
+                return
+            except:
+                raise EnsembleAPILoadFileError(f"\t Simulation network could not be loaded")
+            try:
+                self._library.LoadLayout(scenario.filename_layx)
+                return
+            except:
+                raise EnsembleAPILoadFileError(f"\t Simulation layout could not be loaded")
+        EnsembleAPIWarning(f"\tSimulation could not be loaded.")

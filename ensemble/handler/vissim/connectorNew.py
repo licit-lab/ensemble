@@ -1,7 +1,6 @@
-"""
-    This module contains objects for modeling a simplified connector to handle vissim
-"""
-
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
 import click
 from .stream import SimulatorRequest
 from .configurator import VissimConfigurator
@@ -12,22 +11,22 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadFileError,
     EnsembleAPILoadLibraryError,
 )
-import ensemble.tools.constants as CT
-
-
 try:
     import win32com.client as com
     from pywintypes import com_error
 except ModuleNotFoundError:
     click.echo(click.style("\t Platform non compatible with Windows", fg="yellow"))
+import ensemble.tools.constants as CT
 
 
-class VissimConnector(object):
-    """
-        This models a connector and interactions from the API with the Vissim library.
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
-        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
-    """
+
+class VissimConnector(VissimConfigurator):
+    # def __init__(self):
+    #     super(VissimConnector, self).__init__()
 
     def __init__(self, path: str) -> None:
         self._path = path  # "Vissim.Vissim-64.10"# path
@@ -49,28 +48,23 @@ class VissimConnector(object):
             raise EnsembleAPILoadLibraryError("Library not found", self._path)
         self._library = lib_vissim
 
-    def load_scenario(self, scenario):
+    def load_scenario(self, scenario: VissimScenario):
         """ checks existance and load scenario into
         """
         if isinstance(scenario, VissimScenario):
             try:
                 self._library.LoadNet(scenario.filename, scenario.bread_additional)
-                self.sim_period = self._library.Simulation.AttValue('SimPeriod')
-                self.sim_sec = self._library.Simulation.AttValue('SimSec')
-                self.sim_res = self._library.Simulation.AttValue('SimRes')
-                self.rand_seed = self._library.Simulation.AttValue('RandSeed')
-                self.performInitialize(scenario)
-                self.simulation = scenario
-                click.echo(click.style(f"\t Scenario successfully loaded!", fg="green", bold=True))
+                #self.sim_period = self._library.Simulation.AttValue('SimPeriod')
+                #self.sim_sec = self._library.Simulation.AttValue('SimSec')
+                #self.sim_res = self._library.Simulation.AttValue('SimRes')
+                #self.rand_seed = self._library.Simulation.AttValue('RandSeed')
+                #self.performInitialize(scenario)
+                #self.simulation = scenario
                 return
             except:
-                raise EnsembleAPILoadFileError(f"\t Simulation network could not be loaded")
-            try:
-                self._library.LoadLayout(scenario.filename_layx)
-                return
-            except:
-                raise EnsembleAPILoadFileError(f"\t Simulation layout could not be loaded")
+                raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
         EnsembleAPIWarning(f"\tSimulation could not be loaded.")
+
     def register_simulation(self, scenarioPath: str) -> None:
         """
             Register simulation file within the simulator
@@ -86,18 +80,7 @@ class VissimConnector(object):
         """
         vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
         vehsAttributes = self._library.Net.Vehicles.GetMultipleAttributes(vehsAttributesNamesVissim)
-        if len(vehsAttributes)>1:
-         #print( len(vehsAttributes))
-
-         self.request.parse_data(vehsAttributes)
-         XX = self.request.get_vehicle_data()
-         XX1=self.request.get_vehicle_id()
-         print(self.request.query_vehicle_position(*XX1))
-         print(self.request. query_vehicle_data_dict('Acceleration',*XX1))
-
-         click.echo(click.style(f"\t Vissim found some values!", fg="green", bold=True))
         self.request.parse_data(vehsAttributes)
-
     def run_single_step(self):
         self._library.Simulation.RunSingleStep()
 
@@ -153,8 +136,37 @@ class VissimConnector(object):
         # ATTRIBUTES
         # ============================================================================
 
+    def scenarioFilename(self, encoding=None) -> str:
+        """
+            Scenario filenamme
+
+            :return: Absolute path towards the XML input for SymuVia
+            :rtype: str
+        """
+        return self.simulation.filename(encoding)
+
+
     def get_simulation_steps(self) -> range:
         return range(0,self.sim_period,self.sim_res)
+    def get_vehicletype_information(self) -> tuple:
+        """ Get the vehicle parameters
+
+        :return: tuple of dictionaries containing vehicle parameters
+        :rtype: tuple
+        """
+        vehTypesAttributes = self._library.Net.VehicleTypes.GetMultipleAttributes(['No', 'Name'])
+        return vehTypesAttributes
+    def get_network_links(self) -> tuple:
+        """ Get network link names
+
+        :return: tuple containing link names
+        :rtype: tuple
+        """
+        # GetMultiAttValues         Read one attribute of all objects:
+        Attribute = "Name"
+        NameOfLinks= self._library.Net.Links.GetMultiAttValues(Attribute)
+        # NameOfLinks = toList(NameOfLinks)  # convert to list
+        return NameOfLinks
 
 
 

@@ -61,7 +61,8 @@ class SimulatorRequest(DataQuery):
         """
         #vehsAttributesNames=(' abscissa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
         vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
-        vehsAttributes =self.data_query()
+        vehsAttributes =self._str_response
+        print('Current Number of vehicles in the network  is ',len(vehsAttributes))
 
 
         return [dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes]
@@ -186,7 +187,7 @@ class SimulatorRequest(DataQuery):
 
         neighpos = self.query_vehicle_position(*neigh)
 
-        return tuple(nbh for nbh, npos in zip(neigh, neighpos) if float(npos) < float(vehpos))
+        return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos < vehpos)
 
     def create_vehicle_list(self):
         """Initialize 

@@ -34,15 +34,9 @@ class VissimConfigurator:
         :rtype: Configurator
     """
 
-    def __init__(
-            self,
-            bufferSize: int = CT.BUFFER_STRING,
-            writeXML: bool = True,
-            traceFlow: bool = False,
+    def __init__(self,
             libraryPath: str = "",
-            totalSteps: int = 0,
-            stepLaunchMode: str = "lite",
-    ) -> None:
+            totalSteps: int = 0) -> None:
         """ Configurator class for containing specific simulator parameter
 
             :param bufferSize: Provide an integer for buffer, defaults to CT.BUFFER_STRING
@@ -61,12 +55,8 @@ class VissimConfigurator:
             :rtype: Configurator
         """
         click.echo("Configurator: Initialization")
-        self.bufferString = create_string_buffer(bufferSize)
-        self.writeXML = c_bool(writeXML)
-        self.traceFlow = traceFlow
         self.libraryPath = libraryPath
         self.totalSteps = totalSteps
-        self.stepLaunchMode = stepLaunchMode
         super(VissimConfigurator, self).__init__()
 
     def __repr__(self):
