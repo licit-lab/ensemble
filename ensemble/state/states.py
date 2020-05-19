@@ -108,6 +108,7 @@ class Query(State):
 
     def on_event(self, event: str, configurator):
         if event == "control":
+            configurator.query_data()
             return Control()
 
         return self

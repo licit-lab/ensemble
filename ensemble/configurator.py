@@ -81,8 +81,8 @@ class Configurator(object):
         # Call connector (automatic dispatch)
         self.connector.load_scenario(scenario)
 
-    def run_step(self):
-        self.connector.run_step()
+    def query_data(self):
+        self.connector.query_data()
 
     @property
     def total_steps(self):
