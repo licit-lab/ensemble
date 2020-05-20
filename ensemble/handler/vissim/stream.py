@@ -41,7 +41,7 @@ class SimulatorRequest(DataQuery):
             else "Simulation has not started"
         )
 
-    def parse_data(self, response: List = None) -> List:
+    def parse_data(self, response: List = None,simsec:float=0) -> List:
         """Parses response from simulator to data
 
         :param response: Simulator response
@@ -49,6 +49,7 @@ class SimulatorRequest(DataQuery):
         :return: Full simulator response
         :rtype: dict
         """
+        self.sim_sec=simsec
         self._str_response = response
 
     def get_vehicle_data(self) -> list:
@@ -60,15 +61,22 @@ class SimulatorRequest(DataQuery):
         :rtype: list of dictionaries
         """
         vehsAttributesNames=('abscisa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
-        vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
         vehsAttributes =self._str_response
-        print('Current Number of vehicles in the network  is ',len(vehsAttributes))
-
-
         listofdict=[dict(zip(vehsAttributesNames, item)) for item in vehsAttributes]
         veh_list = VehicleList.from_request(listofdict)
         return veh_list
+    def get_vehicle_data_vissim(self) -> list:
+        """Extracts vehicles information from simulators response
 
+        :param response: Simulator response
+        :type response: str
+        :return: list of vehicles in the network
+        :rtype: list of dictionaries
+        """
+        vehsAttributesNames=('abscisa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
+        vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
+        vehsAttributes =self._str_response
+        return  [dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes]
 
 
 
@@ -78,7 +86,7 @@ class SimulatorRequest(DataQuery):
         :return: tuple containing vehicle ids at current state in all network
         :rtype: list
         """
-        return tuple(veh.get('No') for veh in self.get_vehicle_data())
+        return tuple(veh.get('No') for veh in self.get_vehicle_data_vissim())
 
     def query_vehicle_link(self, vehid: int, *args) -> tuple:
         """ Extracts current vehicle link information from simulators response
@@ -115,7 +123,7 @@ class SimulatorRequest(DataQuery):
         :rtype: dict
         """
         vehids = set((vehid, *args)) if args else set(vehid)
-        data_vehs = [(veh.get('No'), veh.get(dataval)) for veh in self.get_vehicle_data() if veh.get('No') in vehids]
+        data_vehs = [(veh.get('No'), veh.get(dataval)) for veh in self.get_vehicle_data_vissim() if veh.get('No') in vehids]
         return dict(data_vehs)
 
     def is_vehicle_in_network(self, vehid: int, *args) -> bool:
@@ -143,7 +151,7 @@ class SimulatorRequest(DataQuery):
         :return: tuple containing vehicle ids
         :rtype: tuple
         """
-        return tuple(veh.get('No') for veh in self.get_vehicle_data() if veh.get('Lane\\Link\\No') == link and veh.get('Lane\\Index') == lane)
+        return tuple(veh.get('No') for veh in self.get_vehicle_data_vissim() if veh.get('Lane\\Link\\No') == link and veh.get('Lane\\Index') == lane)
 
     def is_vehicle_in_link(self, veh: int, link: int) -> bool:
         """ Returns true if a vehicle is in a link at current state
@@ -213,21 +221,16 @@ class SimulatorRequest(DataQuery):
         return elem in self._vehs
 
     @property
-    def data_query(self):
-        try:
-            return self._str_response
-        except IndexError: # dont know the type of error yet
-            return {}
-
-    @property
     def vehicles(self):
         self.update_vehicle_list()
         return self._vehs
 
     @property
-    def current_time(self) -> str:
-        return self.data_query.get("INST").get("@val")
+    def current_time(self) -> float:
+        "Current simulation second"
+        return self.sim_sec
 
     @property
     def current_nbveh(self) -> int:
-        return self.data_query.get("INST").get("@nbVeh")
+        """ Number of vehicles in the network"""
+        return len(self._str_response)

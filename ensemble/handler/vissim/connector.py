@@ -50,7 +50,7 @@ class VissimConnector(object):
         self._library = lib_vissim
 
     def load_scenario(self, scenario):
-        """ checks existance and load scenario into
+        """ checks existance and load scenario . Also get simulation parameters
         """
         if isinstance(scenario, VissimScenario):
             try:
@@ -86,21 +86,14 @@ class VissimConnector(object):
         """
         vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
         vehsAttributes = self._library.Net.Vehicles.GetMultipleAttributes(vehsAttributesNamesVissim)
-        if len(vehsAttributes)>1:
-         #print( len(vehsAttributes))
-
-         self.request.parse_data(vehsAttributes)
-         XX = self.request.get_vehicle_data()
-         print (XX)
-         XX1=self.request.get_vehicle_id()
-         #print(self.request.query_vehicle_position(*XX1))
-         #print('Now showing currrent acceleration of vehicles(m/s2)')
-         #print(self.request. query_vehicle_data_dict('Acceleration',*XX1))
-
-         click.echo(click.style(f"\t Vissim found some values!", fg="green", bold=True))
-        self.request.parse_data(vehsAttributes)
+        self.request.parse_data(vehsAttributes,self.sim_sec)
 
     def run_single_step(self):
+        """ Run simulation next step
+
+                :return: None
+                :rtype: None
+                """
         self._library.Simulation.RunSingleStep()
 
     def query_data(self) -> int:
@@ -108,6 +101,7 @@ class VissimConnector(object):
 
         :return: iteration step
         :rtype: int
+          To test query, you can use click.echo(self.get_vehicle_data()) after request_answer()
         """
         try:
             self.request_answer()
@@ -118,10 +112,11 @@ class VissimConnector(object):
             self._bContinue = False
             return -1
 
-
-        # ============================================================================
-        # PROTOCOLS
-        # ============================================================================
+    def get_vehicle_data(self):
+        return self.request.get_vehicle_data().vehicles
+    # ============================================================================
+    # PROTOCOLS
+    # ============================================================================
 
     def performConnect(self) -> None:
         """
@@ -156,6 +151,7 @@ class VissimConnector(object):
         # ============================================================================
 
     def get_simulation_steps(self) -> range:
+        """ Gets the list of simulation steps starting from 0 to end of simulation in step of simulation resolution"""
         return range(0,self.sim_period,self.sim_res)
 
 

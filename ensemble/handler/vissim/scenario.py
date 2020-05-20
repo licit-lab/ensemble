@@ -1,15 +1,14 @@
 """
 **Scenario Module**
 
-    This module contains descriptions that stablish a traffic scenario. A traffic scenario for SymuVia  is regularly described by a simulation object that points towards properties of the simulation file in this case an XML.
+    This module contains descriptions that establish a traffic scenario.
+    A traffic scenario for Vissim  is regularly described by a an network files(.inpx) and a layoutfile(.layx).
 """
 
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
-from pathlib import Path
-from datetime import datetime
-import os
+
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -84,7 +83,4 @@ class VissimScenario(Scenario):
         """ Vissim property shortcut"""
         return self.layout_file
 
-    @property
-    def filename_encoded(self):
-        """ Symuvia property shortcut for loading"""
-        return self.scn_file.encode("UTF8")
+

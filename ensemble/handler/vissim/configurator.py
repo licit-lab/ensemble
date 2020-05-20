@@ -1,5 +1,5 @@
 """
-    This module contains a ``Configurator`` object. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation. The objective is to introduce flexibility when configuring the the simulator platform and the runtime execution possibilities offered by exposed functions from the c library of SymuVia
+    This module contains a ``Configurator`` object. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation.
 """
 # ============================================================================
 # STANDARD  IMPORTS
@@ -38,19 +38,10 @@ class VissimConfigurator:
             libraryPath: str = "",
             totalSteps: int = 0) -> None:
         """ Configurator class for containing specific simulator parameter
-
-            :param bufferSize: Provide an integer for buffer, defaults to CT.BUFFER_STRING
-            :type bufferSize: int, optional
-            :param writeXML: Flag to write XML file, defaults to True
-            :type writeXML: bool, optional
-            :param traceFlow: Flag to trace Flow / Traces, defaults to False
-            :type traceFlow: bool, optional
             :param libraryPath: Stores the path of a traffic simulator, defaults to ""
             :type libraryPath: str, optional
             :param totalSteps: total number of simulation steps, defaults to 0
             :type totalSteps: int, optional
-            :param stepLaunchMode: lite / full, defaults to "lite"
-            :type stepLaunchMode: str, optional
             :return: Configurator object with simulation parameters
             :rtype: Configurator
         """
