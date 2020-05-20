@@ -91,9 +91,11 @@ class VissimConnector(object):
 
          self.request.parse_data(vehsAttributes)
          XX = self.request.get_vehicle_data()
+         print (XX)
          XX1=self.request.get_vehicle_id()
-         print(self.request.query_vehicle_position(*XX1))
-         print(self.request. query_vehicle_data_dict('Acceleration',*XX1))
+         #print(self.request.query_vehicle_position(*XX1))
+         #print('Now showing currrent acceleration of vehicles(m/s2)')
+         #print(self.request. query_vehicle_data_dict('Acceleration',*XX1))
 
          click.echo(click.style(f"\t Vissim found some values!", fg="green", bold=True))
         self.request.parse_data(vehsAttributes)

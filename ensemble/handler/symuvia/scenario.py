@@ -1,7 +1,7 @@
 """
 **Scenario Module**
 
-    This module contains descriptions that stablish a traffic scenario. A traffic scenario for SymuVia  is regularly described by a simulation object that points towards properties of the simulation file in this case an XML. 
+    This module contains descriptions that stablish a traffic scenario. A traffic scenario for SymuVia  is regularly described by a simulation object that points towards properties of the simulation file in this case an XML.
 """
 
 # ============================================================================
@@ -17,7 +17,6 @@ from lxml import etree
 # ============================================================================
 from ensemble.input.scenario import Scenario
 
-
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
@@ -26,13 +25,14 @@ from ensemble.tools.exceptions import (
 
 from ensemble.tools import constants as ct
 
+
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
 class SymuviaScenario(Scenario):
-    """ 
+    """
         Scenario class for Vissim
     """
 
@@ -104,7 +104,7 @@ class SymuviaScenario(Scenario):
     def get_network_links(self) -> tuple:
         """ Get network link names
 
-        :return: tuple containing link names 
+        :return: tuple containing link names
         :rtype: tuple
         """
         branch_tree = "TRAFICS/TRAFIC/TRONCONS"
@@ -126,9 +126,9 @@ class SymuviaScenario(Scenario):
         return range(int(n))
 
     def filename(self, encoding: str = None):
-        """ 
+        """
             This method returns the value of encoding of the simulation scenario under consideration
-        
+
             :param encoding: enconder UTF8, defaults to None
             :type encoding: string, optional
             :return: Full path of scenario

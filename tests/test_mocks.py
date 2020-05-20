@@ -46,6 +46,9 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
 
     def test_cli_02_bottleneck_single_vehicle(self):
+
         """ Run: ensemble"""
         result = self.runner.invoke(cli.main, ["launch", "-s", self.mocks_path, "-s", self.mocks_path_layx])
         self.assertEqual(result.exit_code, 0)
+
+

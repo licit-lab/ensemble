@@ -59,13 +59,18 @@ class SimulatorRequest(DataQuery):
         :return: list of vehicles in the network
         :rtype: list of dictionaries
         """
-        #vehsAttributesNames=(' abscissa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
+        vehsAttributesNames=('abscisa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
         vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
         vehsAttributes =self._str_response
         print('Current Number of vehicles in the network  is ',len(vehsAttributes))
 
 
-        return [dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes]
+        listofdict=[dict(zip(vehsAttributesNames, item)) for item in vehsAttributes]
+        veh_list = VehicleList.from_request(listofdict)
+        return veh_list
+
+
+
 
     def get_vehicle_id(self) -> tuple:
         """Extracts vehicle ids information from simulators response

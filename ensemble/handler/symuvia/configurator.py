@@ -14,6 +14,7 @@ import click
 
 import ensemble.tools.constants as CT
 
+
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
@@ -21,12 +22,12 @@ import ensemble.tools.constants as CT
 
 class SymuviaConfigurator:
     """ Configurator class for containing specific simulator parameters
-    
+
         Example:
             To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
                 >>> path = "path/to/simluator.so"
-                >>> simulator = Configurator(libraryPath = path) 
+                >>> simulator = Configurator(libraryPath = path)
 
 
         :return: Configurator object with simulation parameters
@@ -34,16 +35,16 @@ class SymuviaConfigurator:
     """
 
     def __init__(
-        self,
-        bufferSize: int = CT.BUFFER_STRING,
-        writeXML: bool = True,
-        traceFlow: bool = False,
-        libraryPath: str = "",
-        totalSteps: int = 0,
-        stepLaunchMode: str = "lite",
+            self,
+            bufferSize: int = CT.BUFFER_STRING,
+            writeXML: bool = True,
+            traceFlow: bool = False,
+            libraryPath: str = "",
+            totalSteps: int = 0,
+            stepLaunchMode: str = "lite",
     ) -> None:
         """ Configurator class for containing specific simulator parameter
-        
+
             :param bufferSize: Provide an integer for buffer, defaults to CT.BUFFER_STRING
             :type bufferSize: int, optional
             :param writeXML: Flag to write XML file, defaults to True
