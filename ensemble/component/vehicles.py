@@ -139,7 +139,7 @@ class Vehicle(object):
         try:
             return cls(**Vehicle.format_dict(dataveh))
         except KeyError:
-            return Vehicle(**dataveh):
+            return Vehicle(**dataveh)
 
 
 lstordct = List[OrderedDict]
