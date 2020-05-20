@@ -28,8 +28,9 @@ from ensemble.component.vehicles import Vehicle, VehicleList
 
 class SimulatorRequest(DataQuery):
     def __init__(self):
-        self._str_response = ""
-        self._vehs = []
+        self._strResponse = ""
+        self._vehList = []
+        self._dctData = {}
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
@@ -37,19 +38,70 @@ class SimulatorRequest(DataQuery):
     def __str__(self):
         return (
             "Sim Time: {}, VehInNetwork: {}".format(self.current_time, self.current_nbveh)
-            if self.data_query
-            else "Simulation has not started"
+            if self.parsed_data
+            else "No vehicles detected"
         )
 
-    def parse_data(self, response: str = None) -> dict:
-        """Parses response from simulator to data
+    # ============================================================================
+    # MEMORY HANDLING
+    # ============================================================================
 
-        :param response: Simulator response
-        :type response: str
-        :return: Full simulator response
-        :rtype: dict
+    @property
+    def query(self) -> str:
         """
-        self._str_response = response
+            Parses response from simulator to data
+        """
+        return self._strResponse.value
+
+    @query.setter
+    def query(self, response: str = None) -> None:
+        """
+            Parses response from simulator to data
+        """
+
+        # 1. gets string
+        self._strResponse = response
+
+        # 2. parses data
+        try:
+            self._dctData = parse(self._strResponse.value)
+        except ExpatError:
+            self._dctData = {}
+
+        # 3. vehicle list
+        self.update_vehicle_list()
+
+    @property
+    def parsed_data(self) -> dict:
+        """ 
+            Returns current data dictionary
+        """
+        return self._dctData
+
+    @property
+    def vehicles(self):
+        return self._vehList.vehicles
+
+    @property
+    def current_time(self) -> str:
+        return self.parsed_data.get("INST").get("@val")
+
+    @property
+    def current_nbveh(self) -> int:
+        return self.parsed_data.get("INST").get("@nbVeh")
+
+    # ============================================================================
+    # METHODS
+    # ============================================================================
+
+    def update_vehicle_list(self):
+        """ 
+            Construct and or update vehicle data
+        """
+        if self._vehList:
+            self._vehList.update_list(self.get_vehicle_data())
+            return
+        self._vehList = VehicleList.from_request(self.get_vehicle_data())
 
     def get_vehicle_data(self) -> list:
         """Extracts vehicles information from simulators response
@@ -59,8 +111,8 @@ class SimulatorRequest(DataQuery):
         :return: list of vehicles in the network
         :rtype: list of dictionaries
         """
-        if self.data_query.get("INST", {}).get("TRAJS") is not None:
-            veh_data = self.data_query.get("INST").get("TRAJS")
+        if self.parsed_data.get("INST", {}).get("TRAJS") is not None:
+            veh_data = self.parsed_data.get("INST").get("TRAJS")
             if isinstance(veh_data["TRAJ"], list):
                 return veh_data["TRAJ"]
             return [veh_data["TRAJ"]]
@@ -190,40 +242,5 @@ class SimulatorRequest(DataQuery):
 
         return tuple(nbh for nbh, npos in zip(neigh, neighpos) if float(npos) < float(vehpos))
 
-    def create_vehicle_list(self):
-        """Initialize 
-        """
-        if not self._vehs:
-            self._vehs = VehicleList.from_request(self.get_vehicle_data())
-            return
-
-    def update_vehicle_list(self):
-        """ Construct and or update vehicle data
-        """
-        if self._vehs:
-            self._vehs.update_list(self.get_vehicle_data())
-            return
-        self.create_vehicle_list()
-
     def __contains__(self, elem: Vehicle) -> bool:
-        return elem in self._vehs
-
-    @property
-    def data_query(self):
-        try:
-            return parse(self._str_response.value)
-        except ExpatError:
-            return {}
-
-    @property
-    def vehicles(self):
-        self.update_vehicle_list()
-        return self._vehs
-
-    @property
-    def current_time(self) -> str:
-        return self.data_query.get("INST").get("@val")
-
-    @property
-    def current_nbveh(self) -> int:
-        return self.data_query.get("INST").get("@nbVeh")
+        return elem in self._vehList

@@ -142,7 +142,7 @@ class SymuviaConnector(SymuviaConfigurator):
             self._bContinue = self.__library.SymRunNextStepLiteEx(self.writeXML, byref(self._b_end))
             return
         self._bContinue = self.__library.SymRunNextStepEx(self.bufferString, self.writeXML, byref(self._b_end))
-        self.request.parse_data(self.bufferString)
+        self.request.query = self.bufferString
 
     def query_data(self) -> int:
         """ Run simulation step by step
@@ -223,15 +223,15 @@ class SymuviaConnector(SymuviaConfigurator):
     #     """
     #     return self._bContinue
 
-    # @property
-    # def get_request(self) -> dict:
-    #     """
-    #         Returns the query received from the simulator
+    @property
+    def get_vehicle_data(self) -> dict:
+        """
+            Returns the query received from the simulator
 
-    #         :return: Request from the simulator
-    #         :rtype: dict
-    #     """
-    #     return self.request.data_query
+            :return: Request from the simulator
+            :rtype: dict
+        """
+        return self.request.vehicles
 
     # @property
     # def simulation(self) -> Simulation:
