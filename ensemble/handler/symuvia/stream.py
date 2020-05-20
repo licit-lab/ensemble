@@ -211,7 +211,7 @@ class SimulatorRequest(DataQuery):
     @property
     def data_query(self):
         try:
-            return parse(self._str_response)
+            return parse(self._str_response.value)
         except ExpatError:
             return {}
 
