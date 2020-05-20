@@ -136,7 +136,10 @@ class Vehicle(object):
         :return: Vehicle object
         :rtype: [type]
         """
-        return cls(**Vehicle.format_dict(dataveh))
+        try:
+            return cls(**Vehicle.format_dict(dataveh))
+        except KeyError:
+            return Vehicle(**dataveh):
 
 
 lstordct = List[OrderedDict]
