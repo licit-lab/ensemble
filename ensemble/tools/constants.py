@@ -211,3 +211,8 @@ DCT_SIMULATION_INFO = {
 # DATA VEHICLE DYNAMICS
 # *****************************************************************************
 ENGINE_CONSTANT = 0.2
+#platoon constants
+DCT_PLT_CONST={
+    "max_platoon_length":7, # maximum number of vehicles allowed in platoon
+    "max_connection_distance":100 # maximum distance for communication(metres)
+}
