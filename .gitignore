@@ -111,6 +111,7 @@ dmypy.json
 
 ### IDE ### 
 .vscode 
+.DS_STORE
 
 ### Package ### 
 # Automatic generation by docs 
