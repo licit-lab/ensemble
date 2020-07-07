@@ -25,9 +25,9 @@ from ensemble.component.vehicles import Vehicle, VehicleList
 # CLASS AND DEFINITIONS
 # ============================================================================
 
-
 class SimulatorRequest(DataQuery):
-    def __init__(self):
+    def __init__(self, channels):
+        super().__init__(channels)
         self._strResponse = ""
         self._vehList = []
         self._dctData = {}

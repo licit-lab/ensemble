@@ -3,16 +3,27 @@
     Vehicle model acts as an instance to modify vehicle's behaviour according to 
 """
 
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
 from typing import Dict, List
 from collections import OrderedDict
 import itertools
 import numpy as np
 import pandas as pd
 
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
 import ensemble.tools.constants as CT
-
 from .dynamics import VehicleDynamic
+from ensemble.control.tactical.gapcordinator import FrontGap, RearGap
 
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 class Vehicle(object):
     """Class for defining a vehicle
