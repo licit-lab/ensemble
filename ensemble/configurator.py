@@ -4,7 +4,7 @@ import ensemble.tools.constants as ct
 from ensemble.handler.symuvia import SymuviaConnector, SymuviaScenario
 from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
 
-from ensemble.control.tactical import MultiBrandPlatoonRegistry
+from ensemble.control.governor import MultiBrandPlatoonRegistry
 
 
 class Configurator(object):
