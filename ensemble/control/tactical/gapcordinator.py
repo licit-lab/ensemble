@@ -21,6 +21,9 @@ class Subscriber:
     def update(self, message):
         print('{} got message "{}"'.format(self.name, message))
 
+    def getegoinfo(self):
+        pass
+
 
 class FrontGap(Subscriber, StateMachine):
     def __init__(self, veh=PlatoonVehicle()):
@@ -33,6 +36,10 @@ class FrontGap(Subscriber, StateMachine):
         else:
             self.currentState = Split()
 
+    def update_states(self, vehicle_env):
+        """ update informatino from ego vehicle + leader"""
+        self.ego = vehicle_env['ego']
+        self.leader = vehicle_env['leader']
 
 class RearGap(Subscriber, StateMachine):
     def __init__(self, veh=PlatoonVehicle()):

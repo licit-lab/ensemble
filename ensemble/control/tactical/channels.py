@@ -29,15 +29,15 @@ class Publisher:
 
 
 if __name__ == "__main__":
-    pub = Publisher(['lunch', 'dinner'])
-    bob = Subscriber('Bob')
-    alice = Subscriber('Alice')
-    john = Subscriber('John')
+    pub = Publisher(["lunch", "dinner"])
+    bob = Subscriber("Bob")
+    alice = Subscriber("Alice")
+    john = Subscriber("John")
 
-    pub.register("lunch", bob)
-    pub.register("dinner", alice)
-    pub.register("lunch", john)
-    pub.register("dinner", john)
+    pub.register("lunch", bob, bob.update)
+    pub.register("dinner", alice, alice.update)
+    pub.register("lunch", john, john.update)
+    pub.register("dinner", john, john.update)
 
     pub.dispatch("lunch", "It's lunchtime!")
     pub.dispatch("dinner", "Dinner is served")

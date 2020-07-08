@@ -4,6 +4,8 @@ import ensemble.tools.constants as ct
 from ensemble.handler.symuvia import SymuviaConnector, SymuviaScenario
 from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
 
+from ensemble.control.tactical import MultiBrandPlatoonRegistry
+
 
 class Configurator(object):
     """ 
@@ -83,6 +85,16 @@ class Configurator(object):
 
     def query_data(self):
         self.connector.query_data()
+
+    def create_platoon_registry(self):
+        """ Creates a platoon registry for all coordinators (FGC-RGC) """
+        self.platoon_registry = MultiBrandPlatoonRegistry()
+
+    def update_platoon_registry(self):
+        if hasattr(self, "platoon_registry"):
+            self.connector.push_update()
+            return
+        self.create_platoon_registry()
 
     @property
     def total_steps(self):
