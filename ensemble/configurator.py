@@ -92,6 +92,7 @@ class Configurator(object):
 
     def update_platoon_registry(self):
         if hasattr(self, "platoon_registry"):
+            self.platoon_registry.update_truck_registry(self.connector.request)
             self.connector.push_update()
             return
         self.create_platoon_registry()

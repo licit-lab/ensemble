@@ -158,11 +158,11 @@ class SymuviaConnector(SymuviaConfigurator):
             self._bContinue = False
             return -1
 
-    def push_update(self)->None:
+    def push_update(self) -> None:
         """ Calls method within the Simulator request to
         """
         self.request.dispatch()
-        
+
     # ============================================================================
     # PROTOCOLS
     # ============================================================================

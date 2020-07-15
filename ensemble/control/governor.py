@@ -9,6 +9,7 @@ class MultiBrandPlatoonRegistry:
     """
         This 
     """
+
     def __init__(self):
         self.gap_coord = {coordtype: dict() for coordtype in ("FGC", "RGC")}
 
@@ -23,6 +24,11 @@ class MultiBrandPlatoonRegistry:
         """
         del self.cap_coord["FGC"][vehicle.id]
         del self.cap_coord["RGC"][vehicle.id]
+
+    def update_truck_registry(self, request):
+        """ Update truck registry by registering / deregistering
+        """
+        pass
 
 
 class MultiBrandPlatoonClient(object):

@@ -107,8 +107,12 @@ class Query(State):
     """
 
     def on_event(self, event: str, configurator):
+
+        # TODO: call simulator step by step.
+
         if event == "control":
             configurator.query_data()
+            configurator.update_platoon_registry()
             return Control()
 
         return self

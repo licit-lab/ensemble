@@ -36,10 +36,11 @@ class FrontGap(Subscriber, StateMachine):
         else:
             self.currentState = Split()
 
-    def update_states(self, vehicle_env):
+    def update_front(self, vehicle_env):
         """ update informatino from ego vehicle + leader"""
-        self.ego = vehicle_env['ego']
-        self.leader = vehicle_env['leader']
+        self.ego = vehicle_env["ego"]
+        self.leader = vehicle_env["leader"]
+
 
 class RearGap(Subscriber, StateMachine):
     def __init__(self, veh=PlatoonVehicle()):
@@ -51,3 +52,8 @@ class RearGap(Subscriber, StateMachine):
             self.currentState = Platoon()
         else:
             self.currentState = Split()
+
+    def update_back(self, vehicle_env):
+        """ update informatino from ego vehicle + follower"""
+        self.ego = vehicle_env["ego"]
+        self.back = vehicle_env["follower"]
