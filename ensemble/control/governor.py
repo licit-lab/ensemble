@@ -28,7 +28,15 @@ class MultiBrandPlatoonRegistry:
     def update_truck_registry(self, request):
         """ Update truck registry by registering / deregistering
         """
-        pass
+        for key, vehicle in request.vehicles.items():
+            if vehicle not in self:
+                self.regiserTruck(vehicle)
+
+
+    def __contain__(self, vehicle):
+        """ Check if element has created 
+        """
+        return (vehicle.id in self.cap_coord["FGC"].keys()) & (vehicle.id in self.cap_coord["RGC"].keys())
 
 
 class MultiBrandPlatoonClient(object):
