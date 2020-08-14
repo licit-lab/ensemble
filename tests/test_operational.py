@@ -28,9 +28,9 @@ class TestLoadLibrary(unittest.TestCase):
     def setUp(self):
         opsys = platform.system().lower()
         if opsys == "windows":
-            self.path_dll = os.path.join(os.getcwd(), "ensemble", "lib", opsys, "OperationalDLL.dll")
+            self.path_dll = os.path.join(os.getcwd(), "ensemble", "libs", opsys, "OperationalDLL.dll")
         elif opsys == "darwin":
-            self.path_dll = os.path.join(os.getcwd(), "ensemble", "lib", opsys, "OperationalDLL.dylib")
+            self.path_dll = os.path.join(os.getcwd(), "ensemble", "libs", opsys, "OperationalDLL.dylib")
         else:
             print("System not supported")
             sys.exit()
@@ -44,9 +44,9 @@ class TestQueryOperationalDLL(unittest.TestCase):
     def setUp(self):
         opsys = platform.system().lower()
         if opsys == "windows":
-            self.path_dll = os.path.join(os.getcwd(), "ensemble", "lib", opsys, "OperationalDLL.dll")
+            self.path_dll = os.path.join(os.getcwd(), "ensemble", "libs", opsys, "OperationalDLL.dll")
         elif opsys == "darwin":
-            self.path_dll = os.path.join(os.getcwd(), "ensemble", "lib", opsys, "OperationalDLL.dylib")
+            self.path_dll = os.path.join(os.getcwd(), "ensemble", "libs", opsys, "OperationalDLL.dylib")
         else:
             print("System not supported")
             sys.exit()
