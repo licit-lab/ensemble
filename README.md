@@ -2,7 +2,7 @@
 
 # ENSEMBLE Launch 
 
-![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) ![](https://img.shields.io/badge/Documentation-here-green)
+![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) ![](https://img.shields.io/badge/-Documentation-brightgreen)
 
 A CLI implementing Multibrand platooning for ENSEMBLE within traffic simulators. Please find more information in the [documentation](http://paco.hamers-tno.pages.ci.tno.nl/ensemble_drivermodel/)
 
