@@ -14,7 +14,7 @@ A CLI implementing Multibrand platooning for ENSEMBLE within traffic simulators.
 
 This software application describes a model for the platooning driver model which is used within the Eurpean project of [ENSEMBLE](https://platooningensemble.eu).
 
-Here we describe how we think the structure of the cooperation between the specification adn the traffic simulation platform is implemented.
+Here we describe how we think the structure of the cooperation between the specification and the traffic simulation platform is implemented.
 
 
 ## Download
