@@ -2,7 +2,9 @@
 
 # ENSEMBLE Launch 
 
-![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) 
+![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) ![](https://img.shields.io/badge/Documentation-here-green)
+
+A CLI implementing Multibrand platooning for ENSEMBLE within traffic simulators. Please find more information in the [documentation](http://paco.hamers-tno.pages.ci.tno.nl/ensemble_drivermodel/)
 
 <img src="docs/source/img/logo.png" alt="drawing" align="middle" width="200" />
 
@@ -74,7 +76,7 @@ ensemble launch -s 'file_scenario.inpx' -s 'file_layout.layx' -l 'C:\my\path\to\
 
 ## Documentation 
 
-Documentation is available in the `docs` folder. In order to construct the documentation 
+Documentation is available [here](http://paco.hamers-tno.pages.ci.tno.nl/ensemble_drivermodel/) or in the `docs` folder. In order to build the documentation 
 
 ```
 make docs 
