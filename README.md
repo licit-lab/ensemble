@@ -10,12 +10,11 @@ A CLI implementing Multibrand platooning for ENSEMBLE within traffic simulators.
 
 ## Overview 
 
-ENSEMBLE is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different platforms. 
+[ENSEMBLE](https://platooningensemble.eu) is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different traffic simulation platforms. 
 
-A model develeopment platform for the Drivermodel which is used within the Eurpean project of Ensemble
+This software application describes a model for the platooning driver model which is used within the Eurpean project of [ENSEMBLE](https://platooningensemble.eu).
 
-
-Here we describe how we think the structure of the joint algorithm should be. The two simulators are called and started separately and they both perform different tasks.  Each should be capable of sending and retrieving network and status data. Some Tasks are simulator dependent(e.g. retrieving data) while others are simulator independent(l e.g oop through all vehicles)
+Here we describe how we think the structure of the cooperation between the specification adn the traffic simulation platform is implemented.
 
 
 ## Download
