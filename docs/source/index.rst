@@ -9,7 +9,7 @@ Welcome to Ensemble Truck Platooning's documentation!
    02_installation.rst
    03_usage.rst
    04_architecture.rst
-   04_modules.rst
+   modules.rst
    05_contributing.rst
    06_authors.rst
    07_history.md
