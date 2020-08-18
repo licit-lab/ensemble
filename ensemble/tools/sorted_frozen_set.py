@@ -18,9 +18,7 @@ from bisect import bisect_left
 
 class SortedFrozenSet(Sequence, Set):
     """
-        This is a collection that provides a set of properties to create a sorted frozen set. 
-
-        A sorted frozen set is a collection of unique ordered objects. 
+        This is a collection that provides a set of properties to create a sorted frozen set.
 
         In particular
 
