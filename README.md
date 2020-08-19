@@ -2,18 +2,19 @@
 
 # ENSEMBLE Launch 
 
-![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) 
+![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) ![](https://img.shields.io/badge/-Documentation-brightgreen)
+
+A CLI implementing Multibrand platooning for ENSEMBLE within traffic simulators. Please find more information in the [documentation](http://paco.hamers-tno.pages.ci.tno.nl/ensemble_drivermodel/)
 
 <img src="docs/source/img/logo.png" alt="drawing" align="middle" width="200" />
 
 ## Overview 
 
-ENSEMBLE is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different platforms. 
+[ENSEMBLE](https://platooningensemble.eu) is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different traffic simulation platforms. 
 
-A model develeopment platform for the Drivermodel which is used within the Eurpean project of Ensemble
+This software application describes a model for the platooning driver model which is used within the Eurpean project of [ENSEMBLE](https://platooningensemble.eu).
 
-
-Here we describe how we think the structure of the joint algorithm should be. The two simulators are called and started separately and they both perform different tasks.  Each should be capable of sending and retrieving network and status data. Some Tasks are simulator dependent(e.g. retrieving data) while others are simulator independent(l e.g oop through all vehicles)
+Here we describe how we think the structure of the cooperation between the specification and the traffic simulation platform is implemented.
 
 
 ## Download
@@ -74,7 +75,7 @@ ensemble launch -s 'file_scenario.inpx' -s 'file_layout.layx' -l 'C:\my\path\to\
 
 ## Documentation 
 
-Documentation is available in the `docs` folder. In order to construct the documentation 
+Documentation is available [here](http://paco.hamers-tno.pages.ci.tno.nl/ensemble_drivermodel/) or in the `docs` folder. In order to build the documentation 
 
 ```
 make docs 
