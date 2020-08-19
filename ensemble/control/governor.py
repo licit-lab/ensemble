@@ -2,12 +2,20 @@
     This module contains objects that implement the tactical control layer and communication towards the operational layer
 """
 
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from ensemble.tools.sorted_frozen_set import SortedFrozenSet
 from .tactical.gapcordinator import FrontGap, RearGap
 
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
-class MultiBrandPlatoonRegistry:
+class MultiBrandPlatoonRegistry(SortedFrozenSet):
     """
-        This 
+        This class models and represents a single platoon registry 
     """
 
     def __init__(self):
@@ -31,7 +39,6 @@ class MultiBrandPlatoonRegistry:
         for key, vehicle in request.vehicles.items():
             if vehicle not in self:
                 self.regiserTruck(vehicle)
-
 
     def __contain__(self, vehicle):
         """ Check if element has created 
