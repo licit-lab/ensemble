@@ -26,7 +26,7 @@ class TestConstruction(unittest.TestCase):
 
     def test_construct_from_regular_dict(self):
         data = {
-            "abscisa": 0.0,
+            "abscissa": 0.0,
             "acceleration": 0.0,
             "distance": 0.0,
             "vehid": 0,
