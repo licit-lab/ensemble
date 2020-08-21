@@ -9,6 +9,7 @@ pages:
     - mv .public public
     - pip install -U sphinx recommonmark
     - sphinx-apidoc -o docs/source public
+    - sphinx-build -b html docs/source public
   artifacts:
     paths:
       - public
