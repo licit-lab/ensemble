@@ -8,7 +8,7 @@ pages:
     - cp -r * .public
     - mv .public public
     - pip install -U sphinx recommonmark
-    - sphinx-apidoc --ext-autodoc -f -o docs/source public
+    - sphinx-apidoc -o docs/source public
   artifacts:
     paths:
       - public
