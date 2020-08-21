@@ -115,6 +115,6 @@ dmypy.json
 
 ### Package ### 
 # Automatic generation by docs 
-docs/source/ensemble.*
+# docs/source/ensemble.*
 
 test_output
