@@ -27,7 +27,8 @@ from ensemble.component.vehicles import Vehicle, VehicleList
 
 
 class SimulatorRequest(DataQuery):
-    def __init__(self):
+    def __init__(self, channels):
+        super().__init__(channels)
         self._strResponse = ""
         self._vehList = []
         self._dctData = {}
@@ -241,6 +242,18 @@ class SimulatorRequest(DataQuery):
         neighpos = self.query_vehicle_position(*neigh)
 
         return tuple(nbh for nbh, npos in zip(neigh, neighpos) if float(npos) < float(vehpos))
+
+    def dispatch(self, channel: str) -> None:
+        """ This is a dispatcher for the vehicle
+
+        :param channel: Channel to broadcast to (FGC/RGC/ALL)
+        :type vehid: str
+
+        """
+
+        for subscriber, callback in self.get_subscribers(channel).items():
+            vehicle_env = {}
+            callback(vehicle_env)
 
     def __contains__(self, elem: Vehicle) -> bool:
         return elem in self._vehList

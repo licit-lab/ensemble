@@ -158,6 +158,11 @@ class SymuviaConnector(SymuviaConfigurator):
             self._bContinue = False
             return -1
 
+    def push_update(self) -> None:
+        """ Calls method within the Simulator request to
+        """
+        self.request.dispatch()
+
     # ============================================================================
     # PROTOCOLS
     # ============================================================================
@@ -173,7 +178,9 @@ class SymuviaConnector(SymuviaConfigurator):
             Perform simulation initialization
         """
         self._b_end = c_int()
-        self.request = SimulatorRequest()
+        self.request = SimulatorRequest(
+            ["VEHChannel", "FGCChannel", "RGCChannel"]
+        )  # This is to follow an observer pattern with 3 channels.
         self._n_iter = iter(scenario.get_simulation_steps())
         self._c_iter = next(self._n_iter)
         self._bContinue = True

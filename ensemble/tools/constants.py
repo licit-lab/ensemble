@@ -98,14 +98,17 @@ DCT_VEH_PARAM = {
 # Dynamic Vehicle Data
 
 DCT_VEH_DATA = {
-    "abscisa": 0.0,  #  x coordinate [m]
+    "abscissa": 0.0,  #  x coordinate [m]
     "acceleration": 0.0,  #  acceleration [m/s2]
     "distance": 0.0,  #  distance [m]
     "vehid": 0,  #  unique identifier [int]
     "ordinate": 0,  # y coorindate [m]
     "link": "",  # link [string]
-    "veh_type": "",  # vehicle type [string1]
+    "vehtype": "",  # vehicle type [string1]
     "speed": 0.0,  # speed [m/s]
+    "lane": 1,  # lane (from right to left) [int]
+    "elevation": 0.0,  # elevation m
+    "itinerary": [],  # list of ordered links in the network [list]
 }
 
 # Dynamic Platoon Data
@@ -122,7 +125,7 @@ DCT_PLT_DATA = {
 # *****************************************************************************
 
 FIELD_DATA = {
-    "@abs": "abscisa",
+    "@abs": "abscissa",
     "@acc": "acceleration",
     "@dst": "distance",
     "@id": "vehid",
@@ -151,7 +154,7 @@ FLOAT_SELECT = float64
 INT_SELECT = int32
 
 FIELD_FORMATAGG = {
-    "abscisa": (array, FLOAT_SELECT),
+    "abscissa": (array, FLOAT_SELECT),
     "acceleration": (array, FLOAT_SELECT),
     "distance": (array, FLOAT_SELECT),
     "vehid": (array, INT_SELECT),
@@ -211,3 +214,8 @@ DCT_SIMULATION_INFO = {
 # DATA VEHICLE DYNAMICS
 # *****************************************************************************
 ENGINE_CONSTANT = 0.2
+# platoon constants
+DCT_PLT_CONST = {
+    "max_platoon_length": 7,  # maximum number of vehicles allowed in platoon
+    "max_connection_distance": 100,  # maximum distance for communication(metres)
+}

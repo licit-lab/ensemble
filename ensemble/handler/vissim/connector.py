@@ -105,13 +105,23 @@ class VissimConnector(object):
         """
         try:
             self.request_answer()
+            #click.echo(self.get_vehicle_data())
+            myvehids=self.request.get_vehicle_id()
+            click.echo(myvehids)
+            if len(myvehids)!=0:
+                print(self.request.query_vehicle_data_dict('Acceleration', *myvehids))
+                print(myvehids[-1],self.request.get_leader_id(myvehids[-1]))
+                print(str(myvehids[0]), str(self.request.get_follower_id(myvehids[0])))
             self.run_single_step()
             self._c_iter = next(self._n_iter)
             return self._c_iter
         except StopIteration:
             self._bContinue = False
             return -1
-
+    def push_update(self) -> None:
+        """ Calls method within the Simulator request to
+        """
+        self.request.dispatch("VEHChannel")
     def get_vehicle_data(self):
         return self.request.get_vehicle_data().vehicles
     # ============================================================================
@@ -129,7 +139,9 @@ class VissimConnector(object):
             Perform simulation initialization
         """
         #self._b_end = c_int()
-        self.request = SimulatorRequest()
+       # self.request = SimulatorRequest()
+        self.request = SimulatorRequest(
+            ["VEHChannel", "FGCChannel", "RGCChannel"])
         self._n_iter = iter(self.get_simulation_steps())
         self._c_iter = next(self._n_iter)
         self._bContinue = True

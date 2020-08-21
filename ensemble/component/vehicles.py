@@ -10,16 +10,27 @@
     VehicleListIndicators is an object designed for computing indicators over a set of vehicles.  
 """
 
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
 from typing import Dict, List
 from collections import OrderedDict
 import itertools
 import numpy as np
 import pandas as pd
 
-import ensemble.tools.constants as CT
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
 
+import ensemble.tools.constants as ct
 from .dynamics import VehicleDynamic
+from ensemble.control.tactical.gapcordinator import FrontGap, RearGap
 
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 class Vehicle:
     """
@@ -48,22 +59,22 @@ class Vehicle:
 
     def __init__(
         self,
-        abscisa=0.0,
-        acceleration=0.0,
-        distance=0.0,
-        vehid=0,
-        ordinate=0.0,
-        link="",
-        vehtype="",
-        speed=0.0,
-        lane=0,
-        elevation=0.0,
+        abscissa=ct.DCT_VEH_DATA["abscissa"],
+        acceleration=ct.DCT_VEH_DATA["acceleration"],
+        distance=ct.DCT_VEH_DATA["distance"],
+        vehid=ct.DCT_VEH_DATA["vehid"],
+        ordinate=ct.DCT_VEH_DATA["ordinate"],
+        link=ct.DCT_VEH_DATA["link"],
+        vehtype=ct.DCT_VEH_DATA["vehtype"],
+        speed=ct.DCT_VEH_DATA["speed"],
+        lane=ct.DCT_VEH_DATA["lane"],
+        elevation=ct.DCT_VEH_DATA["elevation"],
         dynamic=VehicleDynamic(),
-        itinerary=[],
+        itinerary=ct.DCT_VEH_DATA["itinerary"],
     ):
         """ This initializer creates a Vehicle
         """
-        self.abscisa = abscisa
+        self.abscissa = abscissa
         self.acceleration = acceleration
         self.distance = distance
         self.vehid = vehid
@@ -150,7 +161,7 @@ class Vehicle:
         :return: Dictionary as in description
         :rtype: [type]
         """
-        data = {CT.FIELD_DATA[key]: CT.FIELD_FORMAT[key](val) for key, val in dataveh.items()}
+        data = {ct.FIELD_DATA[key]: ct.FIELD_FORMAT[key](val) for key, val in dataveh.items()}
         return data
 
     @classmethod
@@ -207,7 +218,7 @@ class VehicleList(object):
         :return: vector of all parameters
         :rtype: np.array
         """
-        constructor, ftype = CT.FIELD_FORMATAGG[attribute]
+        constructor, ftype = ct.FIELD_FORMATAGG[attribute]
         if ftype:
             return constructor([getattr(veh, attribute) for veh in self], dtype=ftype)
         return [getattr(veh, attribute) for veh in self]  # Case str
