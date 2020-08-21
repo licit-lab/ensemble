@@ -8,12 +8,8 @@ pages:
     - cp -r * .public
     - mv .public public
     - pip install -U sphinx recommonmark
-    - sphinx-apidoc -o docs/source public
-    - cd docs
-    - make clean html
-    # - sphinx-build -b html docs/source public
-    # - make -C docs clean
-    # - make -C docs html
+    - sphinx-build -b html docs/source public
+    # - sphinx-apidoc -o docs/source public
   artifacts:
     paths:
       - public
