@@ -9,9 +9,11 @@ pages:
     - mv .public public
     - pip install -U sphinx recommonmark
     - sphinx-apidoc -o docs/source public
-    - sphinx-build -b html docs/source public
-    - make -C docs clean
-    - make -C docs html
+    - cd docs
+    - make clean html
+    # - sphinx-build -b html docs/source public
+    # - make -C docs clean
+    # - make -C docs html
   artifacts:
     paths:
       - public
