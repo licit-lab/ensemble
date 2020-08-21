@@ -7,7 +7,7 @@ pages:
     - cp -r * .public
     - mv .public public
     - pip install -U sphinx recommonmark
-    - sphinx-build -b html docs/source public
+    - sphinx-apidoc -o docs/source public
   artifacts:
     paths:
       - public
