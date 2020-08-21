@@ -3,6 +3,7 @@ image: python:3.7-alpine
 pages:
   stage: deploy
   script:
+    - rm -rf .public
     - mkdir .public
     - cp -r * .public
     - mv .public public
