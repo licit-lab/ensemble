@@ -1,6 +1,13 @@
-""" This module implements a vehicle model.
+""" 
+    Implements a set of classes to manage vehicles within the API. The classes include a representation of single vehicle model with dynamic evolution, the set of ordered vehicles within a specific time step in the simulation, and indicators about the total amount of vehicles cumulated on the simulator. 
 
-    Vehicle model acts as an instance to modify vehicle's behaviour according to 
+    Vehicle model acts as an object to store vehicle data and provide specific behaviors required by the driver model in the form of a model :math:`x_i(k+1) = f (x_i(k), u(k), x_{i-1}(k))`
+
+    VehicleList is an ordered frozen set (ordered by id) for which it is possible to iterate at specific time instant to determine specific indicators or particular information of the set of vehicles. 
+
+    VehicleIndicator is an objec in charge of computing indicator for a single vehicle.
+
+    VehicleListIndicators is an object designed for computing indicators over a set of vehicles.  
 """
 
 from typing import Dict, List
@@ -14,8 +21,27 @@ import ensemble.tools.constants as CT
 from .dynamics import VehicleDynamic
 
 
-class Vehicle(object):
-    """Class for defining a vehicle
+class Vehicle:
+    """
+        Vehicle object defining properties and methods required to store and compute predictions according to a vehicle model. 
+
+        Since Pythagoras, we know that :math:`a^2 + b^2 = c^2`.
+
+        Args:
+
+            abscissa (float):   x coordinate [m],
+            acceleration (float):   Acceleration [m/s2],
+            distance (float):   Distance [m],
+            vehid (int):   Unique vehicle identifier,
+            ordinate (float):  y coorindate [m],
+            link (str):  Link name,
+            vehtype (str):  Vehicle type,
+            speed (float):  speed [m/s],
+            lane (int):  lane (from right to left),
+            elevation (float):  elevation [m],
+            dynamic (VehicleDynamic): Vehicle dynamics (check )
+            itinerary (list):  list of ordered links in the network [list],           
+
     """
 
     counter = itertools.count()
@@ -107,7 +133,7 @@ class Vehicle(object):
     @staticmethod
     def format_dict(dataveh: OrderedDict) -> dict:
         """ This function creates the dictionary 
-               {"abscisa":       float(data),
+               {"abscissa":       float(data),
                 "acceleration":  float(data),
                 "distance":      float(data),
                 "vehid":         int(data),
