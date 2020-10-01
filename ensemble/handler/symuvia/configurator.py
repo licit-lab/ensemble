@@ -1,5 +1,5 @@
 """
-    This module contains a ``Configurator`` object. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation. The objective is to introduce flexibility when configuring the the simulator platform and the runtime execution possibilities offered by exposed functions from the c library of SymuVia
+    This module contains a configurator object for SymuVia. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation. The objective is to introduce flexibility when configuring the the simulator platform and the runtime execution possibilities offered by exposed functions from the c library of SymuVia
 """
 # ============================================================================
 # STANDARD  IMPORTS
@@ -7,43 +7,44 @@
 
 from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
 import click
+import platform
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
+from ensemble.tools.connector_configurator import ConnectorConfigurator
+from symupy.utils.configurator import Configurator as SymupyConfigurator
 import ensemble.tools.constants as CT
-
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
-class SymuviaConfigurator:
-    """ Configurator class for containing specific simulator parameters
+class SymuviaConfigurator(ConnectorConfigurator, SymupyConfigurator):
+    """ Configurator class for containing specific simulator parameters for SymuVia
 
         Example:
             To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
                 >>> path = "path/to/simluator.so"
-                >>> simulator = Configurator(libraryPath = path)
+                >>> simulator = SymuviaConfigurator(libraryPath = path)
 
-
-        :return: Configurator object with simulation parameters
-        :rtype: Configurator
+        :return: Symuvia Configurator object with simulation parameters
+        :rtype: SymuviaConfigurator
     """
 
     def __init__(
-            self,
-            bufferSize: int = CT.BUFFER_STRING,
-            writeXML: bool = True,
-            traceFlow: bool = False,
-            libraryPath: str = "",
-            totalSteps: int = 0,
-            stepLaunchMode: str = "lite",
+        self,
+        bufferSize: int = CT.BUFFER_STRING,
+        writeXML: bool = CT.WRITE_XML,
+        traceFlow: bool = CT.TRACE_FLOW,
+        libraryPath: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())],
+        totalSteps: int = CT.TOTAL_SIMULATION_STEPS,
+        stepLaunchMode: str = CT.LAUNCH_MODE,
     ) -> None:
-        """ Configurator class for containing specific simulator parameter
+        """  Symuvia Configurator class for containing specific simulator parameter
 
             :param bufferSize: Provide an integer for buffer, defaults to CT.BUFFER_STRING
             :type bufferSize: int, optional
@@ -60,19 +61,11 @@ class SymuviaConfigurator:
             :return: Configurator object with simulation parameters
             :rtype: Configurator
         """
-        click.echo("Configurator: Initialization")
-        self.bufferString = create_string_buffer(bufferSize)
-        self.writeXML = c_bool(writeXML)
-        self.traceFlow = traceFlow
-        self.libraryPath = libraryPath
-        self.totalSteps = totalSteps
-        self.stepLaunchMode = stepLaunchMode
-        super(SymuviaConfigurator, self).__init__()
-
-    def __repr__(self):
-        data_dct = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({data_dct})"
-
-    def __str__(self):
-        data_dct = "Configuration status:\n " + "\n ".join(f"{k}:  {v}" for k, v in self.__dict__.items())
-        return f"{data_dct}"
+        super(SymuviaConfigurator, self).__init__(
+            bufferSize=bufferSize,
+            writeXML=writeXML,
+            traceFlow=traceFlow,
+            libraryPath=libraryPath,
+            totalSteps=totalSteps,
+            stepLaunchMode=stepLaunchMode,
+        )
