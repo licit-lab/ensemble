@@ -1,13 +1,12 @@
 """
-    **SymuVia Connector Module**
-
     This module details the implementation of a ``Simulator`` object in charge of handling the connection between the traffic simulator and this interface. The connection with the traffic simulator is handled by an object called ``Connector`` which establishes a messaging protocol with the traffic simulator. 
 
     Example:
         To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
-            >>> path = "path/to/simulator.so"
-            >>> simulator = Simulator(path) 
+            >>> from ensemble.handler.symuvia import SymuviaConnector
+            >>> path_symuvia = "path/to/libSymuyVia.dylib"
+            >>> simulator = SymuviaConnector(libraryPath=path_symuvia)
 
     Other parameters can also be send to the simulator in order to provide other configurations:
 
@@ -57,7 +56,11 @@ class SymuviaConnector(SymuviaConfigurator):
     """ 
         This models a connector and interactions from the API with the Symuvia library. 
 
-        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+        :raises EnsembleAPILoadLibraryError: 
+            Error raised whenever the SymuVia library is not found
+        
+        :raises EnsembleAPILoadFileError: 
+            Error raised whenever the provided path for an scenario cannot be loaded into the Simulator
     """
 
     def __init__(
@@ -70,19 +73,8 @@ class SymuviaConnector(SymuviaConfigurator):
         stepLaunchMode: str = "lite",
         **kwargs,
     ) -> None:
-        super(SymuviaConnector, self).__init__(
-            bufferSize=bufferSize,
-            writeXML=writeXML,
-            traceFlow=traceFlow,
-            libraryPath=libraryPath,
-            totalSteps=totalSteps,
-            stepLaunchMode=stepLaunchMode,
-            **kwargs,
-        )
+        super(SymuviaConnector, self).__init__()
         self.load_symuvia()
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.libraryPath})"
 
     # ============================================================================
     # LOADING METHODS

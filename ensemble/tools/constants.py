@@ -15,7 +15,7 @@
     ----------------------------  --------------------------------------
     ``BUFFER_STRING``              Buffer size
     ``DEFAULT_LIB_OSX``            Default OS X library path (SymuVia)
-    ``DEFAULT_LIB_LINUX``          Default Linux library path  
+    ``DEFAULT_LIB_LINUX``          Default Linux library path  (SymuVia)
     ``DEFAULT_LIB_WINDOWS``        Default Windows library path (Vissim)
     ``DCT_SIMULATORS``             Simulator according to SO 
     ``DCT_DEFAULT_PATHS``          Available combinations SO/simulator
@@ -33,31 +33,45 @@
 
 from datetime import date, datetime, timedelta
 from numpy import array, float64, int32
+import os
+
+# ============================================================================
+# SPECIFIC  IMPORTS
+# ============================================================================
+
+from symupy.utils.constants import (
+    DEFAULT_LIB_OSX,
+    DEFAULT_LIB_LINUX,
+    DCT_DEFAULT_PATHS,
+    FIELD_DATA,
+    FIELD_FORMAT,
+    FIELD_FORMATAGG,
+    BUFFER_STRING,
+    DCT_SIMULATION_INFO,
+    DCT_EXPORT_INFO,
+    DCT_TRAFIC_INFO,
+    DCT_NETWORK_INFO,
+    DCT_SCENARIO_INFO,
+    TP_VEHTYPES,
+    TP_VEHTYPES,
+    TIME_STEP,
+    ENGINE_CONSTANT,
+    WRITE_XML,
+    TRACE_FLOW,
+    LAUNCH_MODE,
+    TOTAL_SIMULATION_STEPS
+)
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
-
-# Default simulator per platform
-
-# *****************************************************************************
-# DEFAULT PATHS TO FIND SIMULATOR PLATFORMS
-# *****************************************************************************
-
-# DEFAULT_LIB_OSX = "/Users/ladino/Documents/03-Code/02-Python/libraries/symupy/lib/osx-64/libSymuVia.dylib"
-
-DEFAULT_LIB_OSX = "/Users/andresladino/Documents/01-Code/04-Platforms/dev-symuvia/build/lib/libSymuVia.dylib"
-
-DEFAULT_LIB_LINUX = "/home/build-symuvia/build/symuvia/libSymuVia.so"
-
+# Vissim Command
 DEFAULT_LIB_WINDOWS = "Vissim.Vissim-64.10"
-
 
 # *****************************************************************************
 # DEFAULT SIMULATOR/ OS ASSOCIATION
 # *****************************************************************************
-
 
 DCT_SIMULATORS = {
     "Darwin": "symuvia",
@@ -67,13 +81,29 @@ DCT_SIMULATORS = {
 
 # Feasible Simulator/Platform Paths/Libs
 
-DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_LIB_OSX,
-    ("symuvia", "Linux"): DEFAULT_LIB_LINUX,
-    ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
+# Adding case for Vissim
+DCT_DEFAULT_PATHS[("vissim", "Windows")] = DEFAULT_LIB_WINDOWS
+
+# Dynamic Platoon Data
+
+DCT_PLT_DATA = {
+    "plt_id": 0,  # Platoon id
+    "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
+    "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
+    "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
 
 # *****************************************************************************
+# SYMUVIA CONSTANTS
+# *****************************************************************************
+
+# *****************************************************************************
+# VISSIM CONSTANTS
+# *****************************************************************************
+
+# *****************************************************************************
+# ENSEMBLE
+#
 # DEFAULT SCENARIO PARAMETERS
 # *****************************************************************************
 
@@ -111,111 +141,12 @@ DCT_VEH_DATA = {
     "itinerary": [],  # list of ordered links in the network [list]
 }
 
-# Dynamic Platoon Data
+# Platoon parameters
 
-DCT_PLT_DATA = {
-    "plt_id": 0,  # Platoon id
-    "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
-    "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
-    "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
-}
-
-# *****************************************************************************
-# STREAM CONSTANTS
-# *****************************************************************************
-
-FIELD_DATA = {
-    "@abs": "abscissa",
-    "@acc": "acceleration",
-    "@dst": "distance",
-    "@id": "vehid",
-    "@ord": "ordinate",
-    "@tron": "link",
-    "@type": "vehtype",
-    "@vit": "speed",
-    "@voie": "lane",
-    "@z": "elevation",
-}
-
-FIELD_FORMAT = {
-    "@abs": float,
-    "@acc": float,
-    "@dst": float,
-    "@id": int,
-    "@ord": float,
-    "@tron": str,
-    "@type": str,
-    "@vit": float,
-    "@voie": int,
-    "@z": float,
-}
-
-FLOAT_SELECT = float64
-INT_SELECT = int32
-
-FIELD_FORMATAGG = {
-    "abscissa": (array, FLOAT_SELECT),
-    "acceleration": (array, FLOAT_SELECT),
-    "distance": (array, FLOAT_SELECT),
-    "vehid": (array, INT_SELECT),
-    "ordinate": (array, FLOAT_SELECT),
-    "link": (list, None),
-    "vehtype": (list, None),
-    "speed": (array, FLOAT_SELECT),
-    "lane": (array, INT_SELECT),
-    "elevation": (array, FLOAT_SELECT),
-}
-
-
-# *****************************************************************************
-# SYMUVIA CONSTANTS
-# *****************************************************************************
-
-# *****************************************************************************
-# CONNECTOR
-# *****************************************************************************
-# Buffer string size
-BUFFER_STRING = 1000000
-
-# *****************************************************************************
-# SCENARIO
-# *****************************************************************************
-# Format time from xml file
-HOUR_FORMAT = "%H:%M:%S"
-
-# DATE/TIME INFORMATION
-DELTA_TIME = timedelta(minutes=1)
-TIME_STEP = timedelta(seconds=1).total_seconds()
-today = date.today().strftime("%Y-%m-%d")
-st_time = datetime.now()
-ed_time = st_time + DELTA_TIME
-st_time_str = st_time.strftime("%H:%M:%S")
-ed_time_str = ed_time.strftime("%H:%M:%S")
-
-DCT_SIMULATION_INFO = {
-    "id": "simID",
-    "pasdetemps": f"TIME_STEP",
-    "debut": f"st_time_str",
-    "fin": f"ed_time_str",
-    "loipoursuite": "exacte",
-    "comportementflux": "iti",
-    "date": f"today",
-    "titre": "default_simulation",
-    "proc_deceleration": "false",
-    "seed": "1",
-}
-
-# *****************************************************************************
-# VISSIM CONSTANTS
-# *****************************************************************************
-
-
-# *****************************************************************************
-# DATA VEHICLE DYNAMICS
-# *****************************************************************************
-ENGINE_CONSTANT = 0.2
-# platoon constants
 DCT_PLT_CONST = {
     "max_platoon_length": 7,  # maximum number of vehicles allowed in platoon
     "max_connection_distance": 100,  # maximum distance for communication(metres)
 }
+
+if __name__ == "__main__":
+    print(os.environ.get("SYMUVIALIB"))
