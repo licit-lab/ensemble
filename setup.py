@@ -12,9 +12,6 @@ with open("HISTORY.md", "r") as history_file:
 
 requirements = ["click>=7.0", "xmltodict>=0.12", "lxml>=4.5.0", "pandas>=1.0.0", "symupy>=0.3.4"]
 
-setup_requirements = ["pytest-runner"]
-
-test_requirements = ["pytest>=3"]
 
 setup(
     author="Andres Ladino",
@@ -38,9 +35,7 @@ setup(
     keywords="ensemble",
     name="ensemble",
     packages=find_packages(include=["ensemble", "ensemble.*"]),
-    setup_requires=setup_requirements,
     test_suite="tests",
-    tests_require=test_requirements,
     url="https://github.com/andres.ladino-ifsttar/ensemble",
     version="0.1.0",
     zip_safe=False,
