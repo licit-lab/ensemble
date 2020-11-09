@@ -44,9 +44,16 @@ class Configurator(object):
                 )
             )
 
-        self.library_path = ct.DCT_DEFAULT_PATHS.get((self.simulation_platform, self.platform))
+        self.library_path = ct.DCT_DEFAULT_PATHS.get(
+            (self.simulation_platform, self.platform)
+        )
 
-        click.echo(click.style(f"Simulator path set to default value:\n \t {self.library_path}", fg="green",))
+        click.echo(
+            click.style(
+                f"Simulator path set to default value:\n \t {self.library_path}",
+                fg="green",
+            )
+        )
         return
 
     def update_values(self, **kwargs) -> None:
@@ -57,28 +64,44 @@ class Configurator(object):
 
             self.library_path = kwargs.get("library_path", self.library_path)
 
-            click.echo(click.style(f"Setting new library path to user input:\n \t{self.library_path}", fg="yellow",))
+            click.echo(
+                click.style(
+                    f"Setting new library path to user input:\n \t{self.library_path}",
+                    fg="yellow",
+                )
+            )
 
         if kwargs.get("scenario_files"):
-            self.scenario_files = kwargs.get("scenario_files", self.scenario_files)
+            self.scenario_files = kwargs.get(
+                "scenario_files", self.scenario_files
+            )
 
             click.echo(
-                click.style(f"Setting new scenario file(s) path to user input:  {self.library_path}", fg="yellow",)
+                click.style(
+                    f"Setting new scenario file(s) path to user input:  {self.library_path}",
+                    fg="yellow",
+                )
             )
 
     def load_socket(self):
         """ Determines simulation platform to connect """
         if self.simulation_platform == "symuvia":
-            self.connector = SymuviaConnector(self.library_path, stepLaunchMode="traj")
+            self.connector = SymuviaConnector(
+                self.library_path, stepLaunchMode="traj"
+            )
         else:
             self.connector = VissimConnector(self.library_path)
 
     def load_scenario(self):
         self.scenario_files = tuple(self.scenario_files)
         if self.simulation_platform == "symuvia":
-            scenario = SymuviaScenario.create_input(*self.scenario_files)  # expected input (fileA,fileB)
+            scenario = SymuviaScenario.create_input(
+                *self.scenario_files
+            )  # expected input (fileA,fileB)
         else:
-            scenario = VissimScenario.create_input(*self.scenario_files)  # expected input (fileA,fileB)
+            scenario = VissimScenario.create_input(
+                *self.scenario_files
+            )  # expected input (fileA,fileB)
 
         # Call connector (automatic dispatch)
         self.connector.load_scenario(scenario)

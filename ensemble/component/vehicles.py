@@ -28,9 +28,12 @@ import ensemble.tools.constants as ct
 from .dynamics import VehicleDynamic
 from ensemble.control.tactical.gapcordinator import FrontGap, RearGap
 
+from ensemble.tools.sorted_frozen_set import SortedFrozenSet
+
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
 
 class Vehicle:
     """
@@ -161,7 +164,10 @@ class Vehicle:
         :return: Dictionary as in description
         :rtype: [type]
         """
-        data = {ct.FIELD_DATA[key]: ct.FIELD_FORMAT[key](val) for key, val in dataveh.items()}
+        data = {
+            ct.FIELD_DATA[key]: ct.FIELD_FORMAT[key](val)
+            for key, val in dataveh.items()
+        }
         return data
 
     @classmethod
@@ -183,7 +189,7 @@ lstordct = List[OrderedDict]
 lstvehs = List[Vehicle]
 
 
-class VehicleList(object):
+class VehicleList(SortedFrozenSet):
     """Class for defining a list of vehicles
     """
 
@@ -220,7 +226,9 @@ class VehicleList(object):
         """
         constructor, ftype = ct.FIELD_FORMATAGG[attribute]
         if ftype:
-            return constructor([getattr(veh, attribute) for veh in self], dtype=ftype)
+            return constructor(
+                [getattr(veh, attribute) for veh in self], dtype=ftype
+            )
         return [getattr(veh, attribute) for veh in self]  # Case str
 
     @property
@@ -244,7 +252,9 @@ class VehicleList(object):
 
         df_print = pd.DataFrame()
         for key, value in self.vehicles.items():
-            df_print = df_print.append(pd.DataFrame(value.__dict__, index=(key,)))
+            df_print = df_print.append(
+                pd.DataFrame(value.__dict__, index=(key,))
+            )
         return df_print
 
     def __str__(self):
