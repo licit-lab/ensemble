@@ -60,6 +60,7 @@ from symupy.utils.constants import (
     TRACE_FLOW,
     LAUNCH_MODE,
     TOTAL_SIMULATION_STEPS,
+    HOUR_FORMAT,
 )
 
 from ensemble.tools.exceptions import EnsembleAPIWarning
@@ -82,20 +83,20 @@ DCT_SIMULATORS = {
 }
 
 # Feasible Simulator/Platform Paths/Libs
-DEFAULT_PATH_SYMUVIA_OX = ""
+DEFAULT_PATH_SYMUVIA_OSX = ""
 if platform.system() == "Darwin":
     try:
         if Path(DEFAULT_LIB_OSX).exists():
             DEFAULT_PATH_SYMUVIA_OSX = DEFAULT_LIB_OSX
         else:
-            DEFAULT_PATH_SYMUVIA_OX = config("DEFAULT_LIB_OSX")
+            DEFAULT_PATH_SYMUVIA_OSX = config("DEFAULT_LIB_OSX")
     except UndefinedValueError:
         EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA_OX = ""
+        DEFAULT_PATH_SYMUVIA_OSX = ""
 
 # Fill candidates
 DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OX,
+    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OSX,
     ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
 }
 
