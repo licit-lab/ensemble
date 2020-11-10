@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    ensemble.handler.symuvia
    ensemble.handler.vissim

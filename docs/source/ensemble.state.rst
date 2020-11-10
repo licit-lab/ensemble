@@ -52,7 +52,6 @@ ensemble.state.states module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
