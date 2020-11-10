@@ -6,7 +6,7 @@
 
             >>> from ensemble.handler.symuvia import SymuviaConnector
             >>> path_symuvia = "path/to/libSymuyVia.dylib"
-            >>> simulator = SymuviaConnector(libraryPath=path_symuvia)
+            >>> simulator = SymuviaConnector(library_path=path_symuvia)
 
     Other parameters can also be send to the simulator in order to provide other configurations:
 
@@ -63,17 +63,8 @@ class SymuviaConnector(SymuviaConfigurator):
             Error raised whenever the provided path for an scenario cannot be loaded into the Simulator
     """
 
-    def __init__(
-        self,
-        libraryPath: str = "",
-        bufferSize: int = CT.BUFFER_STRING,
-        writeXML: bool = True,
-        traceFlow: bool = False,
-        totalSteps: int = 0,
-        stepLaunchMode: str = "lite",
-        **kwargs,
-    ) -> None:
-        super(SymuviaConnector, self).__init__()
+    def __init__(self, **kwargs,) -> None:
+        super().__init__(**kwargs)
         self.load_symuvia()
 
     # ============================================================================
@@ -97,11 +88,23 @@ class SymuviaConnector(SymuviaConfigurator):
                 EnsembleAPILoadLibraryError: When the library cannot be loaded
         """
         try:
-            lib_symuvia = cdll.LoadLibrary(self.libraryPath)
-            click.echo(click.style(f"\t Library successfully loaded!", fg="green", bold=True))
+            lib_symuvia = cdll.LoadLibrary(self.library_path)
+            click.echo(
+                click.style(
+                    f"\t Library successfully loaded!", fg="green", bold=True
+                )
+            )
         except OSError:
-            click.echo(click.style(f"\t SymuVia is currently unavailable!", fg="red", bold=True,))
-            raise EnsembleAPILoadLibraryError("Library not found", self.libraryPath)
+            click.echo(
+                click.style(
+                    f"\t SymuVia is currently unavailable!",
+                    fg="red",
+                    bold=True,
+                )
+            )
+            raise EnsembleAPILoadLibraryError(
+                "Library not found", self.library_path
+            )
         self.__library = lib_symuvia
 
     def load_scenario(self, scenario: SymuviaScenario):
@@ -114,7 +117,9 @@ class SymuviaConnector(SymuviaConfigurator):
                 self.simulation = scenario
                 return
             except:
-                raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
+                raise EnsembleAPILoadFileError(
+                    f"\t Simulation could not be loaded"
+                )
         EnsembleAPIWarning(f"\tSimulation could not be loaded.")
 
     def register_simulation(self, scenarioPath: str) -> None:
@@ -130,11 +135,15 @@ class SymuviaConnector(SymuviaConfigurator):
         """
             Request simulator answer and maps the data locally
         """
-        if self.stepLaunchMode == "lite":
-            self._bContinue = self.__library.SymRunNextStepLiteEx(self.writeXML, byref(self._b_end))
+        if self.step_launch_mode == "lite":
+            self._bContinue = self.__library.SymRunNextStepLiteEx(
+                self.write_xml, byref(self._b_end)
+            )
             return
-        self._bContinue = self.__library.SymRunNextStepEx(self.bufferString, self.writeXML, byref(self._b_end))
-        self.request.query = self.bufferString
+        self._bContinue = self.__library.SymRunNextStepEx(
+            self.buffer_string, self.write_xml, byref(self._b_end)
+        )
+        self.request.query = self.buffer_string
 
     def query_data(self) -> int:
         """ Run simulation step by step
@@ -210,7 +219,7 @@ class SymuviaConnector(SymuviaConfigurator):
     #         :return: last query from simulator
     #         :rtype: str
     #     """
-    #     return self.bufferString.value.decode("UTF8")
+    #     return self.buffer_string.value.decode("UTF8")
 
     # @property
     # def do_next(self) -> bool:
