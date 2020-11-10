@@ -17,6 +17,7 @@ requirements = [
     "pandas>=1.0.0",
     "symupy>=0.4.2",
     "networkx>=2.5",
+    "python-decouple>=3.3",
 ]
 
 
