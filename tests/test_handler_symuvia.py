@@ -15,19 +15,27 @@ import pytest
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.handler.symuvia import SymuviaConfigurator, SymuviaConnector, SymuviaScenario
+from ensemble.handler.symuvia import (
+    SymuviaConfigurator,
+    SymuviaConnector,
+    SymuviaScenario,
+)
 import ensemble.tools.constants as CT
 
 # ============================================================================
 # TESTS AND DEFINITIONS
 # ============================================================================
 
+
 @pytest.fixture
 def symuvia_library_path():
     return CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())]
 
+
 def test_configurator_constructor(symuvia_library_path):
     config = SymuviaConfigurator()
-    assert config.bufferString == CT.BUFFER_STRING
-    assert config.libraryPath == symuvia_library_path
-    assert config.stepLaunchMode == CT.LAUNCH_MODE
+    assert len(config.buffer_string.raw) == CT.BUFFER_STRING
+    assert config.library_path == symuvia_library_path
+    assert config.trace_flow == CT.TRACE_FLOW
+    assert config.total_steps == CT.TOTAL_SIMULATION_STEPS
+    assert config.step_launch_mode == CT.LAUNCH_MODE

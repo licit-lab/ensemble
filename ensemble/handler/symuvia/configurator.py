@@ -8,6 +8,7 @@
 from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
 import click
 import platform
+from dataclasses import dataclass
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -22,50 +23,65 @@ import ensemble.tools.constants as CT
 # ============================================================================
 
 
+@dataclass
 class SymuviaConfigurator(ConnectorConfigurator, SymupyConfigurator):
-    """ Configurator class for containing specific simulator parameters for SymuVia
+    """Configurator class for containing specific simulator parameters for
+        Symuvia
 
         Example:
-            To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
+            To use the ``Simulator`` declare in a string the ``path`` to the
+            simulator ::
 
-                >>> path = "path/to/simluator.so"
-                >>> simulator = SymuviaConfigurator(libraryPath = path)
+                >>> path = "path/to/libSymuyVia.dylib"
+                >>> simulator = SymuviaConfigurator(library_path = path)
 
-        :return: Symuvia Configurator object with simulation parameters
-        :rtype: SymuviaConfigurator
+        Args:
+            library_path (str):
+                Absolute path towards the simulator library
+
+            bufferSize (int):
+                Size of the buffer for message for data received from simulator
+
+            write_xml (bool):
+                Flag to turn on writting the XML output
+
+            trace_flow (bool):
+                Flag to determine tracing or not the flow / trajectories
+
+            total_steps (int):
+                Define the number of iterations of a simulation
+
+            step_launch_mode (str):
+                Determine to way to launch the ``RunStepEx``. Options ``lite``/``full``
+
+        :return: Configurator object with simulation parameters
+        :rtype: Configurator
     """
 
-    def __init__(
-        self,
-        bufferSize: int = CT.BUFFER_STRING,
-        writeXML: bool = CT.WRITE_XML,
-        traceFlow: bool = CT.TRACE_FLOW,
-        libraryPath: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())],
-        totalSteps: int = CT.TOTAL_SIMULATION_STEPS,
-        stepLaunchMode: str = CT.LAUNCH_MODE,
-    ) -> None:
-        """  Symuvia Configurator class for containing specific simulator parameter
+    library_path: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())]
 
-            :param bufferSize: Provide an integer for buffer, defaults to CT.BUFFER_STRING
-            :type bufferSize: int, optional
-            :param writeXML: Flag to write XML file, defaults to True
-            :type writeXML: bool, optional
-            :param traceFlow: Flag to trace Flow / Traces, defaults to False
-            :type traceFlow: bool, optional
-            :param libraryPath: Stores the path of a traffic simulator, defaults to ""
-            :type libraryPath: str, optional
-            :param totalSteps: total number of simulation steps, defaults to 0
-            :type totalSteps: int, optional
-            :param stepLaunchMode: lite / full, defaults to "lite"
-            :type stepLaunchMode: str, optional
-            :return: Configurator object with simulation parameters
-            :rtype: Configurator
+    def __init__(self, **kwargs) -> None:
+        """ Configurator class for containing specific simulator parameter
+
+            Args:
+
+            buffer_string (int):
+                Size of the buffer for message for data received from simulator
+
+            write_xml (bool):
+                Flag to turn on writting the XML output
+
+            trace_flow (bool):
+                Flag to determine tracing or not the flow / trajectories
+
+            library_path (str):
+                Absolute path towards the simulator library
+
+            total_steps (int):
+                Define the number of iterations of a simulation
+
+            step_launch_mode (str):
+                Determine to way to launch the ``RunStepEx``. Options ``lite``/``full``
         """
-        super(SymuviaConfigurator, self).__init__(
-            bufferSize=bufferSize,
-            writeXML=writeXML,
-            traceFlow=traceFlow,
-            libraryPath=libraryPath,
-            totalSteps=totalSteps,
-            stepLaunchMode=stepLaunchMode,
-        )
+        ConnectorConfigurator()
+        SymupyConfigurator.__init__(self, **kwargs)
