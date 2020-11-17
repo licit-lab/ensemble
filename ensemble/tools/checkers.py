@@ -29,7 +29,7 @@ from ensemble.tools.screen import (
 LINE_SEP = "*".join(["*"] * 40)
 
 
-def check_library_path(library_path: str, simulation_platform: str) -> bool:
+def check_library_path(library_path: str, simulation_platform: str):
     """ Returns true if platform is available
     """
 

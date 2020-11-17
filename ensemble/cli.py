@@ -17,8 +17,7 @@ import typing
 # ============================================================================
 
 import ensemble.tools.constants as ct
-from ensemble.tools.checkers import check_scenario_consistency
-from .ensemble import launch_simulation
+from .ensemble import launch_simulation, check_consistency
 from .configurator import Configurator
 
 # ============================================================================
@@ -93,7 +92,7 @@ def launch(
 
     # Run optional check
     if check:
-        check_scenario_consistency(config)
+        check_consistency(config)
 
     launch_simulation(config)
 
@@ -119,7 +118,8 @@ def check(config: Configurator, scenario: str, library: str) -> bool:
 
     # Update configurator
     config.update_values(library_path=library, scenario_files=scenario)
-    return check_scenario_consistency(config)
+
+    return check_consistency(config)
 
 
 if __name__ == "__main__":
