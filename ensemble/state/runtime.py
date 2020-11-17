@@ -5,12 +5,22 @@
 from itertools import chain
 import click
 
-from .states import Compliance, Connect, Initialize, PreRoutine, Query, Control, Push, PostRoutine, Terminate
+from .states import (
+    Compliance,
+    Connect,
+    Initialize,
+    PreRoutine,
+    Query,
+    Control,
+    Push,
+    PostRoutine,
+    Terminate,
+)
 
 
-start_seq = ["compliance", "connect", "initialize"]
-runtime_seq = ["preroutine", "query", "control", "push", "postroutine"]
-end_seq = [
+START_SEQ = ["compliance", "connect", "initialize"]
+RUNTIME_SEQ = ["preroutine", "query", "control", "push", "postroutine"]
+END_SEQ = [
     "terminate",
 ]
 
@@ -30,7 +40,7 @@ class RuntimeDevice(object):
     def __enter__(self) -> None:
         """ Implementation of the state machine         
         """
-        full_seq = chain(start_seq, self.cycles * runtime_seq, end_seq)
+        full_seq = chain(START_SEQ, self.cycles * RUNTIME_SEQ, END_SEQ)
 
         ccycle = 0
         for event in full_seq:
