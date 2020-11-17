@@ -14,7 +14,9 @@ import pytest
 # ============================================================================
 
 import ensemble.tools.constants as CT
+from ensemble.configurator import Configurator
 from ensemble.handler.symuvia import SymuviaConfigurator
+
 
 # ============================================================================
 # TESTS AND DEFINITIONS
@@ -26,6 +28,10 @@ def symuvia_library_path():
     uname = platform.system()
     key = ("symuvia", uname)
     return CT.DCT_DEFAULT_PATHS[key]
+
+
+def test_configurator_cli():
+    Configurator(verbose=True, info=True)
 
 
 def test_default_configurator_constructor(symuvia_library_path):
