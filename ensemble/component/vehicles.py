@@ -61,19 +61,7 @@ class Vehicle:
     counter = itertools.count()
 
     def __init__(
-        self,
-        abscissa=ct.DCT_VEH_DATA["abscissa"],
-        acceleration=ct.DCT_VEH_DATA["acceleration"],
-        distance=ct.DCT_VEH_DATA["distance"],
-        vehid=ct.DCT_VEH_DATA["vehid"],
-        ordinate=ct.DCT_VEH_DATA["ordinate"],
-        link=ct.DCT_VEH_DATA["link"],
-        vehtype=ct.DCT_VEH_DATA["vehtype"],
-        speed=ct.DCT_VEH_DATA["speed"],
-        lane=ct.DCT_VEH_DATA["lane"],
-        elevation=ct.DCT_VEH_DATA["elevation"],
-        dynamic=VehicleDynamic(),
-        itinerary=ct.DCT_VEH_DATA["itinerary"],
+        self, abscissa=ct.DCT_VEH_DATA["abscissa"], acceleration=ct.DCT_VEH_DATA["acceleration"], distance=ct.DCT_VEH_DATA["distance"], vehid=ct.DCT_VEH_DATA["vehid"], ordinate=ct.DCT_VEH_DATA["ordinate"], link=ct.DCT_VEH_DATA["link"], vehtype=ct.DCT_VEH_DATA["vehtype"], speed=ct.DCT_VEH_DATA["speed"], lane=ct.DCT_VEH_DATA["lane"], elevation=ct.DCT_VEH_DATA["elevation"], dynamic=VehicleDynamic(), itinerary=ct.DCT_VEH_DATA["itinerary"],
     ):
         """ This initializer creates a Vehicle
         """
@@ -116,9 +104,7 @@ class Vehicle:
         return self.__output_matrix
 
     def activate_sensor(self, **kwargs) -> None:
-        """Define the observation matrix and observed states in the vehicle
-           
-           vehicle.activate_sensor(speed=True,position=True)
+        """Define the observation matrix and observed states in the vehicle vehicle.activate_sensor(speed=True,position=True)
         
         :return: Set the observation matrix __output_matrix
         :rtype: None
@@ -189,7 +175,8 @@ lstordct = List[OrderedDict]
 lstvehs = List[Vehicle]
 
 
-class VehicleList(SortedFrozenSet):
+class VehicleList:
+
     """Class for defining a list of vehicles
     """
 
