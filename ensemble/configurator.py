@@ -97,8 +97,8 @@ class Configurator:
     def set_simulation_platform(self, simulation_platform: str = "") -> None:
         """ A simpler setter for the simulation platform based on OS
 
-        :param simulation_platform: "symuvia" or "vissim", defaults to ""
-        :type simulation_platform: str, optional
+            Args:
+                simulation_platform (str): "symuvia" or "vissim", defaults to ""
         """
         if simulation_platform:
             self.simulation_platform = simulation_platform
@@ -123,7 +123,8 @@ class Configurator:
         return
 
     def update_values(self, **kwargs) -> None:
-        """ Configurator updater, pass a with keyword arguments to update
+        """ Configurator updater, pass a with keyword arguments to update. 
+            Just pass the desired parameter as a kewyword argument.
         """
 
         if kwargs.get("library_path"):
