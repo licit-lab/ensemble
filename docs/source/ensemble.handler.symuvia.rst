@@ -36,7 +36,6 @@ ensemble.handler.symuvia.stream module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

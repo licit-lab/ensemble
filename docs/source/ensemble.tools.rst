@@ -1,6 +1,14 @@
 ensemble.tools package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ensemble.tools.observer
+
 Submodules
 ----------
 
@@ -8,6 +16,14 @@ ensemble.tools.checkers module
 ------------------------------
 
 .. automodule:: ensemble.tools.checkers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ensemble.tools.connector\_configurator module
+---------------------------------------------
+
+.. automodule:: ensemble.tools.connector_configurator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -43,7 +59,6 @@ ensemble.tools.stream module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

@@ -44,7 +44,6 @@ ensemble.control.tactical.reargap module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

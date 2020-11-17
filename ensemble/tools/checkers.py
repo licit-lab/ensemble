@@ -1,50 +1,89 @@
-""" This module contains functions to check 
-
-:raises click.Abort: Raise errors when values are not satisfied
-:raises EnsembleAPIWarning: [description]
-:raises click.UsageError: [description]
-:return: [description]
-:rtype: [type]
+""" 
+Check module 
+====================================
+This module contains functions to check 
 """
-
-from ensemble.tools.exceptions import EnsembleAPIWarning
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
 
 import click
 from pathlib import Path
 
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
 
-def check_library_path(configurator) -> bool:
+from ensemble.tools.exceptions import EnsembleAPIWarning
+from ensemble.tools.screen import (
+    log_success,
+    log_verify,
+    log_warning,
+    log_error,
+)
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
+
+LINE_SEP = "*".join(["*"] * 40)
+
+
+def check_library_path(library_path: str, simulation_platform: str):
     """ Returns true if platform is available
     """
-    click.echo("\tLooking for library path: " + click.style(f"{configurator.library_path}", fg="blue"))
 
-    # Check Path existance for symuvia
-    if configurator.simulation_platform == "symuvia" and Path(configurator.library_path).exists():
-        return True
-    elif configurator.simulation_platform == "symuvia":
-        click.echo("\tGiven Library Path: " + click.style(f"{configurator.library_path}", fg="red") + " does not exist")
+    log_verify(
+        LINE_SEP, f"Looking for library path:", f"{library_path}", LINE_SEP,
+    )
+
+    if simulation_platform == "symuvia":
+        if not Path(library_path).exists():
+            log_error(f"\tGiven Library Path: {library_path} does not exist")
+            return False
     else:
-        click.echo(
-            f"\tPlatform and path: "
-            + click.style(f"{configurator.platform} -- {configurator.library_path}", fg="red",)
-            + " were not verified."
+        log_warning(
+            "\tPlatform and path:",
+            "\t{simulation_platform} -- {library_path}",
+            " were not verified.",
+        )
+    # Check Path existance for symuvia
+
+    if simulation_platform == "symuvia" and Path(library_path).exists():
+        log_success(f"Platform Found:", f"\t{library_path}")
+        return True
+    elif simulation_platform == "symuvia":
+        log_error("Given Library Path:", f"\t{library_path}", "does not exist")
+    else:
+        # Tests for Vissim should go here
+        log_warning(
+            "Platform and path:",
+            f"\t{simulation_platform} -- {library_path}",
+            "were not verified.",
         )
         return True
 
 
-def check_scenario_path(configurator) -> bool:
+def check_scenario_path(scenario_files: tuple) -> bool:
     """ Returns true if all scenario file(s) are available
     """
-    click.echo("\tLooking for scenario files: " + click.style(f"{configurator.scenario_files}", fg="blue"))
+    log_verify(
+        LINE_SEP,
+        f"Looking for scenario files: ",
+        f"{scenario_files}",
+        LINE_SEP,
+    )
+
     scenario = True
-    if configurator.scenario_files:
-        for file in configurator.scenario_files:
+    temp = False
+    if scenario_files:
+        for file in scenario_files:
             if Path(file).exists():
-                click.echo("\tInput File: " + click.style(f"{file} Found", fg="green", bold=True))
+                log_success(f"\tInput File: {file} Found")
                 temp = True
             else:
                 temp = False
-                EnsembleAPIWarning(f"Input File: {file}. Not Found ")
+                EnsembleAPIWarning(f"Input File: {file}. Not Found")
         return scenario and temp
     raise click.UsageError("\tScenario file(s) is an empty list")
 
@@ -53,12 +92,16 @@ def check_scenario_consistency(configurator) -> bool:
     """ Determine the consistency of files and libraries where indicated"""
 
     # Print info
-    click.echo(click.style("\tChecking consistency of files", fg="blue", bold=True))
+    log_verify(
+        LINE_SEP, "Checking consistency of files", LINE_SEP,
+    )
 
     # Check for Library
-    platform = check_library_path(configurator)
+    platform = check_library_path(
+        configurator.library_path, configurator.simulation_platform
+    )
 
     # Check for scenarios
-    scenario = check_scenario_path(configurator)
+    scenario = check_scenario_path(configurator.scenario_files)
 
-    return platform * scenario
+    return bool(platform * scenario)

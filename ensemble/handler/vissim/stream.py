@@ -11,9 +11,10 @@
 # STANDARD  IMPORTS
 # ============================================================================
 
-#from xmltodict import parse
-#from xml.parsers.expat import ExpatError
+# from xmltodict import parse
+# from xml.parsers.expat import ExpatError
 from typing import List
+
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
@@ -31,6 +32,7 @@ class SimulatorRequest(DataQuery):
         super().__init__(channels)
         self._str_response = ""
         self._vehs = []
+
     # def __init__(self):
     #     self._str_response = ""
     #     self._vehs = []
@@ -40,12 +42,14 @@ class SimulatorRequest(DataQuery):
 
     def __str__(self):
         return (
-            "Sim Time: {}, VehInNetwork: {}".format(self.current_time, self.current_nbveh)
+            "Sim Time: {}, VehInNetwork: {}".format(
+                self.current_time, self.current_nbveh
+            )
             if self.data_query
             else "Simulation has not started"
         )
 
-    def parse_data(self, response: List = None,simsec:float=0) -> List:
+    def parse_data(self, response: List = None, simsec: float = 0) -> List:
         """Parses response from simulator to data
 
         :param response: Simulator response
@@ -53,7 +57,7 @@ class SimulatorRequest(DataQuery):
         :return: Full simulator response
         :rtype: dict
         """
-        self.sim_sec=simsec
+        self.sim_sec = simsec
         self._str_response = response
 
     def get_vehicle_data(self) -> list:
@@ -64,11 +68,24 @@ class SimulatorRequest(DataQuery):
         :return: list of vehicles in the network
         :rtype: list of dictionaries
         """
-        vehsAttributesNames=('abscisa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
-        vehsAttributes =self._str_response
-        listofdict=[dict(zip(vehsAttributesNames, item)) for item in vehsAttributes]
+        vehsAttributesNames = (
+            "abscissa",
+            "acceleration",
+            "distance",
+            "vehid",
+            "ordinate",
+            "link",
+            "vehtype",
+            "speed",
+            "lane",
+        )
+        vehsAttributes = self._str_response
+        listofdict = [
+            dict(zip(vehsAttributesNames, item)) for item in vehsAttributes
+        ]
         veh_list = VehicleList.from_request(listofdict)
         return veh_list
+
     def get_vehicle_data_vissim(self) -> list:
         """Extracts vehicles information from simulators response
 
@@ -77,10 +94,33 @@ class SimulatorRequest(DataQuery):
         :return: list of vehicles in the network
         :rtype: list of dictionaries
         """
-        vehsAttributesNames=('abscisa','acceleration', 'distance','vehid','ordinate','link','vehtype','speed','lane')
-        vehsAttributesNamesVissim = ('CoordFrontX', 'Acceleration', 'Pos', 'No', 'CoordFrontY', 'Lane\\Link\\No', 'VehType', 'Speed', 'Lane\\Index')
-        vehsAttributes =self._str_response
-        return  [dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes]
+        vehsAttributesNames = (
+            "abscissa",
+            "acceleration",
+            "distance",
+            "vehid",
+            "ordinate",
+            "link",
+            "vehtype",
+            "speed",
+            "lane",
+        )
+        vehsAttributesNamesVissim = (
+            "CoordFrontX",
+            "Acceleration",
+            "Pos",
+            "No",
+            "CoordFrontY",
+            "Lane\\Link\\No",
+            "VehType",
+            "Speed",
+            "Lane\\Index",
+        )
+        vehsAttributes = self._str_response
+        return [
+            dict(zip(vehsAttributesNamesVissim, item))
+            for item in vehsAttributes
+        ]
 
     def get_vehicle_id(self) -> tuple:
         """Extracts vehicle ids information from simulators response
@@ -88,7 +128,8 @@ class SimulatorRequest(DataQuery):
         :return: tuple containing vehicle ids at current state in all network
         :rtype: list
         """
-        return tuple(veh.get('No')for veh in self.get_vehicle_data_vissim())
+        return tuple(veh.get("No") for veh in self.get_vehicle_data_vissim())
+
     def query_vehicle_link(self, vehid: int, *args) -> tuple:
         """ Extracts current vehicle link information from simulators response
 
@@ -98,11 +139,11 @@ class SimulatorRequest(DataQuery):
         :rtype: tuple
         """
         vehids = set((vehid, *args)) if args else vehid
-        vehid_pos = self.query_vehicle_data_dict('Lane\\Link\\No', vehids)
-        if type(vehids)==set:
-            links=tuple(vehid_pos.get(veh) for veh in vehids)
+        vehid_pos = self.query_vehicle_data_dict("Lane\\Link\\No", vehids)
+        if type(vehids) == set:
+            links = tuple(vehid_pos.get(veh) for veh in vehids)
         else:
-            links=tuple([vehid_pos.get(vehid)])
+            links = tuple([vehid_pos.get(vehid)])
         return links
 
     def query_vehicle_position(self, vehid: int, *args) -> tuple:
@@ -114,12 +155,13 @@ class SimulatorRequest(DataQuery):
         :rtype: tuple
         """
         vehids = set((vehid, *args)) if args else vehid
-        vehid_pos = self.query_vehicle_data_dict('Pos', vehids)
-        if type(vehids)==set:
-            positions=tuple(vehid_pos.get(veh) for veh in vehids)
+        vehid_pos = self.query_vehicle_data_dict("Pos", vehids)
+        if type(vehids) == set:
+            positions = tuple(vehid_pos.get(veh) for veh in vehids)
         else:
-            positions=tuple([vehid_pos.get(vehid)])
+            positions = tuple([vehid_pos.get(vehid)])
         return positions
+
     def query_vehicle_data_dict(self, dataval: str, vehid: int, *args) -> dict:
         """ Extracts and filters vehicle data from the simulators response
 
@@ -132,13 +174,20 @@ class SimulatorRequest(DataQuery):
         """
         vehids = set((vehid, *args)) if args else vehid
 
-        if type(vehids)==set:
-         data_vehs = [(veh.get('No'), veh.get(dataval)) for veh in self.get_vehicle_data_vissim() if
-                     veh.get('No') in vehids]
+        if type(vehids) == set:
+            data_vehs = [
+                (veh.get("No"), veh.get(dataval))
+                for veh in self.get_vehicle_data_vissim()
+                if veh.get("No") in vehids
+            ]
         else:
-            data_vehs =[(veh.get('No'), veh.get(dataval)) for veh in self.get_vehicle_data_vissim() if
-                     veh.get('No') == vehids]
+            data_vehs = [
+                (veh.get("No"), veh.get(dataval))
+                for veh in self.get_vehicle_data_vissim()
+                if veh.get("No") == vehids
+            ]
         return dict(data_vehs)
+
     def is_vehicle_in_network(self, vehid: int, *args) -> bool:
         """True if veh id is in the network at current state, for multiple arguments
            True if all veh ids are in the network
@@ -164,8 +213,12 @@ class SimulatorRequest(DataQuery):
         :return: tuple containing vehicle ids
         :rtype: tuple
         """
-        return tuple(veh.get('No') for veh in self.get_vehicle_data_vissim() if
-                     veh.get('Lane\\Link\\No') == link and veh.get('Lane\\Index') == lane)
+        return tuple(
+            veh.get("No")
+            for veh in self.get_vehicle_data_vissim()
+            if veh.get("Lane\\Link\\No") == link
+            and veh.get("Lane\\Index") == lane
+        )
 
     def is_vehicle_in_link(self, veh: int, link: int) -> bool:
         """ Returns true if a vehicle is in a link at current state
@@ -215,27 +268,29 @@ class SimulatorRequest(DataQuery):
         neighpos = self.query_vehicle_position(*neigh)
 
         return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos < vehpos)
-    def get_leader_id(self,vehid):
+
+    def get_leader_id(self, vehid):
         try:
-         downstream_ids=tuple(self.vehicle_downstream_of(vehid))
-         dict_pos=self.query_vehicle_data_dict('Pos',*downstream_ids)
-         leader_id=min(dict_pos, key=dict_pos.get)
+            downstream_ids = tuple(self.vehicle_downstream_of(vehid))
+            dict_pos = self.query_vehicle_data_dict("Pos", *downstream_ids)
+            leader_id = min(dict_pos, key=dict_pos.get)
         except IndexError:
-            leader_id=-1
+            leader_id = -1
         except TypeError:
-            leader_id=-1
+            leader_id = -1
         return leader_id
 
     def get_follower_id(self, vehid):
         try:
             upstream_ids = tuple(self.vehicle_upstream_of(vehid))
-            dict_pos = self.query_vehicle_data_dict('Pos', *upstream_ids)
+            dict_pos = self.query_vehicle_data_dict("Pos", *upstream_ids)
             follower_id = max(dict_pos, key=dict_pos.get)
         except IndexError:
-            follower_id= -1
+            follower_id = -1
         except TypeError:
-            follower_id=-1
+            follower_id = -1
         return follower_id
+
     def dispatch(self, channel: str) -> None:
         """ This is a dispatcher for the vehicle
 

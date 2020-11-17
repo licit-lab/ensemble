@@ -40,5 +40,20 @@ class TestConstruction(unittest.TestCase):
 
         v = Vehicle(**data)
 
+    def test_construct_from_list_dict(self):
+        data = [
+            {
+                "abscissa": 12.374845509246274,
+                "acceleration": 0.1817535409600709,
+                "distance": 12.375229607561504,
+                "vehid": 1,
+                "ordinate": 0.09750108760931722,
+                "link": 1,
+                "vehtype": "100",
+                "speed": 57.01563959662845,
+                "lane": 1,
+            }
+        ]
+
     def test_construct_from_ordered_dict(self):
         data = OrderedDict()

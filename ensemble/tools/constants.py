@@ -33,7 +33,9 @@
 
 from datetime import date, datetime, timedelta
 from numpy import array, float64, int32
-import os
+import os, platform
+from decouple import config, UndefinedValueError
+from pathlib import Path
 
 # ============================================================================
 # SPECIFIC  IMPORTS
@@ -41,8 +43,6 @@ import os
 
 from symupy.utils.constants import (
     DEFAULT_LIB_OSX,
-    DEFAULT_LIB_LINUX,
-    DCT_DEFAULT_PATHS,
     FIELD_DATA,
     FIELD_FORMAT,
     FIELD_FORMATAGG,
@@ -59,8 +59,11 @@ from symupy.utils.constants import (
     WRITE_XML,
     TRACE_FLOW,
     LAUNCH_MODE,
-    TOTAL_SIMULATION_STEPS
+    TOTAL_SIMULATION_STEPS,
+    HOUR_FORMAT,
 )
+
+from ensemble.tools.exceptions import EnsembleAPIWarning
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -80,9 +83,22 @@ DCT_SIMULATORS = {
 }
 
 # Feasible Simulator/Platform Paths/Libs
+DEFAULT_PATH_SYMUVIA_OSX = ""
+if platform.system() == "Darwin":
+    try:
+        if Path(DEFAULT_LIB_OSX).exists():
+            DEFAULT_PATH_SYMUVIA_OSX = DEFAULT_LIB_OSX
+        else:
+            DEFAULT_PATH_SYMUVIA_OSX = config("DEFAULT_LIB_OSX")
+    except UndefinedValueError:
+        EnsembleAPIWarning("No Simulator could be defined")
+        DEFAULT_PATH_SYMUVIA_OSX = ""
 
-# Adding case for Vissim
-DCT_DEFAULT_PATHS[("vissim", "Windows")] = DEFAULT_LIB_WINDOWS
+# Fill candidates
+DCT_DEFAULT_PATHS = {
+    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OSX,
+    ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
+}
 
 # Dynamic Platoon Data
 
@@ -90,7 +106,9 @@ DCT_PLT_DATA = {
     "plt_id": 0,  # Platoon id
     "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
     "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
-    "plt_order": [(0, 0),],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
+    "plt_order": [
+        (0, 0),
+    ],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
 
 # *****************************************************************************
