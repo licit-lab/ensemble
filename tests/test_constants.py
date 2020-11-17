@@ -28,15 +28,11 @@ from ensemble.tools.constants import DCT_DEFAULT_PATHS
 
 
 @pytest.fixture
-def env_path_default():
-    path_env = os.environ.get("SYMUVIALIB")
-    return path_env
+def symuvia_library_path():
+    uname = platform.system()
+    key = ("symuvia", uname)
+    return DCT_DEFAULT_PATHS[key]
 
 
-def test_environment_variable(env_path_default):
-    assert Path(env_path_default).exists() == True
-
-
-def test_detection_symupy(env_path_default):
-    path_symupy = DCT_DEFAULT_PATHS[("symuvia", platform.system())]
-    assert Path(path_symupy) == Path(env_path_default)
+def test_detection_symupy(symuvia_library_path):
+    assert Path(symuvia_library_path).exists() == True
