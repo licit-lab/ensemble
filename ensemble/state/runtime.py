@@ -29,8 +29,6 @@ class RuntimeDevice:
     """ This class defines the runtime device describing a series of 
         cyclic states required to be run:
 
-    :param object: Runtime Device for controlling states of the simulation runtime
-    :type object: Class with internal logic
     """
 
     def __init__(self, configurator):
