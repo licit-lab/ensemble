@@ -1,4 +1,4 @@
-image: python:3.7-alpine
+image: python:3.8-slim
 
 pages:
   stage: deploy
@@ -9,6 +9,8 @@ pages:
     - mv .public public
     - pip install -U sphinx recommonmark
     - sphinx-build -b html docs/source public
+  tags:
+    - docs
     # - sphinx-apidoc -o docs/source public
   artifacts:
     paths:
