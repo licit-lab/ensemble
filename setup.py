@@ -45,12 +45,13 @@ dev_requirements = [
 setup(
     author="Andres Ladino",
     author_email="andres.ladino@ifsttar.fr",
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
     description="A command line interface to launch scenarios for the ENSEMBLE project ",
@@ -64,7 +65,7 @@ setup(
     test_suite="tests",
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    extra_require={"dev": dev_requirements},    
+    extra_require={"dev": dev_requirements},
     url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
     version="0.1.0",
     zip_safe=False,
