@@ -7,7 +7,8 @@ pages:
     - mkdir .public
     - cp -r * .public
     - mv .public public
-    - pip install -U sphinx recommonmark
+    - ls -alh
+    - pip install -r requirements.txt
     - sphinx-build -b html docs/source public
   tags:
     - docs
