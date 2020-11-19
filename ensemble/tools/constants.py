@@ -23,6 +23,7 @@
     ``DCT_VEH_PARAM``              Vehicle default parameters 
     ``DCT_VEH_DATA``               Vehicle data default parameters
     ``DCT_PLT_DATA``               Platoon parameters
+    ``DCT_LIB_CACC``               Default CACC library path
     ============================  ======================================
 
 """
@@ -110,6 +111,20 @@ DCT_PLT_DATA = {
         (0, 0),
     ],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
+
+DCT_LIB_CACC = {
+    "Windows": "OperationalDLL.dll",
+    "Darwin": "OperationalDLL.dylib",
+}
+
+DEFAULT_CACC_PATH = os.path.join(
+    os.getcwd(),
+    "ensemble",
+    "libs",
+    platform.system().lower(),
+    DCT_LIB_CACC[platform.system()],
+)
+
 
 # *****************************************************************************
 # SYMUVIA CONSTANTS

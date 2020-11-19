@@ -19,6 +19,7 @@ from collections import OrderedDict
 import itertools
 import numpy as np
 import pandas as pd
+from dataclasses import dataclass, field
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -34,7 +35,20 @@ from ensemble.tools.sorted_frozen_set import SortedFrozenSet
 # CLASS AND DEFINITIONS
 # ============================================================================
 
+ABSCISSA = ct.DCT_VEH_DATA["abscissa"]
+ACCELERATION = ct.DCT_VEH_DATA["acceleration"]
+DISTANCE = ct.DCT_VEH_DATA["distance"]
+VEHID = ct.DCT_VEH_DATA["vehid"]
+ORDINATE = ct.DCT_VEH_DATA["ordinate"]
+LINK = ct.DCT_VEH_DATA["link"]
+VEHTYPE = ct.DCT_VEH_DATA["vehtype"]
+SPEED = ct.DCT_VEH_DATA["speed"]
+LANE = ct.DCT_VEH_DATA["lane"]
+ELEVATION = ct.DCT_VEH_DATA["elevation"]
+ITINERARY = ct.DCT_VEH_DATA["itinerary"]
 
+
+@dataclass
 class Vehicle:
     """
         Vehicle object defining properties and methods required to store and compute predictions according to a vehicle model. 
@@ -58,33 +72,21 @@ class Vehicle:
 
     """
 
-    counter = itertools.count()
+    abscissa: float = field(default_factory=ABSCISSA)
+    acceleration: float = field(default_factory=ACCELERATION)
+    distance: float = field(default_factory=DISTANCE)
+    vehid: float = field(default_factory=VEHID)
+    ordinate: float = field(default_factory=ORDINATE)
+    link: float = field(default_factory=LINK)
+    vehtype: float = field(default_factory=VEHTYPE)
+    speed: float = field(default_factory=SPEED)
+    lane: float = field(default_factory=LANE)
+    elevation: float = field(default_factory=ELEVATION)
+    itinerary: float = field(default_factory=ITINERARY)
 
-    def __init__(
-        self, abscissa=ct.DCT_VEH_DATA["abscissa"], acceleration=ct.DCT_VEH_DATA["acceleration"], distance=ct.DCT_VEH_DATA["distance"], vehid=ct.DCT_VEH_DATA["vehid"], ordinate=ct.DCT_VEH_DATA["ordinate"], link=ct.DCT_VEH_DATA["link"], vehtype=ct.DCT_VEH_DATA["vehtype"], speed=ct.DCT_VEH_DATA["speed"], lane=ct.DCT_VEH_DATA["lane"], elevation=ct.DCT_VEH_DATA["elevation"], dynamic=VehicleDynamic(), itinerary=ct.DCT_VEH_DATA["itinerary"],
-    ):
-        """ This initializer creates a Vehicle
-        """
-        self.abscissa = abscissa
-        self.acceleration = acceleration
-        self.distance = distance
-        self.vehid = vehid
-        self.ordinate = ordinate
-        self.link = link
-        self.vehtype = vehtype
-        self.speed = speed
-        self.lane = lane
-        self.elevation = elevation
-        self.dynamic = dynamic
-        self.itinerary = itinerary
-
-    def __repr__(self):
-        data_dct = ", ".join(f"{k}:{v}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({data_dct})"
-
-    def __str__(self):
-        data_dct = ", ".join(f"{k}:{v}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({data_dct})"
+    def __post_init__(self):
+        self.counter = itertools.count()
+        self.dynamic = VehicleDynamic()
 
     def update_state(self, dataveh):
         """Updates data within the structure with 
