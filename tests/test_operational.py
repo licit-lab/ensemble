@@ -19,6 +19,7 @@ from unittest.case import TestCase
 
 from ensemble import configurator
 from ensemble.tools.constants import DEFAULT_CACC_PATH
+from ensemble.control.operational import CACC
 
 # ============================================================================
 # TESTS
@@ -29,13 +30,16 @@ from ensemble.tools.constants import DEFAULT_CACC_PATH
 def controller_libpath():
     return DEFAULT_CACC_PATH
 
+
 @pytest.fixture
 def controller():
     return cdll.LoadLibrary(DEFAULT_CACC_PATH)
 
+
 def test_load_dll(controller_libpath):
     handle = cdll.LoadLibrary(controller_libpath)
     assert handle._name == controller_libpath
+
 
 def test_specific_output(controller):
     # Set input values: Write value's for current vehicle, in current timestep
@@ -106,3 +110,8 @@ def test_specific_output(controller):
     assert veh_autonomous_operational_warning.value == 10.0
     assert veh_cc_setpoint.value == 24.444444444444443
     assert veh_cruisecontrol_acceleration.value == 0.0
+
+
+def test_cacc_artifact(controller_libpath):
+    control = CACC()
+    control.lib._name == controller_libpath
