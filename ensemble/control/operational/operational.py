@@ -19,8 +19,6 @@ from ensemble.tools.constants import DEFAULT_CACC_PATH
 # CLASS AND DEFINITIONS
 # ============================================================================
 
-cacc = cdll.LoadLibrary(DEFAULT_CACC_PATH)
-
 
 @dataclass
 class CACC:
@@ -103,7 +101,8 @@ class CACC:
     veh_cruisecontrol_acceleration: c_double = field(default=c_double(1))
     success: c_int = field(default=c_int(0))
 
-    lib: CDLL = field(default=cacc)
+    def __post_init__(self):
+        self.load_library()
 
     def _apply_control(self):
         self.lib.operational_controller(
@@ -186,6 +185,11 @@ class CACC:
         """Update values to compute control"""
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def load_library(self):
+        """Loads the control library into the controller
+        """
+        self.lib = cdll.LoadLibrary(DEFAULT_CACC_PATH)
 
 
 if __name__ == "__main__":

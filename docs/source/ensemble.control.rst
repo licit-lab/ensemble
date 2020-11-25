@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   ensemble.control.operational
    ensemble.control.tactical
 
 Submodules
@@ -15,14 +16,6 @@ ensemble.control.governor module
 --------------------------------
 
 .. automodule:: ensemble.control.governor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ensemble.control.operational module
------------------------------------
-
-.. automodule:: ensemble.control.operational
    :members:
    :undoc-members:
    :show-inheritance:

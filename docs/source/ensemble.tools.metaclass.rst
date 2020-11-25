@@ -4,14 +4,6 @@ ensemble.tools.metaclass package
 Submodules
 ----------
 
-ensemble.tools.metaclass.configurator module
---------------------------------------------
-
-.. automodule:: ensemble.tools.metaclass.configurator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ensemble.tools.metaclass.observer module
 ----------------------------------------
 
