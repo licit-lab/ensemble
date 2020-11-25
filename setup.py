@@ -1,14 +1,23 @@
-#!/usr/bin/env python
-
-"""The setup script."""
-
 from setuptools import setup, find_packages
 
+CLASSIFIERS = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Natural Language :: English",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+]
+
 with open("README.md", "r", encoding="UTF8") as readme_file:
-    readme = readme_file.read()
+    LONG_DESCRIPTION = readme_file.read()
 
 with open("HISTORY.md", "r", encoding="UTF8") as history_file:
-    history = history_file.read()
+    HISTORY = history_file.read()
 
 requirements = [
     "click>=7.0",
@@ -43,30 +52,27 @@ dev_requirements = [
 ]
 
 setup(
-    author="Andres Ladino",
-    author_email="andres.ladino@ifsttar.fr",
-    python_requires=">=3.7",
-    classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "Intended Audience :: Developers",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-    ],
-    description="A command line interface to launch scenarios for the ENSEMBLE project ",
-    entry_points={"console_scripts": ["ensemble=ensemble.cli:main"]},
-    install_requires=requirements,
-    long_description=readme + "\n\n" + history,
-    include_package_data=True,
-    keywords="ensemble",
     name="ensemble",
-    packages=find_packages(include=["ensemble", "ensemble.*"]),
-    test_suite="tests",
-    setup_requires=setup_requirements,
-    tests_require=test_requirements,
-    extra_require={"dev": dev_requirements},
-    url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
     version="0.1.0",
+    description="A command line interface to launch scenarios for the ENSEMBLE project ",
+    long_description=LONG_DESCRIPTION + "\n\n" + HISTORY,
+    long_description_content_type="text/markdown",
+    author="Andres Ladino",
+    author_email="andres.ladino@univ-eiffel.fr",
+    maintainer="Andres Ladino",
+    maintainer_email="andres.ladino@univ-eiffel.fr",
+    url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
+    download_url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
+    packages=find_packages(include=["ensemble", "ensemble.*"]),
+    classifiers=CLASSIFIERS,
+    keywords="ensemble, truck platooning",
+    include_package_data=True,
+    install_requires=requirements,
+    entry_points={"console_scripts": ["ensemble=ensemble.cli:main"]},
+    extra_require={"dev": dev_requirements},
+    python_requires=">=3.7",
+    setup_requires=setup_requirements,
+    test_suite="tests",
+    tests_require=test_requirements,
     zip_safe=False,
 )
