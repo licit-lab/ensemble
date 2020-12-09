@@ -24,7 +24,7 @@ requirements = [
     "xmltodict>=0.12",
     "lxml>=4.5.0",
     "pandas>=1.0.0",
-    "symupy>=0.4.2",
+    "symupy>=0.5.0",
     "networkx>=2.5",
     "python-decouple>=3.3",
 ]

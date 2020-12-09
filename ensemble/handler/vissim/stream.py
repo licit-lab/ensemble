@@ -1,26 +1,21 @@
 """
-    This module is able to receive the stream of data comming from the SymuVia platform and define a parser for a specific vehicle data suitable to perform platooning activities. 
-"""
-
-
-""" 
-    This module handles the Simulation response converting it into proper formats for querying data afterwards. 
+Vissim Stream
+================
+This module is able to receive the stream of data comming from the Vissim platform and define a parser for a specific vehicle data suitable to perform platooning activities. 
 """
 
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
 
-# from xmltodict import parse
-# from xml.parsers.expat import ExpatError
 from typing import List
+from symupy.components import Vehicle, VehicleList
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.tools.stream import DataQuery
-from ensemble.component.vehicles import Vehicle, VehicleList
+from ensemble.metaclass.stream import DataQuery
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -28,46 +23,62 @@ from ensemble.component.vehicles import Vehicle, VehicleList
 
 
 class SimulatorRequest(DataQuery):
-    def __init__(self, channels):
-        super().__init__(channels)
-        self._str_response = ""
-        self._vehs = []
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # initialize extra things here!
 
-    # def __init__(self):
-    #     self._str_response = ""
-    #     self._vehs = []
+    @property
+    def current_time(self) -> float:
+        "Current simulation second"
+        # TODO: How is this updated?
+        return self.sim_sec
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}()"
+    @property
+    def current_nbveh(self) -> int:
+        """ Number of vehicles in the network"""
+        # TODO: What is self._str_response?
+        return len(self._str_response)
 
-    def __str__(self):
-        return (
-            "Sim Time: {}, VehInNetwork: {}".format(
-                self.current_time, self.current_nbveh
-            )
-            if self.data_query
-            else "Simulation has not started"
-        )
+    # NOTE: This is from symuvia
+    # @property
+    # def query(self):
+    #     """String response from the simulator"""
+    #     return self._str_response
 
-    def parse_data(self, response: List = None, simsec: float = 0) -> List:
-        """Parses response from simulator to data
+    # @query.setter
+    # def query(self, response: str):
+    #     self._str_response = response
+    #     for c in self._channels:
+    #         self.dispatch(c)
 
-        :param response: Simulator response
-        :type response: str
-        :return: Full simulator response
-        :rtype: dict
-        """
-        self.sim_sec = simsec
-        self._str_response = response
+    # def is_vehicle_driven(self, vehid: int) -> bool:
+    #     """ Returns true if the vehicle state is exposed to a driven state
+
+    #         Args:
+    #             vehid (str):
+    #                 vehicle id
+
+    #         Returns:
+    #             driven (bool): True if veh is driven
+    #     """
+    #     if self.is_vehicle_in_network(vehid):
+
+    #         forced = tuple(
+    #             veh.get("driven") == True
+    #             for veh in self.get_vehicle_data()
+    #             if veh.get("vehid") == vehid
+    #         )
+    #         return any(forced)
+    #     return False
 
     def get_vehicle_data(self) -> list:
         """Extracts vehicles information from simulators response
 
-        :param response: Simulator response
-        :type response: str
-        :return: list of vehicles in the network
-        :rtype: list of dictionaries
-        """
+            :param response: Simulator response
+            :type response: str
+            :return: list of vehicles in the network
+            :rtype: list of dictionaries
+            """
         vehsAttributesNames = (
             "abscissa",
             "acceleration",
@@ -83,255 +94,256 @@ class SimulatorRequest(DataQuery):
         listofdict = [
             dict(zip(vehsAttributesNames, item)) for item in vehsAttributes
         ]
-        veh_list = VehicleList.from_request(listofdict)
-        return veh_list
+        # veh_list = VehicleList.from_request(listofdict)
+        return listofdict
 
-    def get_vehicle_data_vissim(self) -> list:
-        """Extracts vehicles information from simulators response
+    # def parse_data(self, response: List = None, simsec: float = 0) -> List:
+    #     """Parses response from simulator to data
 
-        :param response: Simulator response
-        :type response: str
-        :return: list of vehicles in the network
-        :rtype: list of dictionaries
-        """
-        vehsAttributesNames = (
-            "abscissa",
-            "acceleration",
-            "distance",
-            "vehid",
-            "ordinate",
-            "link",
-            "vehtype",
-            "speed",
-            "lane",
-        )
-        vehsAttributesNamesVissim = (
-            "CoordFrontX",
-            "Acceleration",
-            "Pos",
-            "No",
-            "CoordFrontY",
-            "Lane\\Link\\No",
-            "VehType",
-            "Speed",
-            "Lane\\Index",
-        )
-        vehsAttributes = self._str_response
-        return [
-            dict(zip(vehsAttributesNamesVissim, item))
-            for item in vehsAttributes
-        ]
+    #     :param response: Simulator response
+    #     :type response: str
+    #     :return: Full simulator response
+    #     :rtype: dict
+    #     """
+    #     self.sim_sec = simsec
+    #     self._str_response = response
 
-    def get_vehicle_id(self) -> tuple:
-        """Extracts vehicle ids information from simulators response
+    # def get_vehicle_data_vissim(self) -> list:
+    #     """Extracts vehicles information from simulators response
 
-        :return: tuple containing vehicle ids at current state in all network
-        :rtype: list
-        """
-        return tuple(veh.get("No") for veh in self.get_vehicle_data_vissim())
+    #     :param response: Simulator response
+    #     :type response: str
+    #     :return: list of vehicles in the network
+    #     :rtype: list of dictionaries
+    #     """
+    #     vehsAttributesNames = (
+    #         "abscissa",
+    #         "acceleration",
+    #         "distance",
+    #         "vehid",
+    #         "ordinate",
+    #         "link",
+    #         "vehtype",
+    #         "speed",
+    #         "lane",
+    #     )
+    #     vehsAttributesNamesVissim = (
+    #         "CoordFrontX",
+    #         "Acceleration",
+    #         "Pos",
+    #         "No",
+    #         "CoordFrontY",
+    #         "Lane\\Link\\No",
+    #         "VehType",
+    #         "Speed",
+    #         "Lane\\Index",
+    #     )
+    #     vehsAttributes = self._str_response
+    #     return [
+    #         dict(zip(vehsAttributesNamesVissim, item))
+    #         for item in vehsAttributes
+    #     ]
 
-    def query_vehicle_link(self, vehid: int, *args) -> tuple:
-        """ Extracts current vehicle link information from simulators response
+    # def get_vehicle_id(self) -> tuple:
+    #     """Extracts vehicle ids information from simulators response
 
-        :param vehid: vehicle id multiple arguments accepted
-        :type vehid: str
-        :return: vehicle link in tuple form
-        :rtype: tuple
-        """
-        vehids = set((vehid, *args)) if args else vehid
-        vehid_pos = self.query_vehicle_data_dict("Lane\\Link\\No", vehids)
-        if type(vehids) == set:
-            links = tuple(vehid_pos.get(veh) for veh in vehids)
-        else:
-            links = tuple([vehid_pos.get(vehid)])
-        return links
+    #     :return: tuple containing vehicle ids at current state in all network
+    #     :rtype: list
+    #     """
+    #     return tuple(veh.get("No") for veh in self.get_vehicle_data_vissim())
 
-    def query_vehicle_position(self, vehid: int, *args) -> tuple:
-        """ Extracts current vehicle distance information from simulators response
+    # def query_vehicle_link(self, vehid: int, *args) -> tuple:
+    #     """ Extracts current vehicle link information from simulators response
 
-        :param vehid: vehicle id multiple arguments accepted
-        :type vehid: str
-        :return: vehicle distance in link in tuple form
-        :rtype: tuple
-        """
-        vehids = set((vehid, *args)) if args else vehid
-        vehid_pos = self.query_vehicle_data_dict("Pos", vehids)
-        if type(vehids) == set:
-            positions = tuple(vehid_pos.get(veh) for veh in vehids)
-        else:
-            positions = tuple([vehid_pos.get(vehid)])
-        return positions
+    #     :param vehid: vehicle id multiple arguments accepted
+    #     :type vehid: str
+    #     :return: vehicle link in tuple form
+    #     :rtype: tuple
+    #     """
+    #     vehids = set((vehid, *args)) if args else vehid
+    #     vehid_pos = self.query_vehicle_data_dict("Lane\\Link\\No", vehids)
+    #     if type(vehids) == set:
+    #         links = tuple(vehid_pos.get(veh) for veh in vehids)
+    #     else:
+    #         links = tuple([vehid_pos.get(vehid)])
+    #     return links
 
-    def query_vehicle_data_dict(self, dataval: str, vehid: int, *args) -> dict:
-        """ Extracts and filters vehicle data from the simulators response
+    # def query_vehicle_position(self, vehid: int, *args) -> tuple:
+    #     """ Extracts current vehicle distance information from simulators response
 
-        :param dataval: parameter to be extracted e.g. '@id', '@dst'
-        :type dataval: str
-        :param vehid: vehicle id, multiple arguments accepted
-        :type vehid: str
-        :return: dictionary where key is @id and value is dataval
-        :rtype: dict
-        """
-        vehids = set((vehid, *args)) if args else vehid
+    #     :param vehid: vehicle id multiple arguments accepted
+    #     :type vehid: str
+    #     :return: vehicle distance in link in tuple form
+    #     :rtype: tuple
+    #     """
+    #     vehids = set((vehid, *args)) if args else vehid
+    #     vehid_pos = self.query_vehicle_data_dict("Pos", vehids)
+    #     if type(vehids) == set:
+    #         positions = tuple(vehid_pos.get(veh) for veh in vehids)
+    #     else:
+    #         positions = tuple([vehid_pos.get(vehid)])
+    #     return positions
 
-        if type(vehids) == set:
-            data_vehs = [
-                (veh.get("No"), veh.get(dataval))
-                for veh in self.get_vehicle_data_vissim()
-                if veh.get("No") in vehids
-            ]
-        else:
-            data_vehs = [
-                (veh.get("No"), veh.get(dataval))
-                for veh in self.get_vehicle_data_vissim()
-                if veh.get("No") == vehids
-            ]
-        return dict(data_vehs)
+    # def query_vehicle_data_dict(self, dataval: str, vehid: int, *args) -> dict:
+    #     """ Extracts and filters vehicle data from the simulators response
 
-    def is_vehicle_in_network(self, vehid: int, *args) -> bool:
-        """True if veh id is in the network at current state, for multiple arguments
-           True if all veh ids are in the network
+    #     :param dataval: parameter to be extracted e.g. '@id', '@dst'
+    #     :type dataval: str
+    #     :param vehid: vehicle id, multiple arguments accepted
+    #     :type vehid: str
+    #     :return: dictionary where key is @id and value is dataval
+    #     :rtype: dict
+    #     """
+    #     vehids = set((vehid, *args)) if args else vehid
 
-        :param vehid: Integer of vehicle id, comma separated if testing for multiple
-        :type vehid: int
-        :return: True if vehicle is in the network otherwise false
-        :rtype: bool
-        """
-        all_vehs = self.get_vehicle_id()
-        if not args:
-            return vehid in all_vehs
-        vehids = set((vehid, *args))
-        return set(vehids).issubset(set(all_vehs))
+    #     if type(vehids) == set:
+    #         data_vehs = [
+    #             (veh.get("No"), veh.get(dataval))
+    #             for veh in self.get_vehicle_data_vissim()
+    #             if veh.get("No") in vehids
+    #         ]
+    #     else:
+    #         data_vehs = [
+    #             (veh.get("No"), veh.get(dataval))
+    #             for veh in self.get_vehicle_data_vissim()
+    #             if veh.get("No") == vehids
+    #         ]
+    #     return dict(data_vehs)
 
-    def vehicle_in_link(self, link: int, lane: int = 1) -> tuple:
-        """Returns a tuple containing vehicle ids traveling on the same link+lane at current state
+    # def is_vehicle_in_network(self, vehid: int, *args) -> bool:
+    #     """True if veh id is in the network at current state, for multiple arguments
+    #        True if all veh ids are in the network
 
-        :param link: link name
-        :type link: int
-        :param lane: lane number, defaults to 1
-        :type lane: int, optional
-        :return: tuple containing vehicle ids
-        :rtype: tuple
-        """
-        return tuple(
-            veh.get("No")
-            for veh in self.get_vehicle_data_vissim()
-            if veh.get("Lane\\Link\\No") == link
-            and veh.get("Lane\\Index") == lane
-        )
+    #     :param vehid: Integer of vehicle id, comma separated if testing for multiple
+    #     :type vehid: int
+    #     :return: True if vehicle is in the network otherwise false
+    #     :rtype: bool
+    #     """
+    #     all_vehs = self.get_vehicle_id()
+    #     if not args:
+    #         return vehid in all_vehs
+    #     vehids = set((vehid, *args))
+    #     return set(vehids).issubset(set(all_vehs))
 
-    def is_vehicle_in_link(self, veh: int, link: int) -> bool:
-        """ Returns true if a vehicle is in a link at current state
+    # def vehicle_in_link(self, link: int, lane: int = 1) -> tuple:
+    #     """Returns a tuple containing vehicle ids traveling on the same link+lane at current state
 
-        :param veh: vehicle id
-        :type veh: int
-        :param link: link name
-        :type link: int
-        :return: True if veh is in link
-        :rtype: bool
-        """
-        veh_ids = self.vehicle_in_link(link)
-        return set(veh).issubset(set(veh_ids))
+    #     :param link: link name
+    #     :type link: int
+    #     :param lane: lane number, defaults to 1
+    #     :type lane: int, optional
+    #     :return: tuple containing vehicle ids
+    #     :rtype: tuple
+    #     """
+    #     return tuple(
+    #         veh.get("No")
+    #         for veh in self.get_vehicle_data_vissim()
+    #         if veh.get("Lane\\Link\\No") == link
+    #         and veh.get("Lane\\Index") == lane
+    #     )
 
-    def vehicle_downstream_of(self, vehid: int) -> tuple:
-        """Get ids of vehicles downstream to vehid
+    # def is_vehicle_in_link(self, veh: int, link: int) -> bool:
+    #     """ Returns true if a vehicle is in a link at current state
 
-        :param vehid: integer describing id of reference veh
-        :type vehid: int
-        :return: tuple with ids of vehicles ahead (downstream)
-        :rtype: tuple
-        """
-        link = self.query_vehicle_link(vehid)[0]
-        vehpos = self.query_vehicle_position(vehid)[0]
+    #     :param veh: vehicle id
+    #     :type veh: int
+    #     :param link: link name
+    #     :type link: int
+    #     :return: True if veh is in link
+    #     :rtype: bool
+    #     """
+    #     veh_ids = self.vehicle_in_link(link)
+    #     return set(veh).issubset(set(veh_ids))
 
-        vehids = set(self.vehicle_in_link(link))
-        neigh = vehids.difference({vehid})
+    # def vehicle_downstream_of(self, vehid: int) -> tuple:
+    #     """Get ids of vehicles downstream to vehid
 
-        neighpos = self.query_vehicle_position(*neigh)
+    #     :param vehid: integer describing id of reference veh
+    #     :type vehid: int
+    #     :return: tuple with ids of vehicles ahead (downstream)
+    #     :rtype: tuple
+    #     """
+    #     link = self.query_vehicle_link(vehid)[0]
+    #     vehpos = self.query_vehicle_position(vehid)[0]
 
-        return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos > vehpos)
+    #     vehids = set(self.vehicle_in_link(link))
+    #     neigh = vehids.difference({vehid})
 
-    def vehicle_upstream_of(self, vehid: int) -> tuple:
-        """Get ids of vehicles upstream to vehid
+    #     neighpos = self.query_vehicle_position(*neigh)
 
-        :param vehid: integer describing id of reference veh
-        :type vehid: int
-        :return: tuple with ids of vehicles behind (upstream)
-        :rtype: tuple
-        """
-        link = self.query_vehicle_link(vehid)[0]
-        vehpos = self.query_vehicle_position(vehid)[0]
+    #     return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos > vehpos)
 
-        vehids = set(self.vehicle_in_link(link))
-        neigh = vehids.difference({vehid})
+    # def vehicle_upstream_of(self, vehid: int) -> tuple:
+    #     """Get ids of vehicles upstream to vehid
 
-        neighpos = self.query_vehicle_position(*neigh)
+    #     :param vehid: integer describing id of reference veh
+    #     :type vehid: int
+    #     :return: tuple with ids of vehicles behind (upstream)
+    #     :rtype: tuple
+    #     """
+    #     link = self.query_vehicle_link(vehid)[0]
+    #     vehpos = self.query_vehicle_position(vehid)[0]
 
-        return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos < vehpos)
+    #     vehids = set(self.vehicle_in_link(link))
+    #     neigh = vehids.difference({vehid})
 
-    def get_leader_id(self, vehid):
-        try:
-            downstream_ids = tuple(self.vehicle_downstream_of(vehid))
-            dict_pos = self.query_vehicle_data_dict("Pos", *downstream_ids)
-            leader_id = min(dict_pos, key=dict_pos.get)
-        except IndexError:
-            leader_id = -1
-        except TypeError:
-            leader_id = -1
-        return leader_id
+    #     neighpos = self.query_vehicle_position(*neigh)
 
-    def get_follower_id(self, vehid):
-        try:
-            upstream_ids = tuple(self.vehicle_upstream_of(vehid))
-            dict_pos = self.query_vehicle_data_dict("Pos", *upstream_ids)
-            follower_id = max(dict_pos, key=dict_pos.get)
-        except IndexError:
-            follower_id = -1
-        except TypeError:
-            follower_id = -1
-        return follower_id
+    #     return tuple(nbh for nbh, npos in zip(neigh, neighpos) if npos < vehpos)
 
-    def dispatch(self, channel: str) -> None:
-        """ This is a dispatcher for the vehicle
+    # def get_leader_id(self, vehid):
+    #     try:
+    #         downstream_ids = tuple(self.vehicle_downstream_of(vehid))
+    #         dict_pos = self.query_vehicle_data_dict("Pos", *downstream_ids)
+    #         leader_id = min(dict_pos, key=dict_pos.get)
+    #     except IndexError:
+    #         leader_id = -1
+    #     except TypeError:
+    #         leader_id = -1
+    #     return leader_id
 
-        :param channel: Channel to broadcast to (FGC/RGC/ALL)
-        :type vehid: str
+    # def get_follower_id(self, vehid):
+    #     try:
+    #         upstream_ids = tuple(self.vehicle_upstream_of(vehid))
+    #         dict_pos = self.query_vehicle_data_dict("Pos", *upstream_ids)
+    #         follower_id = max(dict_pos, key=dict_pos.get)
+    #     except IndexError:
+    #         follower_id = -1
+    #     except TypeError:
+    #         follower_id = -1
+    #     return follower_id
 
-        """
+    # def dispatch(self, channel: str) -> None:
+    #     """ This is a dispatcher for the vehicle
 
-        for subscriber, callback in self.get_subscribers(channel).items():
-            vehicle_env = {}
-            callback(vehicle_env)
+    #     :param channel: Channel to broadcast to (FGC/RGC/ALL)
+    #     :type vehid: str
 
-    def create_vehicle_list(self):
-        """Initialize 
-        """
-        if not self._vehs:
-            self._vehs = VehicleList.from_request(self.get_vehicle_data())
-            return
+    #     """
 
-    def update_vehicle_list(self):
-        """ Construct and or update vehicle data
-        """
-        if self._vehs:
-            self._vehs.update_list(self.get_vehicle_data())
-            return
-        self.create_vehicle_list()
+    #     for subscriber, callback in self.get_subscribers(channel).items():
+    #         vehicle_env = {}
+    #         callback(vehicle_env)
 
-    def __contains__(self, elem: Vehicle) -> bool:
-        return elem in self._vehs
+    # def create_vehicle_list(self):
+    #     """Initialize
+    #     """
+    #     if not self._vehs:
+    #         self._vehs = VehicleList.from_request(self.get_vehicle_data())
+    #         return
 
-    @property
-    def vehicles(self):
-        self.update_vehicle_list()
-        return self._vehs
+    # def update_vehicle_list(self):
+    #     """ Construct and or update vehicle data
+    #     """
+    #     if self._vehs:
+    #         self._vehs.update_list(self.get_vehicle_data())
+    #         return
+    #     self.create_vehicle_list()
 
-    @property
-    def current_time(self) -> float:
-        "Current simulation second"
-        return self.sim_sec
+    # def __contains__(self, elem: Vehicle) -> bool:
+    #     return elem in self._vehs
 
-    @property
-    def current_nbveh(self) -> int:
-        """ Number of vehicles in the network"""
-        return len(self._str_response)
+    # @property
+    # def vehicles(self):
+    #     self.update_vehicle_list()
+    #     return self._vehs
