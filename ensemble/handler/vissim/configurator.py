@@ -13,14 +13,14 @@ import click
 # ============================================================================
 
 import ensemble.tools.constants as CT
-
+from ensemble.tools.connector_configurator import ConnectorConfigurator
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
-class VissimConfigurator:
+class VissimConfigurator(ConnectorConfigurator):
     """ Configurator class for containing specific simulator parameters
 
         Example:
@@ -34,9 +34,7 @@ class VissimConfigurator:
         :rtype: Configurator
     """
 
-    def __init__(self,
-            libraryPath: str = "",
-            totalSteps: int = 0) -> None:
+    def __init__(self, libraryPath: str = "", totalSteps: int = 0) -> None:
         """ Configurator class for containing specific simulator parameter
             :param libraryPath: Stores the path of a traffic simulator, defaults to ""
             :type libraryPath: str, optional
@@ -46,14 +44,6 @@ class VissimConfigurator:
             :rtype: Configurator
         """
         click.echo("Configurator: Initialization")
+        ConnectorConfigurator()
         self.libraryPath = libraryPath
         self.totalSteps = totalSteps
-        super(VissimConfigurator, self).__init__()
-
-    def __repr__(self):
-        data_dct = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({data_dct})"
-
-    def __str__(self):
-        data_dct = "Configuration status:\n " + "\n ".join(f"{k}:  {v}" for k, v in self.__dict__.items())
-        return f"{data_dct}"

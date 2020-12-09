@@ -5,21 +5,30 @@
 from itertools import chain
 import click
 
-from .states import Compliance, Connect, Initialize, PreRoutine, Query, Control, Push, PostRoutine, Terminate
+from .states import (
+    Compliance,
+    Connect,
+    Initialize,
+    PreRoutine,
+    Query,
+    Control,
+    Push,
+    PostRoutine,
+    Terminate,
+)
 
 
-start_seq = ["compliance", "connect", "initialize"]
-runtime_seq = ["preroutine", "query", "control", "push", "postroutine"]
-end_seq = [
+START_SEQ = ["compliance", "connect", "initialize"]
+RUNTIME_SEQ = ["preroutine", "query", "control", "push", "postroutine"]
+END_SEQ = [
     "terminate",
 ]
 
 
-class RuntimeDevice(object):
-    """ This class defines the runtime device describing a series of cyclic states required to be run 
+class RuntimeDevice:
+    """ This class defines the runtime device describing a series of 
+        cyclic states required to be run:
 
-    :param object: Runtime Device for controlling states of the simulation runtime
-    :type object: Class with internal logic
     """
 
     def __init__(self, configurator):
@@ -30,12 +39,13 @@ class RuntimeDevice(object):
     def __enter__(self) -> None:
         """ Implementation of the state machine         
         """
-        full_seq = chain(start_seq, self.cycles * runtime_seq, end_seq)
+        full_seq = chain(START_SEQ, self.cycles * RUNTIME_SEQ, END_SEQ)
 
         ccycle = 0
         for event in full_seq:
             self.on_event(event)
-            if isinstance(self.state, PostRoutine):  # Step counted on PreRoutine
+            # Step counted on PreRoutine
+            if isinstance(self.state, PostRoutine):
                 ccycle = ccycle + 1
                 click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
             if isinstance(self.state, Terminate):

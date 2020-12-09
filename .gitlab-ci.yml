@@ -1,4 +1,4 @@
-image: python:3.7-alpine
+image: continuumio/miniconda3
 
 pages:
   stage: deploy
@@ -7,8 +7,13 @@ pages:
     - mkdir .public
     - cp -r * .public
     - mv .public public
-    - pip install -U sphinx recommonmark
+    - ls -alh
+    - pip install -r requirements.txt
+    - apt-get update
+    - apt-get install -y python3-sphinx
     - sphinx-build -b html docs/source public
+  tags:
+    - docs
     # - sphinx-apidoc -o docs/source public
   artifacts:
     paths:
