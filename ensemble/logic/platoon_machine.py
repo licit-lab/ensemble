@@ -10,8 +10,6 @@
 
 """
 
-from .base import PlatoonState
-
 
 class StandAlone(PlatoonState):
     """

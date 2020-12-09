@@ -1,11 +1,20 @@
 """
-    This module describes classes and objects to perform a runtime of a single scenario
+Runtime Device
+=================
+This module describes classes and objects to perform a runtime of a single scenario
 """
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
 
 from itertools import chain
 import click
 
-from .states import (
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from .runtime_states import (
     Compliance,
     Connect,
     Initialize,
@@ -16,6 +25,10 @@ from .states import (
     PostRoutine,
     Terminate,
 )
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 
 START_SEQ = ["compliance", "connect", "initialize"]

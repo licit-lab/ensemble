@@ -1,26 +1,43 @@
 """ 
-    This module defines the basic states required to execute and launch a simulation. 
+Runtime States
+==============
+This module defines the basic states required to execute and launch a simulation. 
 
-    The states are defined as: 
+The states are defined as: 
 
-    * **Compliance**: This state is defined to check availability of files and candidates.
-    * **Connect**: This state is defined to process 
-    * **Initialize**: This state perform initialization tasks. In example, loading the file scenarios into the simulator. Declaring initial conditions for the platoon, etc. 
-    * **Preroutine**: Tasks to be done before the querying information from the simulator
-    * **Query**: Tasks of parsing data and querying information from the simulator
-    * **Control**: Perform decision tasks for the platoon 
-    * **Push**: Push updated information to the simulator for platoon vehicles 
-    * **Postroutine**: Performs tasks after the information has been pushed. 
+* **Compliance**: This state is defined to check availability of files and candidates.
+* **Connect**: This state is defined to process 
+* **Initialize**: This state perform initialization tasks. In example, loading the file scenarios into the simulator. Declaring initial conditions for the platoon, etc. 
+* **Preroutine**: Tasks to be done before the querying information from the simulator
+* **Query**: Tasks of parsing data and querying information from the simulator
+* **Control**: Perform decision tasks for the platoon 
+* **Push**: Push updated information to the simulator for platoon vehicles 
+* **Postroutine**: Performs tasks after the information has been pushed. 
 """
 
-from .base import State
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
 import click
 
-from ensemble.tools.checkers import check_scenario_consistency
-from ensemble.tools.exceptions import EnsembleAPILoadLibraryError, EnsembleAPILoadFileError
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
 
-# Start of our states
-class Compliance(State):
+from ensemble.metaclass.state import AbsState
+from ensemble.tools.checkers import check_scenario_consistency
+from ensemble.tools.exceptions import (
+    EnsembleAPILoadLibraryError,
+    EnsembleAPILoadFileError,
+)
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
+
+
+class Compliance(AbsState):
     """
     The state which declares an status to check file compliance .
     """
@@ -51,7 +68,7 @@ class Compliance(State):
         return check_scenario_consistency(configurator)
 
 
-class Connect(State):
+class Connect(AbsState):
     """
     The state which declares the creation of a connection with the simulator
     """
@@ -61,7 +78,12 @@ class Connect(State):
         try:
             configurator.load_socket()
         except EnsembleAPILoadLibraryError:
-            click.echo(click.style(f"\tLibrary could not be loaded.\n\tEnding simulation", fg="yellow",))
+            click.echo(
+                click.style(
+                    f"\tLibrary could not be loaded.\n\tEnding simulation",
+                    fg="yellow",
+                )
+            )
             return Terminate()
 
         if event == "initialize":
@@ -70,7 +92,7 @@ class Connect(State):
         return self
 
 
-class Initialize(State):
+class Initialize(AbsState):
     """
     The state which initializes values for the scenario simulation
     """
@@ -80,7 +102,12 @@ class Initialize(State):
         try:
             configurator.load_scenario()
         except EnsembleAPILoadFileError:
-            click.echo(click.style(f"\tScenario could not be loaded.\n\tEnding simulation", fg="yellow",))
+            click.echo(
+                click.style(
+                    f"\tScenario could not be loaded.\n\tEnding simulation",
+                    fg="yellow",
+                )
+            )
             return Terminate()
 
         if event == "preroutine":
@@ -89,7 +116,7 @@ class Initialize(State):
         return self
 
 
-class PreRoutine(State):
+class PreRoutine(AbsState):
     """
     The state which performs task previous to the interaction with the simulator
     """
@@ -101,7 +128,7 @@ class PreRoutine(State):
         return self
 
 
-class Query(State):
+class Query(AbsState):
     """
     The state which retrieves information from the simulator
     """
@@ -118,7 +145,7 @@ class Query(State):
         return self
 
 
-class Control(State):
+class Control(AbsState):
     """
     The state which computes the control decision  
     """
@@ -130,7 +157,7 @@ class Control(State):
         return self
 
 
-class Push(State):
+class Push(AbsState):
     """
     The state which pushes data back to the simulator
     """
@@ -142,7 +169,7 @@ class Push(State):
         return self
 
 
-class PostRoutine(State):
+class PostRoutine(AbsState):
     """
     The state which logs information or compute step indicators 
     """
@@ -156,7 +183,7 @@ class PostRoutine(State):
         return self
 
 
-class Terminate(State):
+class Terminate(AbsState):
     """
     The state which declares the end of a simulation
     """
