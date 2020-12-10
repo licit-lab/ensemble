@@ -98,7 +98,9 @@ if platform.system() == "Darwin":
 # Fill candidates
 DCT_DEFAULT_PATHS = {
     ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OSX,
+    ("symuvia", "Windows"): DEFAULT_PATH_SYMUVIA_OSX,
     ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
+    ("vissim", "Darwin"): DEFAULT_LIB_WINDOWS,
 }
 
 # Dynamic Platoon Data
