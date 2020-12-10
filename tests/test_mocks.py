@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-
-"""Tests for `ensemble` package."""
+""" Unit tests for ensemble.py
+"""
 
 import os
 import pytest

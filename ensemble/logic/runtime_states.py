@@ -31,6 +31,7 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadLibraryError,
     EnsembleAPILoadFileError,
 )
+from ensemble.tools.screen import log_warning
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -78,12 +79,7 @@ class Connect(AbsState):
         try:
             configurator.load_socket()
         except EnsembleAPILoadLibraryError:
-            click.echo(
-                click.style(
-                    f"\tLibrary could not be loaded.\n\tEnding simulation",
-                    fg="yellow",
-                )
-            )
+            log_warning("\tLibrary could not be loaded.\n\tEnding simulation")
             return Terminate()
 
         if event == "initialize":
@@ -102,12 +98,7 @@ class Initialize(AbsState):
         try:
             configurator.load_scenario()
         except EnsembleAPILoadFileError:
-            click.echo(
-                click.style(
-                    f"\tScenario could not be loaded.\n\tEnding simulation",
-                    fg="yellow",
-                )
-            )
+            log_warning("\tScenario could not be loaded.\n\tEnding simulation")
             return Terminate()
 
         if event == "preroutine":

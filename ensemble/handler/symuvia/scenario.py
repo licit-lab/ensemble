@@ -51,7 +51,9 @@ class SymuviaScenario(Scenario):
             try:
                 xml_path = find_xml(existing_files)[0]
             except IndexError:
-                raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an XML file")
+                raise EnsembleAPILoadFileError(
+                    f"\tProvided files do not match expected input. Provide an XML file"
+                )
             try:
                 platooncsv_path = find_csv(existing_files)[0]
             except IndexError:
@@ -119,13 +121,19 @@ class SymuviaScenario(Scenario):
         :return:
         :rtype: range
         """
-        t1 = datetime.strptime(self.get_simulation_parameters()[simid].get("debut"), ct.HOUR_FORMAT)
-        t2 = datetime.strptime(self.get_simulation_parameters()[simid].get("fin"), ct.HOUR_FORMAT)
+        t1 = datetime.strptime(
+            self.get_simulation_parameters()[simid].get("debut"), ct.HOUR_FORMAT
+        )
+        t2 = datetime.strptime(
+            self.get_simulation_parameters()[simid].get("fin"), ct.HOUR_FORMAT
+        )
         t = t2 - t1
-        n = t.seconds / float(self.get_simulation_parameters()[simid].get("pasdetemps"))
+        n = t.seconds / float(
+            self.get_simulation_parameters()[simid].get("pasdetemps")
+        )
         return range(int(n))
 
-    def filename(self, encoding: str = None):
+    def filename(self, encoding: str = "UTF8"):
         """
             This method returns the value of encoding of the simulation scenario under consideration
 

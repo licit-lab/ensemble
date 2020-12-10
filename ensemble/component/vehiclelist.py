@@ -18,7 +18,7 @@ import pandas as pd
 # ============================================================================
 
 from .vehicle import Vehicle
-from ensemble.logic.frozen_Set import SortedFrozenSet
+from ensemble.logic.frozen_set import SortedFrozenSet
 
 # ============================================================================
 # CLASS AND DEFINITIONS

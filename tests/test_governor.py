@@ -1,25 +1,25 @@
-"""
-    Unit tests for the Multibrand Platooning Registry 
-"""
+# """
+#     Unit tests for the Multibrand Platooning Registry
+# """
 
-# ============================================================================
-# STANDARD  IMPORTS
-# ============================================================================
+# # ============================================================================
+# # STANDARD  IMPORTS
+# # ============================================================================
 
-import unittest
+# import unittest
 
-# ============================================================================
-# INTERNAL IMPORTS
-# ============================================================================
+# # ============================================================================
+# # INTERNAL IMPORTS
+# # ============================================================================
 
-from ensemble.control.governor import MultiBrandPlatoonRegistry
-from ensemble.component.vehicles import Vehicle
+# from ensemble.control.governor import MultiBrandPlatoonRegistry
+# from ensemble.component.vehicles import Vehicle
 
-# ============================================================================
-# TESTS AND DEFINITIONS
-# ============================================================================
+# # ============================================================================
+# # TESTS AND DEFINITIONS
+# # ============================================================================
 
 
-class TestConstruction(unittest.TestCase):
-    def test_construct_empty(self):
-        s = MultiBrandPlatoonRegistry()
+# class TestConstruction(unittest.TestCase):
+#     def test_construct_empty(self):
+#         s = MultiBrandPlatoonRegistry()

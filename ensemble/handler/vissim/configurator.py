@@ -1,40 +1,48 @@
 """
-    This module contains a ``Configurator`` object. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation.
+    This module contains a ``Configurator`` object for Vissim. The configurator is an object that stores *parameters* that can be relevant to make the evolution of a simulation.
 """
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
 
-from ctypes import cdll, create_string_buffer, c_int, byref, c_bool, c_double
-import click
+import platform
+from dataclasses import dataclass
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
-import ensemble.tools.constants as CT
 from ensemble.tools.connector_configurator import ConnectorConfigurator
+from ensemble.tools.screen import log_verify
+import ensemble.tools.constants as CT
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
+@dataclass
 class VissimConfigurator(ConnectorConfigurator):
-    """ Configurator class for containing specific simulator parameters
+    """ Configurator class for containing specific simulator parameters for     
+        Vissim
 
         Example:
             To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
                 >>> path = "path/to/simluator.so"
-                >>> simulator = Configurator(libraryPath = path)
+                >>> simulator = VissimConfigurator(library_path = path)
 
+        Args:
+            library_path (str):
+                Absolute path towards the simulator library
 
         :return: Configurator object with simulation parameters
         :rtype: Configurator
     """
 
-    def __init__(self, libraryPath: str = "", totalSteps: int = 0) -> None:
+    library_path: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())]
+
+    def __init__(self, **kwargs) -> None:
         """ Configurator class for containing specific simulator parameter
             :param libraryPath: Stores the path of a traffic simulator, defaults to ""
             :type libraryPath: str, optional
@@ -43,7 +51,7 @@ class VissimConfigurator(ConnectorConfigurator):
             :return: Configurator object with simulation parameters
             :rtype: Configurator
         """
-        click.echo("Configurator: Initialization")
+        log_verify(f"{self.__class__.__name__}: Initialization")
         ConnectorConfigurator()
-        self.libraryPath = libraryPath
-        self.totalSteps = totalSteps
+        self.libraryPath = kwargs.get("libraryPath", "")
+        self.totalSteps = kwargs.get("totalSteps", 0)

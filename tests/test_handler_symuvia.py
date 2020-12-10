@@ -39,3 +39,11 @@ def test_configurator_constructor(symuvia_library_path):
     assert config.trace_flow == CT.TRACE_FLOW
     assert config.total_steps == CT.TOTAL_SIMULATION_STEPS
     assert config.step_launch_mode == CT.LAUNCH_MODE
+
+
+def test_connector_constructor(symuvia_library_path):
+    connector = SymuviaConnector(library_path=symuvia_library_path)
+    assert connector.library_path == symuvia_library_path
+    assert connector.trace_flow == CT.TRACE_FLOW
+    assert connector.total_steps == CT.TOTAL_SIMULATION_STEPS
+    assert connector.step_launch_mode == CT.LAUNCH_MODE
