@@ -87,13 +87,16 @@ class SimulatorRequest(DataQuery):
             "abscissa",
             "acceleration",
             "distance",
-            "vehid",
-            "ordinate",
-            "link",
-            "vehtype",
-            "speed",
+            "driven",
+            "elevation",
             "lane",
+            "link",
+            "ordinate",
+            "speed",
+            "vehid",
+            "vehtype",
         )
+
         listofdict = [
             dict(zip(vehsAttributesNames, item)) for item in self.query
         ]
