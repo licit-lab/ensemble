@@ -1,11 +1,20 @@
 """
-    This module describes classes and objects to perform a runtime of a single scenario
+Runtime Device
+=================
+This module describes classes and objects to perform a runtime of a single scenario
 """
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
 
 from itertools import chain
 import click
 
-from .states import (
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from .runtime_states import (
     Compliance,
     Connect,
     Initialize,
@@ -16,6 +25,10 @@ from .states import (
     PostRoutine,
     Terminate,
 )
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 
 START_SEQ = ["compliance", "connect", "initialize"]
@@ -44,7 +57,8 @@ class RuntimeDevice:
         ccycle = 0
         for event in full_seq:
             self.on_event(event)
-            if isinstance(self.state, PostRoutine):  # Step counted on PreRoutine
+            # Step counted on PreRoutine
+            if isinstance(self.state, PostRoutine):
                 ccycle = ccycle + 1
                 click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
             if isinstance(self.state, Terminate):

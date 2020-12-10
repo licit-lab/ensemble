@@ -25,7 +25,9 @@ from ensemble.tools.constants import (
 )
 from ensemble.handler.symuvia import SymuviaConnector, SymuviaScenario
 from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
-from ensemble.control.governor import MultiBrandPlatoonRegistry
+
+# from ensemble.control.governor import MultiBrandPlatoonRegistry
+from ensemble.component.vehiclelist import VehicleList
 from ensemble.tools.screen import log_success, log_verify, log_warning
 
 # ============================================================================
@@ -174,12 +176,13 @@ class Configurator:
 
     def create_platoon_registry(self):
         """ Creates a platoon registry for all coordinators (FGC-RGC) """
-        self.platoon_registry = MultiBrandPlatoonRegistry()
+        self.platoon_registry = VehicleList(
+            self.connector.request
+        )  # MultiBrandPlatoonRegistry()
 
     def update_platoon_registry(self):
         if hasattr(self, "platoon_registry"):
-            self.platoon_registry.update_truck_registry(self.connector.request)
-            self.connector.push_update()
+            self.platoon_registry.update_list()
             return
         self.create_platoon_registry()
 

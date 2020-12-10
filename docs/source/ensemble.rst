@@ -5,7 +5,6 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
    ensemble.component
    ensemble.control
@@ -40,6 +39,7 @@ ensemble.ensemble module
    :members:
    :undoc-members:
    :show-inheritance:
+
 
 Module contents
 ---------------

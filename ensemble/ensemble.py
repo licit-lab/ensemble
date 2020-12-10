@@ -15,7 +15,7 @@ import click
 
 from ensemble.tools.screen import log_in_terminal
 from ensemble.tools.checkers import check_scenario_consistency
-from ensemble.state import RuntimeDevice
+from ensemble.logic import RuntimeDevice
 
 
 def launch_simulation(configurator):

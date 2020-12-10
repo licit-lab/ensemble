@@ -5,9 +5,8 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
-   ensemble.tools.observer
+   ensemble.tools.metaclass
 
 Submodules
 ----------
@@ -44,6 +43,14 @@ ensemble.tools.exceptions module
    :undoc-members:
    :show-inheritance:
 
+ensemble.tools.screen module
+----------------------------
+
+.. automodule:: ensemble.tools.screen
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ensemble.tools.sorted\_frozen\_set module
 -----------------------------------------
 
@@ -59,6 +66,7 @@ ensemble.tools.stream module
    :members:
    :undoc-members:
    :show-inheritance:
+
 
 Module contents
 ---------------

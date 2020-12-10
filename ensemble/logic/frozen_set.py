@@ -1,5 +1,7 @@
 """
-    This is a class describing a sorted frozen set. This is a collection implementation for a set of ordered elements that establish specific protocols for iteration, information access, element identification.
+Frozen Set
+===========
+This is a class describing a sorted frozen set. This is a collection implementation for a set of ordered elements that establish specific protocols for iteration, information access, element identification.
 
 """
 # ============================================================================
@@ -9,7 +11,6 @@
 from collections.abc import Sequence, Set
 from itertools import chain
 from bisect import bisect_left
-
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -28,7 +29,12 @@ class SortedFrozenSet(Sequence, Set):
     """
 
     def __init__(self, items=None):
-        self._items = tuple(sorted(set(items) if (items is not None) else set()))
+        self._items = tuple(
+            sorted(
+                set(items) if (items is not None) else set(),
+                key=lambda x: x.vehid,
+            )
+        )
 
     def __contains__(self, item):
         try:
@@ -49,7 +55,12 @@ class SortedFrozenSet(Sequence, Set):
 
     def __repr__(self):
         return "{type}({arg})".format(
-            type=type(self).__name__, arg=("[{}]".format(", ".join(map(repr, self._items))) if self._items else "")
+            type=type(self).__name__,
+            arg=(
+                "[{}]".format(", ".join(map(repr, self._items)))
+                if self._items
+                else ""
+            ),
         )
 
     def __eq__(self, rhs):
