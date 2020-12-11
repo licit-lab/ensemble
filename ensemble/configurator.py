@@ -155,7 +155,7 @@ class Configurator:
                 library_path=self.library_path, step_launch_mode="traj"
             )
         else:
-            self.connector = VissimConnector(self.library_path)
+            self.connector = VissimConnector(library_path=self.library_path)
 
     def load_scenario(self):
         self.scenario_files = tuple(self.scenario_files)

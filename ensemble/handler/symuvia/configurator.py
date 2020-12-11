@@ -39,13 +39,13 @@ import ensemble.tools.constants as CT
 
 @dataclass
 class SymuviaConfigurator(ConnectorConfigurator):
-    """Configurator class for containing specific simulator parameters
+    """ Configurator class for containing specific simulator parameters
         Example:
             To use the ``Simulator`` declare in a string the ``path`` to the
             simulator ::
 
                 >>> path = "path/to/libSymuyVia.dylib"
-                >>> simulator = Configurator(library_path = path)
+                >>> simulator = SymuviaConfigurator(library_path = path)
 
         Args:
             library_path (str):
@@ -66,8 +66,9 @@ class SymuviaConfigurator(ConnectorConfigurator):
             step_launch_mode (str):
                 Determine to way to launch the ``RunStepEx``. Options ``lite``/``full``
 
-        :return: Configurator object with simulation parameters
-        :rtype: Configurator
+        Returns: 
+            configurator (Configurator): 
+                Configurator object with simulation parameters
     """
 
     buffer_string: c_char = create_string_buffer(BUFFER_STRING)

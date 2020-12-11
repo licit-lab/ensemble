@@ -6,7 +6,6 @@
 # STANDARD  IMPORTS
 # ============================================================================
 
-import click
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -25,7 +24,12 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadLibraryError,
 )
 
-from ensemble.tools.screen import log_verify, log_success, log_error
+from ensemble.tools.screen import (
+    log_verify,
+    log_success,
+    log_error,
+    log_warning,
+)
 
 import ensemble.tools.constants as CT
 
@@ -37,9 +41,7 @@ try:
     import win32com.client as com
     from pywintypes import com_error
 except ModuleNotFoundError:
-    click.echo(
-        click.style("\t Platform non compatible with Windows", fg="yellow")
-    )
+    log_warning("\t Platform non compatible with Windows")
 
 
 class VissimConnector(AbsConnector, VissimConfigurator):
