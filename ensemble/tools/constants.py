@@ -136,6 +136,34 @@ DEFAULT_CACC_PATH = os.path.join(
 # VISSIM CONSTANTS
 # *****************************************************************************
 
+FIELD_FORMAT_VISSIM = {
+    "CoordFrontX": float,
+    "Acceleration": float,
+    "Pos": float,
+    "No": int,
+    "CoordFrontY": float,
+    "Lane\\Link\\No": str,
+    "VehType": str,
+    "Speed": lambda x: float(x) / 3.6,
+    "Lane\\Index": int,
+    "@z": float,
+    "@etat_pilotage": bool,
+}
+
+FIELD_DATA_VISSIM = {
+    "CoordFrontX": "abscissa",
+    "Acceleration": "acceleration",
+    "Pos": "distance",
+    "No": "vehid",
+    "CoordFrontY": "ordinate",
+    "Lane\\Link\\No": "link",
+    "VehType": "vehtype",
+    "Speed": "speed",
+    "Lane\\Index": "lane",
+    "@z": "elevation",
+    "@etat_pilotage": "driven",
+}
+
 # *****************************************************************************
 # ENSEMBLE
 #

@@ -132,9 +132,12 @@ class VissimConnector(AbsConnector, VissimConfigurator):
         vehsAttributes = self.__library.Net.Vehicles.GetMultipleAttributes(
             vehsAttributesNamesVissim
         )
-        self.request.query = vehsAttributes  # List[Lists]
+        vehData = [
+            dict(zip(vehsAttributesNamesVissim, item))
+            for item in vehsAttributes
+        ]
+        self.request.query = vehData  # List[Dicts]
         self.request.sim_sec = self.sim_sec
-        # self.request.parse_data(vehsAttributes,self.sim_sec)
 
     def run_single_step(self):
         """ Run simulation next step

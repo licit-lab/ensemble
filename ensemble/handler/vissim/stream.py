@@ -16,6 +16,8 @@ from symupy.components import Vehicle, VehicleList
 # ============================================================================
 
 from ensemble.metaclass.stream import DataQuery
+from symupy.utils.parser import response
+import ensemble.tools.constants as ct
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -73,6 +75,59 @@ class SimulatorRequest(DataQuery):
         # return False
         return False
 
+    @staticmethod
+    def transform(veh_data: dict):
+        """ Transform vehicle data from string format to coherent format
+
+            Args: 
+                veh_data (dict): vehicle data as received from simulator
+
+            Returns:
+                t_veh_data (dict): vehicle data with correct formatting 
+
+
+            Example: 
+                As an example, for an input of the following style ::
+
+                >>> v = {"CoordFrontX":421.31564190349957 
+                            "Acceleration":-0.0
+                            "Pos":16.25355208592856
+                            "No":1,
+                            "CoordFrontY":-979.2497097242955
+                            "Lane\\Link\\No":6,
+                            "VehType":'630',
+                            "Speed":83.93049031871615,
+                            "Lane\\Index":1,
+                        }
+                >>> tv = SimulatorRequest.transform(v)
+                >>> # Transforms into 
+                >>> tv == {
+                >>>     "abscissa": 421.31564190349957,
+                >>>     "acceleration": -0.0,
+                >>>     "distance": 16.25355208592856,
+                >>>     "driven": False,
+                >>>     "elevation": 0.0,
+                >>>     "lane": 1,
+                >>>     "link": "6",
+                >>>     "ordinate": -979.2497097242955,
+                >>>     "speed": 23.314025088532265,
+                >>>     "vehid": 0,
+                >>>     "vehtype": "630",
+                >>> },
+
+        """
+        for key, val in veh_data.items():
+            response[ct.FIELD_DATA_VISSIM[key]] = ct.FIELD_FORMAT_VISSIM[key](
+                val
+            )
+        lkey = "@etat_pilotage"
+        response[ct.FIELD_DATA_VISSIM[lkey]] = ct.FIELD_FORMAT_VISSIM[lkey](
+            veh_data.get(lkey)
+        )
+        lkey = "@z"
+        response[ct.FIELD_DATA_VISSIM[lkey]] = 0
+        return dict(response)
+
     def get_vehicle_data(self) -> list:
         """ Extracts vehicles information from simulators response
 
@@ -83,25 +138,11 @@ class SimulatorRequest(DataQuery):
                 listdict (list): List of dictionaries 
         
         """
-        vehsAttributesNames = (
-            "abscissa",
-            "acceleration",
-            "distance",
-            "driven",
-            "elevation",
-            "lane",
-            "link",
-            "ordinate",
-            "speed",
-            "vehid",
-            "vehtype",
-        )
-
-        listofdict = [
-            dict(zip(vehsAttributesNames, item)) for item in self.query
-        ]
-        # veh_list = VehicleList.from_request(listofdict)
-        return listofdict
+        if self.query is not None:
+            if isinstance(self.query, list):
+                return [SimulatorRequest.transform(d) for d in self.query]
+            return [SimulatorRequest.transform(self.query)]
+        return []
 
     # def get_leader_id(self, vehid):
     #     try:
