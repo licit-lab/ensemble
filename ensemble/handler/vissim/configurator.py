@@ -36,22 +36,20 @@ class VissimConfigurator(ConnectorConfigurator):
             library_path (str):
                 Absolute path towards the simulator library
 
-        :return: Configurator object with simulation parameters
-        :rtype: Configurator
+        Returns: 
+            configurator (Configurator): 
+                Configurator object with simulation parameters
     """
 
-    library_path: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())]
+    library_path: str = CT.DCT_DEFAULT_PATHS[("vissim", platform.system())]
 
     def __init__(self, **kwargs) -> None:
         """ Configurator class for containing specific simulator parameter
-            :param libraryPath: Stores the path of a traffic simulator, defaults to ""
-            :type libraryPath: str, optional
-            :param totalSteps: total number of simulation steps, defaults to 0
-            :type totalSteps: int, optional
-            :return: Configurator object with simulation parameters
-            :rtype: Configurator
+
+            Args:
+                library_path (str):
+                    Absolute path towards the simulator library
+
         """
         log_verify(f"{self.__class__.__name__}: Initialization")
         ConnectorConfigurator()
-        self.libraryPath = kwargs.get("libraryPath", "")
-        self.totalSteps = kwargs.get("totalSteps", 0)
