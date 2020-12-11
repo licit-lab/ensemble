@@ -44,7 +44,7 @@ def check_library_path(library_path: str, simulation_platform: str):
     else:
         log_warning(
             "\tPlatform and path:",
-            "\t{simulation_platform} -- {library_path}",
+            f"\t{simulation_platform} -- {library_path}",
             " were not verified.",
         )
     # Check Path existance for symuvia
