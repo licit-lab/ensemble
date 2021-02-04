@@ -29,7 +29,8 @@ from ensemble.tools.constants import DCT_PLT_CONST
 
 @dataclass
 class PlatoonVehicle(Vehicle):
-    """ This is a vehicle class defined for storing data on a single vehicle.
+    """ This is a vehicle class defined for storing data of a single platoon
+        vehicle.
 
         You need a Publisher from where the vehicle is going to take data: 
 

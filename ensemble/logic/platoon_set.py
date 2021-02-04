@@ -1,9 +1,9 @@
 """
-Frozen Set
+Platoon Set
 ===========
-This is a class describing a sorted frozen set. This is a collection implementation for a set of ordered elements that establish specific protocols for iteration, information access, element identification.
-
+This is a class describing a frozen set. This is a collection implementation for a set of ordered elements that establish specific protocols for iteration, information access, element identification.
 """
+
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
@@ -13,25 +13,28 @@ from itertools import chain
 from bisect import bisect_left
 
 # ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from ensemble.logic.frozen_set import SortedFrozenSet
+
+# ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
-class SortedFrozenSet(Sequence, Set):
+class PlatoonSet(SortedFrozenSet):
     """
-        This is a collection that provides a set of properties to create a sorted frozen set.
+        This is a collection that provides a set of properties to create a platoon frozen set.
 
-        In particular this is 
+        In particular
 
         Args:
-            Items (Iterable): 
-                Inherits from the `Sequence` collection object.
-
-            Key (str): 
-                Key to organize the vehicle platoon
+            Sequence (Sequence): Inherits from the `Sequence` collection object.
+            Set (Set): Inherits from the `Set` collection object.
     """
 
-    def __init__(self, items=None, key="vehid"):
+    def __init__(self, items=None, key="x"):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
@@ -54,7 +57,7 @@ class SortedFrozenSet(Sequence, Set):
 
     def __getitem__(self, index):
         result = self._items[index]
-        return SortedFrozenSet(result) if isinstance(index, slice) else result
+        return PlatoonSet(result) if isinstance(index, slice) else result
 
     def __repr__(self):
         return "{type}({arg})".format(
@@ -75,12 +78,18 @@ class SortedFrozenSet(Sequence, Set):
         return hash((type(self), self._items))
 
     def __add__(self, rhs):
+
         if not isinstance(rhs, type(self)):
             return NotImplemented
-        return SortedFrozenSet(chain(self._items, rhs._items))
+        # Join from the front
+        if self[-1].joinable():
+            return PlatoonSet(chain(self._items, rhs._items))
+        return self
+
+        # Join from the back
 
     def __mul__(self, rhs):
-        return self if rhs > 0 else SortedFrozenSet()
+        return self if rhs > 0 else PlatoonSet()
 
     def __rmul__(self, lhs):
         return self * lhs
@@ -95,19 +104,19 @@ class SortedFrozenSet(Sequence, Set):
         raise ValueError(f"{item!r} not found")
 
     def issubset(self, iterable):
-        return self <= SortedFrozenSet(iterable)
+        return self <= PlatoonSet(iterable)
 
     def issuperset(self, iterable):
-        return self >= SortedFrozenSet(iterable)
+        return self >= PlatoonSet(iterable)
 
     def intersection(self, iterable):
-        return self & SortedFrozenSet(iterable)
+        return self & PlatoonSet(iterable)
 
     def union(self, iterable):
-        return self | SortedFrozenSet(iterable)
+        return self | PlatoonSet(iterable)
 
     def symmetric_difference(self, iterable):
-        return self ^ SortedFrozenSet(iterable)
+        return self ^ PlatoonSet(iterable)
 
     def difference(self, iterable):
-        return self - SortedFrozenSet(iterable)
+        return self - PlatoonSet(iterable)
