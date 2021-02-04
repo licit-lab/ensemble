@@ -247,7 +247,8 @@ DCT_VEH_DATA = {
 
 DCT_PLT_CONST = {
     "max_platoon_length": 7,  # maximum number of vehicles allowed in platoon
-    "max_connection_distance": 100,  # maximum distance for communication(metres)
+    "max_connection_distance": 100,  # maximum distance for communication
+    "platoon_types": ("PL", 201),
 }
 
 if __name__ == "__main__":

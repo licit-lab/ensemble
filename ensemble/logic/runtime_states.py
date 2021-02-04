@@ -43,7 +43,7 @@ class Compliance(AbsState):
     The state which declares an status to check file compliance .
     """
 
-    def on_event(self, event: str, configurator) -> None:
+    def next_state(self, event: str, configurator) -> None:
         """ Returns next state 
         
         :param event: Event keyword for next state "connect"
@@ -74,7 +74,7 @@ class Connect(AbsState):
     The state which declares the creation of a connection with the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
 
         try:
             configurator.load_socket()
@@ -93,7 +93,7 @@ class Initialize(AbsState):
     The state which initializes values for the scenario simulation
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
 
         try:
             configurator.load_scenario()
@@ -112,7 +112,7 @@ class PreRoutine(AbsState):
     The state which performs task previous to the interaction with the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
         if event == "query":
             return Query()
 
@@ -124,7 +124,7 @@ class Query(AbsState):
     The state which retrieves information from the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
 
         # TODO: call simulator step by step.
 
@@ -141,7 +141,7 @@ class Control(AbsState):
     The state which computes the control decision  
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
         if event == "push":
             return Push()
 
@@ -153,7 +153,7 @@ class Push(AbsState):
     The state which pushes data back to the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
         if event == "postroutine":
             return PostRoutine()
 
@@ -165,7 +165,7 @@ class PostRoutine(AbsState):
     The state which logs information or compute step indicators 
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
         if event == "preroutine":
             return PreRoutine()
         elif event == "terminate":
@@ -179,7 +179,7 @@ class Terminate(AbsState):
     The state which declares the end of a simulation
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator):
         click.echo(click.style("Succesfully accomplished ⏱", fg="magenta"))
         return self
 
