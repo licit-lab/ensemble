@@ -122,6 +122,21 @@ class Vehicle(Subscriber):
             self.itinerary.append(link)
 
     @property
-    def x(self):
+    def state(self):
         """Vehicle state vector (x,v,a)"""
         return np.array((self.distance, self.speed, self.acceleration))
+
+    @property
+    def x(self):
+        """ Return vehicle travelled ditance """
+        return self.distance
+
+    @property
+    def v(self):
+        """ Return vehicle speed """
+        return self.speed
+
+    @property
+    def a(self):
+        """ Return vehicle acceleration """
+        return self.acceleration

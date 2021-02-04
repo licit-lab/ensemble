@@ -1,23 +1,43 @@
-# """
-#     Unit tests for the Vehicle object within the ENSEMBLE API
-# """
+"""
+    Unit tests for the Vehicle object within the ENSEMBLE API
+"""
 
-# # ============================================================================
-# # STANDARD  IMPORTS
-# # ============================================================================
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
 
-# import unittest
+import pytest
+
 # from collections import OrderedDict
 
-# # ============================================================================
-# # INTERNAL IMPORTS
-# # ============================================================================
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
 
-# from ensemble.component.vehicles import Vehicle
+from ensemble.component.truck import Truck
+from ensemble.component.vehicle import Vehicle
+from ensemble.handler.symuvia.stream import SimulatorRequest
 
-# # ============================================================================
-# # TESTS AND DEFINITIONS
-# # ============================================================================
+from ensemble.logic.platoon_states import StandAlone
+
+# ============================================================================
+# TESTS AND DEFINITIONS
+# ============================================================================
+
+
+@pytest.fixture
+def simrequest():
+    return SimulatorRequest()
+
+
+def test_constructor_vehicle(simrequest):
+    veh = Vehicle(simrequest)
+    assert True
+
+
+def test_constructor_truck(simrequest):
+    truck = Truck(simrequest)
+    assert isinstance(truck.status, StandAlone) == True
 
 
 # class TestConstruction(unittest.TestCase):
