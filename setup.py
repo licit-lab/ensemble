@@ -29,10 +29,6 @@ requirements = [
     "python-decouple>=3.3",
 ]
 
-setup_requirements = [
-    "pytest-runner",
-]
-
 test_requirements = [
     "pytest>=3",
 ]
