@@ -35,7 +35,8 @@
 from datetime import date, datetime, timedelta
 from numpy import array, float64, int32
 import os, platform
-from decouple import config, UndefinedValueError
+import decouple
+from decouple import UndefinedValueError
 from pathlib import Path
 
 # ============================================================================
@@ -64,7 +65,7 @@ from symupy.utils.constants import (
     HOUR_FORMAT,
 )
 
-from ensemble.tools.exceptions import EnsembleAPIWarning
+from ensemble.tools.exceptions import EnsembleAPIWarning, EnsembleAPIError
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -84,31 +85,68 @@ DCT_SIMULATORS = {
 }
 
 # Feasible Simulator/Platform Paths/Libs
-DEFAULT_PATH_SYMUVIA_OSX = ""
+# Point to ini file
+ini_config = decouple.Config(os.path.dirname(__file__))
+
+DEFAULT_LIB_OSX = os.path.join(
+    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.dylib"
+)
+
+DEFAULT_LIB_LINUX = os.path.join(
+    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.so"
+)
+
+DEFAULT_LIB_WINDOWS = os.path.join(
+    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.dll"
+)
+
 if platform.system() == "Darwin":
     try:
         if Path(DEFAULT_LIB_OSX).exists():
-            DEFAULT_PATH_SYMUVIA_OSX = DEFAULT_LIB_OSX
+            DEFAULT_PATH_SYMUVIA = DEFAULT_LIB_OSX
         else:
-            DEFAULT_PATH_SYMUVIA_OSX = config("DEFAULT_LIB_OSX")
+            DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_OSX")
     except UndefinedValueError:
         EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA_OSX = ""
+        DEFAULT_PATH_SYMUVIA = ""
+elif platform.system() == "Linux":
+    try:
+        if Path(DEFAULT_LIB_LINUX).exists():
+            DEFAULT_PATH_SYMUVIA = DEFAULT_LIB_LINUX
+        else:
+            DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_LINUX")
+    except UndefinedValueError:
+        EnsembleAPIWarning("No Simulator could be defined")
+        DEFAULT_PATH_SYMUVIA = ""
+elif platform.system() == "Windows":
+    try:
+        DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_WINDOWS")
+    except UndefinedValueError:
+        EnsembleAPIWarning("No Simulator could be defined")
+        DEFAULT_PATH_SYMUVIA = ""
+else:
+    raise EnsembleAPIError("Platform could not be determined")
 
 # Fill candidates
 DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OSX,
-    ("symuvia", "Windows"): DEFAULT_PATH_SYMUVIA_OSX,
+    ("symuvia", "Darwin"): DEFAULT_LIB_OSX,
+    ("symuvia", "Windows"): DEFAULT_LIB_OSX,
     ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
     ("vissim", "Darwin"): DEFAULT_LIB_WINDOWS,
+    ("symuvia", "Linux"): DEFAULT_LIB_LINUX,
+    ("vissim", "Linux"): DEFAULT_LIB_LINUX,
 }
 
 # Dynamic Platoon Data
 
 DCT_PLT_DATA = {
     "plt_id": 0,  # Platoon id
-    "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
-    "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
+    "headway": [
+        0.0,
+    ],  # Inter-vehicle distance List[Float, Float]
+    "plt_brands": [
+        0,
+    ],  # Vehicle Platoon brands List[Int, Int]
     "plt_order": [
         (0, 0),
     ],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
@@ -117,6 +155,7 @@ DCT_PLT_DATA = {
 DCT_LIB_CACC = {
     "Windows": "OperationalDLL.dll",
     "Darwin": "OperationalDLL.dylib",
+    "Linux": "OperationalDLL.so",
 }
 
 DEFAULT_CACC_PATH = os.path.join(

@@ -1,5 +1,5 @@
 """
-    Test suite for the shared library containing the operational layer.
+    Unit testing for ensemble.control.operational
 """
 
 # ============================================================================
@@ -20,6 +20,7 @@ from unittest.case import TestCase
 from ensemble import configurator
 from ensemble.tools.constants import DEFAULT_CACC_PATH
 from ensemble.control.operational import CACC
+import platform
 
 # ============================================================================
 # TESTS
@@ -31,17 +32,15 @@ def controller_libpath():
     return DEFAULT_CACC_PATH
 
 
-@pytest.fixture
-def controller():
-    return cdll.LoadLibrary(DEFAULT_CACC_PATH)
-
-
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
 def test_load_dll(controller_libpath):
     handle = cdll.LoadLibrary(controller_libpath)
     assert handle._name == controller_libpath
 
 
-def test_specific_output(controller):
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
+def test_specific_output(controller_libpath):
+    controller = cdll.LoadLibrary(controller_libpath)
     # Set input values: Write value's for current vehicle, in current timestep
     curr_lead_veh_acceleration = c_double(2.0)
     curr_lead_veh_id = c_long(40)
@@ -112,6 +111,7 @@ def test_specific_output(controller):
     assert veh_cruisecontrol_acceleration.value == 0.0
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
 def test_cacc_artifact(controller_libpath):
     control = CACC()
     control.lib._name == controller_libpath
