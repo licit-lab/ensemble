@@ -1,35 +1,119 @@
-# import pytest
-# from mypackage.frontgap2 import FrontGapState
-# from mypackage.vehicle2 import PlatoonVehicle
-# # def test_1():
-# #     veh=PlatoonVehicle(leader_PCM_capable=1,
-# #     leader_split_request=False,
-# #     ego_distance_gap_to_leader=0,
-# #     leader_id=1,
-# #     leader_speed=4.0,
-# #     leader_length=5.0,
-# #     gap_distance_error=0,
-# #     ego_split_request=False,
-# #     ego_standalone_time_gap=1,
-# #     front_target_state="join",
-# #     ego_speed=4.0,
-# #     ego_position=0,
-# #     leader_position=0,
-# #     desired_gap=1,
-# #     standalone_gap=1,
-# #     platoon_id=1,
-# #     platoon_length=1,
-# #     front_id=2,
-# #     intruder=True,
-# #     ego_platoon_position=1,
-# #     leader_platoon_position=2,
-# #     maximum_platoon_length=7,
-# #     platoon_desired_speed=50,
-# #     platoon_desired_time_gap=2,
-# #     max_connection_distance=100)
-# #     fgc = FrontGapState( veh)
-# #     fgc.update_state(veh)
-# #     assert veh.front_target_state=="standalone"
+"""
+    Unit testing Tactical Layer (Front Gap)
+"""
+
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
+import platform
+import pytest
+
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from ensemble.component.platoon import Platoon
+from ensemble.component.truck import Truck
+
+from ensemble.logic.platoon_states import (
+    StandAlone,
+    Platooning,
+    Joining,
+    Splitting,
+)
+
+# ============================================================================
+# TESTS AND DEFINITIONS
+# ============================================================================
+
+
+def to_xml(data):
+    return str.encode(
+        '<INST nbVeh="1" val="2.00"><CREATIONS><CREATION entree="Ext_In" id="{vehid}" sortie="Ext_Out" type="VL"/></CREATIONS><SORTIES/><TRAJS><TRAJ abs="{abscissa}" acc="{acceleration}" dst="{distance}" id="{vehid}" ord="{ordinate}" tron="{link}" type="{vehtype}" vit="{speed}" voie="{lane}" z="{elevation}"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'.format(
+            **data
+        )
+    )
+
+
+@pytest.fixture
+def trk01_data_test01():
+    return to_xml(
+        {
+            "abscissa": 0,
+            "acceleration": 0,
+            "distance": 200,
+            "driven": False,
+            "elevation": 0,
+            "lane": 1,
+            "link": "LinkA",
+            "ordinate": 100,
+            "speed": 4.0,
+            "vehid": 1,
+            "vehtype": "PLT",
+            "status": StandAlone(),
+            "platoon": False,
+        }
+    )
+
+
+@pytest.fixture
+def trk02_data_test01():
+    return to_xml(
+        {
+            "abscissa": 0,
+            "acceleration": 0,
+            "distance": 50,
+            "driven": False,
+            "elevation": 0,
+            "lane": 1,
+            "link": "LinkA",
+            "ordinate": 100,
+            "speed": 4.0,
+            "vehid": 2,
+            "vehtype": "PLT",
+            "status": StandAlone(),
+            "platoon": False,
+        }
+    )
+
+
+def test_1(trk01_data_test01, trk02_data_test02):
+    pass
+    # veh = PlatoonVehicle(**truck_leader_data)
+    # fgc = FrontGapState(veh)
+    # fgc.update_state(veh)
+    # assert veh.front_target_state == "standalone"
+
+
+# @pytest.fixture
+# def truck_leader_data():
+#     return {
+#         leader_PCM_capable=1,
+#         leader_split_request=False,
+#         ego_distance_gap_to_leader=0,
+#         leader_id=1,
+#         leader_length=5.0,
+#         ego_split_request=False,
+#         ego_standalone_time_gap=1,
+#         front_target_state="join",
+#         ego_speed=4.0,
+#         ego_position=0,
+#         leader_position=0,
+#         desired_gap=1,
+#         standalone_gap=1,
+#         platoon_id=1,
+#         platoon_length=1,
+#         front_id=2,
+#         intruder=True,
+#         ego_platoon_position=1,
+#         leader_platoon_position=2,
+#         maximum_platoon_length=7,
+#         platoon_desired_speed=50,
+#         platoon_desired_time_gap=2,
+#         max_connection_distance=100,
+#     }
+
 # #
 # # def test_2():
 # #     veh=PlatoonVehicle(leader_PCM_capable=1,
