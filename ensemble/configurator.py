@@ -37,7 +37,37 @@ from ensemble.tools.screen import log_success, log_verify, log_warning
 
 @dataclass
 class Configurator:
-    """ Configurator class for containing specific simulator parameter
+    """Configurator class for containing specific simulator parameter
+
+    Args:
+
+    verbose (bool):
+        Indicates if verbosity is required within the exit
+
+    info (bool):
+        Prints project information
+
+    platform (str):
+        Platform to run: Windows, Darwin, Linux
+
+    simulation_platform (str):
+        Traffic simulation platform: vissim, symuvia
+
+    scenario_files (list):
+        List of absolute files containing traffic scenarios
+
+    simulation_parameters (dict):
+        List of simulatio parameters. Check ``constants`` module for more information
+    """
+
+    verbose: bool = False
+    info: bool = True
+    platform: str = platform.system()
+    simulation_platform: str = ""
+    library_path: str = ""
+
+    def __init__(self, **kwargs) -> None:
+        """Configurator class for containing specific simulator parameter
 
         Args:
 
@@ -58,36 +88,6 @@ class Configurator:
 
         simulation_parameters (dict):
             List of simulatio parameters. Check ``constants`` module for more information
-    """
-
-    verbose: bool = False
-    info: bool = True
-    platform: str = platform.system()
-    simulation_platform: str = ""
-    library_path: str = ""
-
-    def __init__(self, **kwargs) -> None:
-        """ Configurator class for containing specific simulator parameter
-
-            Args:
-
-            verbose (bool):
-                Indicates if verbosity is required within the exit
-
-            info (bool):
-                Prints project information
-
-            platform (str):
-                Platform to run: Windows, Darwin, Linux
-
-            simulation_platform (str):
-                Traffic simulation platform: vissim, symuvia
-
-            scenario_files (list):
-                List of absolute files containing traffic scenarios
-
-            simulation_parameters (dict):
-                List of simulatio parameters. Check ``constants`` module for more information
         """
 
         for key, value in kwargs.items():
@@ -97,10 +97,10 @@ class Configurator:
         self.simulation_parameters = DCT_RUNTIME_PARAM
 
     def set_simulation_platform(self, simulation_platform: str = "") -> None:
-        """ A simpler setter for the simulation platform based on OS
+        """A simpler setter for the simulation platform based on OS
 
-            Args:
-                simulation_platform (str): "symuvia" or "vissim", defaults to ""
+        Args:
+            simulation_platform (str): "symuvia" or "vissim", defaults to ""
         """
         if simulation_platform:
             self.simulation_platform = simulation_platform
@@ -119,14 +119,12 @@ class Configurator:
         key = (self.simulation_platform, self.platform)
         self.library_path = DCT_DEFAULT_PATHS[key]
 
-        log_success(
-            "Simulator path set to default value:", f"\t{self.library_path}"
-        )
+        log_success("Simulator path set to default value:", f"\t{self.library_path}")
         return
 
     def update_values(self, **kwargs) -> None:
-        """ Configurator updater, pass a with keyword arguments to update. 
-            Just pass the desired parameter as a kewyword argument.
+        """Configurator updater, pass a with keyword arguments to update.
+        Just pass the desired parameter as a kewyword argument.
         """
 
         if kwargs.get("library_path"):
@@ -139,9 +137,7 @@ class Configurator:
             )
 
         if kwargs.get("scenario_files"):
-            self.scenario_files = kwargs.get(
-                "scenario_files", self.scenario_files
-            )
+            self.scenario_files = kwargs.get("scenario_files", self.scenario_files)
 
             log_verify(
                 "Setting new scenario file(s) path to user input:",

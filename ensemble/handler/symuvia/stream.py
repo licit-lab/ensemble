@@ -55,10 +55,10 @@ class SimulatorRequest(DataQuery):
 
     @property
     def data_query(self):
-        """ Direct parsing from the string buffer
-            
-            Returns:
-                simdata (OrderedDict): Simulator data parsed from XML
+        """Direct parsing from the string buffer
+
+        Returns:
+            simdata (OrderedDict): Simulator data parsed from XML
         """
         try:
             dataveh = parse(self._str_response)
@@ -74,10 +74,10 @@ class SimulatorRequest(DataQuery):
     # =========================================================================
 
     def get_vehicle_data(self) -> vlists:
-        """ Extracts vehicles information from simulators response
+        """Extracts vehicles information from simulators response
 
-            Returns:
-                t_veh_data (list): list of dictionaries containing vehicle data with correct formatting
+        Returns:
+            t_veh_data (list): list of dictionaries containing vehicle data with correct formatting
 
         """
         if self.data_query.get("INST", {}).get("TRAJS") is not None:
@@ -89,52 +89,50 @@ class SimulatorRequest(DataQuery):
 
     @staticmethod
     def transform(veh_data: dict):
-        """ Transform vehicle data from string format to coherent format
+        """Transform vehicle data from string format to coherent format
 
-            Args: 
-                veh_data (dict): vehicle data as received from simulator
+        Args:
+            veh_data (dict): vehicle data as received from simulator
 
-            Returns:
-                t_veh_data (dict): vehicle data with correct formatting 
+        Returns:
+            t_veh_data (dict): vehicle data with correct formatting
 
 
-            Example: 
-                As an example, for an input of the following style ::
+        Example:
+            As an example, for an input of the following style ::
 
-                >>> v = OrderedDict([('@abs', '25.00'), ('@acc', '0.00'), ('@dst', '25.00'), ('@id', '0'), ('@ord', '0.00'), ('@tron', 'Zone_001'), ('@type', 'VL'), ('@vit', '25.00'), ('@voie', '1'),('@z', '0')])
-                >>> tv = SimulatorRequest.transform(v)
-                >>> # Transforms into 
-                >>> tv == {
-                >>>     "abscissa": 25.0,
-                >>>     "acceleration": 0.0,
-                >>>     "distance": 25.0,
-                >>>     "elevation": 0.0,
-                >>>     "lane": 1,
-                >>>     "link": "Zone_001",
-                >>>     "ordinate": 0.0,
-                >>>     "speed": 25.0,
-                >>>     "vehid": 0,
-                >>>     "vehtype": "VL",
-                >>> },
+            >>> v = OrderedDict([('@abs', '25.00'), ('@acc', '0.00'), ('@dst', '25.00'), ('@id', '0'), ('@ord', '0.00'), ('@tron', 'Zone_001'), ('@type', 'VL'), ('@vit', '25.00'), ('@voie', '1'),('@z', '0')])
+            >>> tv = SimulatorRequest.transform(v)
+            >>> # Transforms into
+            >>> tv == {
+            >>>     "abscissa": 25.0,
+            >>>     "acceleration": 0.0,
+            >>>     "distance": 25.0,
+            >>>     "elevation": 0.0,
+            >>>     "lane": 1,
+            >>>     "link": "Zone_001",
+            >>>     "ordinate": 0.0,
+            >>>     "speed": 25.0,
+            >>>     "vehid": 0,
+            >>>     "vehtype": "VL",
+            >>> },
 
         """
         for key, val in veh_data.items():
             response[ct.FIELD_DATA[key]] = ct.FIELD_FORMAT[key](val)
         lkey = "@etat_pilotage"
-        response[ct.FIELD_DATA[lkey]] = ct.FIELD_FORMAT[lkey](
-            veh_data.get(lkey)
-        )
+        response[ct.FIELD_DATA[lkey]] = ct.FIELD_FORMAT[lkey](veh_data.get(lkey))
         return dict(response)
 
     def is_vehicle_driven(self, vehid: int) -> bool:
-        """ Returns true if the vehicle state is exposed to a driven state
+        """Returns true if the vehicle state is exposed to a driven state
 
-            Args:
-                vehid (str):
-                    vehicle id
-            
-            Returns: 
-                driven (bool): True if veh is driven
+        Args:
+            vehid (str):
+                vehicle id
+
+        Returns:
+            driven (bool): True if veh is driven
         """
         if self.is_vehicle_in_network(vehid):
 

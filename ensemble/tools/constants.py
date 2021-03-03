@@ -14,6 +14,7 @@
      **Variable**                 **Description**
     ----------------------------  --------------------------------------
     ``BUFFER_STRING``              Buffer size
+    ``DEFAULT_PATH_SYMUVIA``       Default Path Towards SymuVia    
     ``DEFAULT_LIB_OSX``            Default OS X library path (SymuVia)
     ``DEFAULT_LIB_LINUX``          Default Linux library path  (SymuVia)
     ``DEFAULT_LIB_WINDOWS``        Default Windows library path (Vissim)
@@ -24,6 +25,17 @@
     ``DCT_VEH_DATA``               Vehicle data default parameters
     ``DCT_PLT_DATA``               Platoon parameters
     ``DCT_LIB_CACC``               Default CACC library path
+    ``FIELD_DATA``                 Vehicle trajectory data
+    ``FIELD_FORMAT``               Trajectory data types
+    ``HOUR_FORMAT``                Time format
+    ``FIELD_FORMATAGG``            Format aggretations
+    ``DCT_SIMULATION_INFO```       XML Simulation information
+    ``DCT_EXPORT_INFO``            XML Export information
+    ``DCT_TRAFIC_INFO``            XML Traffic information
+    ``DCT_NETWORK_INFO``           XML Network information
+    ``DCT_SCENARIO_INFO``          XML Scenario information
+    ``TP_VEHTYPES``                Vehicle type information
+    ``TP_ACCEL``                   Vehicle acceleration boundaries    
     ============================  ======================================
 
 """
@@ -32,19 +44,20 @@
 # STANDARD  IMPORTS
 # ============================================================================
 
+import os
 from datetime import date, datetime, timedelta
+import platform
+
+from decouple import UndefinedValueError, config
 from numpy import array, float64, int32
-import os, platform
-import decouple
-from decouple import UndefinedValueError
 from pathlib import Path
+from collections import defaultdict
 
 # ============================================================================
 # SPECIFIC  IMPORTS
 # ============================================================================
 
 from symupy.utils.constants import (
-    DEFAULT_LIB_OSX,
     FIELD_DATA,
     FIELD_FORMAT,
     FIELD_FORMATAGG,
@@ -54,7 +67,6 @@ from symupy.utils.constants import (
     DCT_TRAFIC_INFO,
     DCT_NETWORK_INFO,
     DCT_SCENARIO_INFO,
-    TP_VEHTYPES,
     TP_VEHTYPES,
     TIME_STEP,
     ENGINE_CONSTANT,
@@ -71,8 +83,33 @@ from ensemble.tools.exceptions import EnsembleAPIWarning, EnsembleAPIError
 # CLASS AND DEFINITIONS
 # ============================================================================
 
-# Vissim Command
-DEFAULT_LIB_WINDOWS = "Vissim.Vissim-64.10"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Solving conda (local,RTD)
+RTDPATH = config("RTD_ENV", cast=str)
+CONDA_PREFIX = os.getenv("CONDA_PREFIX", RTDPATH)
+
+PATHS_2_SEARCH = (CONDA_PREFIX,)
+
+# Default names/platform
+DCT_LIBOSNAME = {
+    "Darwin": "libSymuVia.dylib",
+    "Linux": "libSymuVia.so",
+    "Windows": "Vissim.Vissim-64.10",
+}
+
+
+def find_path(roots):
+    for root in roots:
+        if (p := Path(root)).is_dir():
+            yield from p.glob(f"**/{DCT_LIBOSNAME[platform.system()]}")
+
+
+DEFAULT_PATH_SYMUVIA = ""
+for path in find_path(PATHS_2_SEARCH):
+    DEFAULT_PATH_SYMUVIA = path
+
+print(f"Default path: {DEFAULT_PATH_SYMUVIA}")
 
 # *****************************************************************************
 # DEFAULT SIMULATOR/ OS ASSOCIATION
@@ -85,56 +122,15 @@ DCT_SIMULATORS = {
 }
 
 # Feasible Simulator/Platform Paths/Libs
-# Point to ini file
-ini_config = decouple.Config(os.path.dirname(__file__))
-
-DEFAULT_LIB_OSX = os.path.join(
-    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.dylib"
-)
-
-DEFAULT_LIB_LINUX = os.path.join(
-    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.so"
-)
-
-DEFAULT_LIB_WINDOWS = os.path.join(
-    os.getenv("CONDA_PREFIX"), "lib", "libSymuVia.dll"
-)
-
-if platform.system() == "Darwin":
-    try:
-        if Path(DEFAULT_LIB_OSX).exists():
-            DEFAULT_PATH_SYMUVIA = DEFAULT_LIB_OSX
-        else:
-            DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_OSX")
-    except UndefinedValueError:
-        EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA = ""
-elif platform.system() == "Linux":
-    try:
-        if Path(DEFAULT_LIB_LINUX).exists():
-            DEFAULT_PATH_SYMUVIA = DEFAULT_LIB_LINUX
-        else:
-            DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_LINUX")
-    except UndefinedValueError:
-        EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA = ""
-elif platform.system() == "Windows":
-    try:
-        DEFAULT_PATH_SYMUVIA = ini_config("DEFAULT_LIB_WINDOWS")
-    except UndefinedValueError:
-        EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA = ""
-else:
-    raise EnsembleAPIError("Platform could not be determined")
 
 # Fill candidates
 DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_LIB_OSX,
-    ("symuvia", "Windows"): DEFAULT_LIB_OSX,
-    ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
-    ("vissim", "Darwin"): DEFAULT_LIB_WINDOWS,
-    ("symuvia", "Linux"): DEFAULT_LIB_LINUX,
-    ("vissim", "Linux"): DEFAULT_LIB_LINUX,
+    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA,
+    ("symuvia", "Windows"): DEFAULT_PATH_SYMUVIA,
+    ("vissim", "Windows"): DEFAULT_PATH_SYMUVIA,
+    ("vissim", "Darwin"): DEFAULT_PATH_SYMUVIA,
+    ("symuvia", "Linux"): DEFAULT_PATH_SYMUVIA,
+    ("vissim", "Linux"): DEFAULT_PATH_SYMUVIA,
 }
 
 # Dynamic Platoon Data

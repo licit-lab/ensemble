@@ -39,8 +39,8 @@ END_SEQ = [
 
 
 class RuntimeDevice:
-    """ This class defines the runtime device describing a series of 
-        cyclic states required to be run:
+    """This class defines the runtime device describing a series of
+    cyclic states required to be run:
 
     """
 
@@ -50,8 +50,7 @@ class RuntimeDevice:
         self.cycles = configurator.total_steps
 
     def __enter__(self) -> None:
-        """ Implementation of the state machine         
-        """
+        """Implementation of the state machine"""
         full_seq = chain(START_SEQ, self.cycles * RUNTIME_SEQ, END_SEQ)
 
         ccycle = 0
@@ -63,7 +62,7 @@ class RuntimeDevice:
                 click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
             if isinstance(self.state, Terminate):
                 break
- 
+
         self.next_state(event)  # Run Terminate sequence
 
         return self
@@ -72,7 +71,7 @@ class RuntimeDevice:
         return False
 
     def next_state(self, event: str):
-        """ Action to consider on event:
+        """Action to consider on event:
 
         * compliance
         * connect
@@ -83,9 +82,9 @@ class RuntimeDevice:
         * push
         * postroutine
         * terminate
-        
-        :param event: 
-        :type event: str 
+
+        :param event:
+        :type event: str
         :param configurator:
         :type configurator: Configurator
         """

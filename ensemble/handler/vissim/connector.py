@@ -46,9 +46,9 @@ except ModuleNotFoundError:
 
 class VissimConnector(AbsConnector, VissimConfigurator):
     """
-        This models a connector and interactions from the API with the Vissim library.
+    This models a connector and interactions from the API with the Vissim library.
 
-        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
     """
 
     def __init__(self, **kwargs) -> None:
@@ -63,28 +63,19 @@ class VissimConnector(AbsConnector, VissimConfigurator):
             log_success("\t Library successfully loaded!")
         except OSError:
             log_error("\t Vissim is currently unavailable!")
-            raise EnsembleAPILoadLibraryError(
-                "Library not found", self.library_path
-            )
+            raise EnsembleAPILoadLibraryError("Library not found", self.library_path)
         except com_error:
             log_error("\t Vissim is currently unavailable!")
             lib_vissim = None
-            raise EnsembleAPILoadLibraryError(
-                "Library not found", self.library_path
-            )
+            raise EnsembleAPILoadLibraryError("Library not found", self.library_path)
         self.__library = lib_vissim
 
     def load_scenario(self, scenario):
-        """ checks existance and load scenario . Also get simulation parameters
-        """
+        """checks existance and load scenario . Also get simulation parameters"""
         if isinstance(scenario, VissimScenario):
             try:
-                self.__library.LoadNet(
-                    scenario.filename, scenario.bread_additional
-                )
-                self.sim_period = self.__library.Simulation.AttValue(
-                    "SimPeriod"
-                )
+                self.__library.LoadNet(scenario.filename, scenario.bread_additional)
+                self.sim_period = self.__library.Simulation.AttValue("SimPeriod")
                 self.sim_sec = self.__library.Simulation.AttValue("SimSec")
                 self.sim_res = self.__library.Simulation.AttValue("SimRes")
                 self.rand_seed = self.__library.Simulation.AttValue("RandSeed")
@@ -107,16 +98,16 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     def register_simulation(self, scenarioPath: str) -> None:
         """
-            Register simulation file within the simulator
+        Register simulation file within the simulator
 
-            :param scenarioPath: Path to scenario
-            :type scenarioPath: str
+        :param scenarioPath: Path to scenario
+        :type scenarioPath: str
         """
         self.simulation = VissimScenario(scenarioPath)
 
     def request_answer(self):
         """
-            Request simulator answer and maps the data locally
+        Request simulator answer and maps the data locally
         """
         vehsAttributesNamesVissim = (
             "CoordFrontX",
@@ -133,22 +124,21 @@ class VissimConnector(AbsConnector, VissimConfigurator):
             vehsAttributesNamesVissim
         )
         vehData = [
-            dict(zip(vehsAttributesNamesVissim, item))
-            for item in vehsAttributes
+            dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes
         ]
         self.request.query = vehData  # List[Dicts]
         self.request.sim_sec = self.sim_sec
 
     def run_single_step(self):
-        """ Run simulation next step
+        """Run simulation next step
 
-                :return: None
-                :rtype: None
-                """
+        :return: None
+        :rtype: None
+        """
         self.__library.Simulation.RunSingleStep()
 
     def query_data(self) -> int:
-        """ Run simulation step by step
+        """Run simulation step by step
 
         :return: iteration step
         :rtype: int
@@ -169,13 +159,13 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     def performConnect(self) -> None:
         """
-             Perform simulation connection
+        Perform simulation connection
         """
         self.load_simulator()
 
     def performInitialize(self, scenario: VissimScenario) -> None:
         """
-            Perform simulation initialization
+        Perform simulation initialization
         """
         self.request = SimulatorRequest()
         self._n_iter = iter(self.get_simulation_steps())
@@ -184,13 +174,13 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     def performPreRoutine(self) -> None:
         """
-            Perform simulator preroutine
+        Perform simulator preroutine
         """
         raise NotImplementedError
 
     def performQuery(self) -> None:
         """
-            Perform simulator Query
+        Perform simulator Query
         """
         raise NotImplementedError
 
@@ -204,20 +194,20 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     @property
     def scenariofilename(self):
-        """ Scenario filenamme
-        
-            Returns: 
-                filname (str): Absolute path towards the XML input for SymuVia
+        """Scenario filenamme
+
+        Returns:
+            filname (str): Absolute path towards the XML input for SymuVia
 
         """
         return self.simulation.filename
 
     @property
     def get_vehicle_data(self):
-        """ Returns the query received from the simulator
+        """Returns the query received from the simulator
 
-            :return: Request from the simulator
-            :rtype: dict
+        :return: Request from the simulator
+        :rtype: dict
         """
         return self.request.get_vehicle_data()
 

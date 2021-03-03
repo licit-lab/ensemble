@@ -47,9 +47,7 @@ file://ensemble/docs/_build/html/index.html
 
 @click.group()
 @click.option("-v", "--verbose", is_flag=True, help="Increase verbosity.")
-@click.option(
-    "-i", "--info", is_flag=True, help="Prints additional information"
-)
+@click.option("-i", "--info", is_flag=True, help="Prints additional information")
 @click.option("-p", "--platform", default="", help="'symuvia' or 'vissim'")
 @click.pass_context
 def main(ctx, verbose: bool, info: str, platform: str) -> int:
@@ -57,7 +55,12 @@ def main(ctx, verbose: bool, info: str, platform: str) -> int:
     ctx.obj = Configurator(verbose=verbose, info=info)
     ctx.obj.set_simulation_platform(platform)
     if ctx.obj.verbose:
-        click.echo(click.style(help_text, fg="green",))
+        click.echo(
+            click.style(
+                help_text,
+                fg="green",
+            )
+        )
     return 0
 
 
@@ -77,11 +80,8 @@ def main(ctx, verbose: bool, info: str, platform: str) -> int:
 )
 @click.option("--check", is_flag=True, help="Enable check flag")
 @pass_config
-def launch(
-    config: Configurator, scenario: str, library: str, check: bool
-) -> None:
-    """ Launches an escenario for a specific platform 
-    """
+def launch(config: Configurator, scenario: str, library: str, check: bool) -> None:
+    """Launches an escenario for a specific platform"""
     click.echo(
         "Launching Scenario on platform: "
         + click.style((f"{config.platform}"), fg="green")
@@ -113,8 +113,7 @@ def launch(
 )
 @pass_config
 def check(config: Configurator, scenario: str, library: str) -> bool:
-    """ Diagnoses files consistancy and simulator availability
-    """
+    """Diagnoses files consistancy and simulator availability"""
 
     # Update configurator
     config.update_values(library_path=library, scenario_files=scenario)

@@ -19,16 +19,16 @@ from bisect import bisect_left
 
 class SortedFrozenSet(Sequence, Set):
     """
-        This is a collection that provides a set of properties to create a sorted frozen set.
+    This is a collection that provides a set of properties to create a sorted frozen set.
 
-        In particular this is 
+    In particular this is
 
-        Args:
-            Items (Iterable): 
-                Inherits from the `Sequence` collection object.
+    Args:
+        Items (Iterable):
+            Inherits from the `Sequence` collection object.
 
-            Key (str): 
-                Key to organize the vehicle platoon
+        Key (str):
+            Key to organize the vehicle platoon
     """
 
     def __init__(self, items=None, key="vehid"):
@@ -60,9 +60,7 @@ class SortedFrozenSet(Sequence, Set):
         return "{type}({arg})".format(
             type=type(self).__name__,
             arg=(
-                "[{}]".format(", ".join(map(repr, self._items)))
-                if self._items
-                else ""
+                "[{}]".format(", ".join(map(repr, self._items))) if self._items else ""
             ),
         )
 

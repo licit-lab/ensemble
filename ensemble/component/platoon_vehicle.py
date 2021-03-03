@@ -29,49 +29,49 @@ from ensemble.tools.constants import DCT_PLT_CONST
 
 @dataclass
 class PlatoonVehicle(Vehicle):
-    """ This is a vehicle class defined for storing data of a single platoon
-        vehicle.
+    """This is a vehicle class defined for storing data of a single platoon
+    vehicle.
 
-        You need a Publisher from where the vehicle is going to take data: 
+    You need a Publisher from where the vehicle is going to take data:
 
-        Args: 
-            request (Publisher): Parser or object publishing data
-        
-        Retunrns: 
-            vehicle (Vehicle): A Dataclass with vehicle parameters
+    Args:
+        request (Publisher): Parser or object publishing data
 
-        ============================  =================================
-        **Variable**                  **Description**
-        ----------------------------  ---------------------------------
-        ``abscissa``                    Current coordinate on y axis
-        ``acceleration``                Current acceleration
-        ``distance``                    Current distance traveled on link
-        ``elevation``                   Current elevation
-        ``lane``                        Current lane
-        ``link``                        Current road vehicle is traveling
-        ``ordinate``                    Current coordinate x axis
-        ``speed``                       Current speed
-        ``vehid``                       Vehicle id
-        ``vehtype``                     Vehicle class
-        ============================  =================================
+    Retunrns:
+        vehicle (Vehicle): A Dataclass with vehicle parameters
 
-        Example: 
-            This is one example on how to register a new vehicle ::
+    ============================  =================================
+    **Variable**                  **Description**
+    ----------------------------  ---------------------------------
+    ``abscissa``                    Current coordinate on y axis
+    ``acceleration``                Current acceleration
+    ``distance``                    Current distance traveled on link
+    ``elevation``                   Current elevation
+    ``lane``                        Current lane
+    ``link``                        Current road vehicle is traveling
+    ``ordinate``                    Current coordinate x axis
+    ``speed``                       Current speed
+    ``vehid``                       Vehicle id
+    ``vehtype``                     Vehicle class
+    ============================  =================================
 
-            >>> req = SimulatorRequest()
-            >>> veh = Vehicle(req)
-            >>> req.dispatch() # This will update vehicle data
+    Example:
+        This is one example on how to register a new vehicle ::
 
-        When having multiple vehicles please indicate the `vehid` before launching the dispatch method. This is because the vehicle object is looks for a vehicle id within the data. 
+        >>> req = SimulatorRequest()
+        >>> veh = Vehicle(req)
+        >>> req.dispatch() # This will update vehicle data
 
-        Example: 
-            This is one example on how to register two vehicles ::
+    When having multiple vehicles please indicate the `vehid` before launching the dispatch method. This is because the vehicle object is looks for a vehicle id within the data.
 
-            >>> req = SimulatorRequest()
-            >>> veh1 = Vehicle(req, vehid=0)
-            >>> veh2 = Vehicle(req, vehid=1)
-            >>> req.dispatch() # This will update vehicle data on both vehicles
-    
+    Example:
+        This is one example on how to register two vehicles ::
+
+        >>> req = SimulatorRequest()
+        >>> veh1 = Vehicle(req, vehid=0)
+        >>> veh2 = Vehicle(req, vehid=1)
+        >>> req.dispatch() # This will update vehicle data on both vehicles
+
     """
 
     ego_position: int = 1
@@ -85,9 +85,7 @@ class PlatoonVehicle(Vehicle):
     split_request: bool = False
 
     def joinable(self):
-        if (
-            self.leader.ego_position() < DCT_PLT_CONST["max_platoon_length"]
-        ) and (
+        if (self.leader.ego_position() < DCT_PLT_CONST["max_platoon_length"]) and (
             self.gap_distance_error() < DCT_PLT_CONST["max_connection_distance"]
         ):
             return True

@@ -25,13 +25,13 @@ from ensemble.logic.frozen_set import SortedFrozenSet
 
 class PlatoonSet(SortedFrozenSet):
     """
-        This is a collection that provides a set of properties to create a platoon frozen set.
+    This is a collection that provides a set of properties to create a platoon frozen set.
 
-        In particular
+    In particular
 
-        Args:
-            Sequence (Sequence): Inherits from the `Sequence` collection object.
-            Set (Set): Inherits from the `Set` collection object.
+    Args:
+        Sequence (Sequence): Inherits from the `Sequence` collection object.
+        Set (Set): Inherits from the `Set` collection object.
     """
 
     def __init__(self, items=None, key="x"):
@@ -63,9 +63,7 @@ class PlatoonSet(SortedFrozenSet):
         return "{type}({arg})".format(
             type=type(self).__name__,
             arg=(
-                "[{}]".format(", ".join(map(repr, self._items)))
-                if self._items
-                else ""
+                "[{}]".format(", ".join(map(repr, self._items))) if self._items else ""
             ),
         )
 

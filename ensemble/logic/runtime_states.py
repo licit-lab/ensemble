@@ -44,8 +44,8 @@ class Compliance(AbsState):
     """
 
     def next_state(self, event: str, configurator) -> None:
-        """ Returns next state 
-        
+        """Returns next state
+
         :param event: Event keyword for next state "connect"
         :type event: str
         :return: Connect object in case of switch
@@ -61,9 +61,9 @@ class Compliance(AbsState):
             return Terminate()
 
     def perform_check(self, configurator):
-        """ This function triggers the check validation for the files raises errors in case files are not found 
-        
-        :param configurator: Configuration descriptor 
+        """This function triggers the check validation for the files raises errors in case files are not found
+
+        :param configurator: Configuration descriptor
         :type configurator: Configurator
         """
         return check_scenario_consistency(configurator)
@@ -138,7 +138,7 @@ class Query(AbsState):
 
 class Control(AbsState):
     """
-    The state which computes the control decision  
+    The state which computes the control decision
     """
 
     def next_state(self, event: str, configurator):
@@ -162,7 +162,7 @@ class Push(AbsState):
 
 class PostRoutine(AbsState):
     """
-    The state which logs information or compute step indicators 
+    The state which logs information or compute step indicators
     """
 
     def next_state(self, event: str, configurator):

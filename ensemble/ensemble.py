@@ -19,19 +19,19 @@ from ensemble.logic import RuntimeDevice
 
 
 def launch_simulation(configurator):
-    """ Launches a RuntimeDevice starting from a configurator 
+    """Launches a RuntimeDevice starting from a configurator
 
-        Args:
-            configurator(Configurator): Configurator class
+    Args:
+        configurator(Configurator): Configurator class
 
-        Example:
-            Use the the function from a python package as::
-                >>> from ensemble import launch_simulation, Configurator
-                >>> c = Configurator() # default arguments
-                >>> library = 'path/to/simulator'
-                >>> scenarios = ('path/to/scenario',) 
-                >>> config.update_values(library_path=library, scenario_files=scenario)
-                >>> launch_simulation(configurator)
+    Example:
+        Use the the function from a python package as::
+            >>> from ensemble import launch_simulation, Configurator
+            >>> c = Configurator() # default arguments
+            >>> library = 'path/to/simulator'
+            >>> scenarios = ('path/to/scenario',)
+            >>> config.update_values(library_path=library, scenario_files=scenario)
+            >>> launch_simulation(configurator)
     """
     log_in_terminal("Initializing scenario ⏱", fg="magenta")
 
@@ -40,10 +40,10 @@ def launch_simulation(configurator):
 
 
 def check_consistency(configurator) -> bool:
-    """ Checks consistency of the current configurator
-    
-        Args:
-            configurator(Configurator): Configurator class
+    """Checks consistency of the current configurator
+
+    Args:
+        configurator(Configurator): Configurator class
     """
     # Check only for consistency, others could be added in future
     return check_scenario_consistency(configurator)

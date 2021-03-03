@@ -55,14 +55,14 @@ class SimulatorRequest(DataQuery):
             self.dispatch(c)
 
     def is_vehicle_driven(self, vehid: int) -> bool:
-        """ Returns true if the vehicle state is exposed to a driven state
+        """Returns true if the vehicle state is exposed to a driven state
 
-            Args:
-                vehid (str):
-                    vehicle id
+        Args:
+            vehid (str):
+                vehicle id
 
-            Returns:
-                driven (bool): True if veh is driven
+        Returns:
+            driven (bool): True if veh is driven
         """
         # if self.is_vehicle_in_network(vehid):
 
@@ -77,49 +77,47 @@ class SimulatorRequest(DataQuery):
 
     @staticmethod
     def transform(veh_data: dict):
-        """ Transform vehicle data from string format to coherent format
+        """Transform vehicle data from string format to coherent format
 
-            Args: 
-                veh_data (dict): vehicle data as received from simulator
+        Args:
+            veh_data (dict): vehicle data as received from simulator
 
-            Returns:
-                t_veh_data (dict): vehicle data with correct formatting 
+        Returns:
+            t_veh_data (dict): vehicle data with correct formatting
 
 
-            Example: 
-                As an example, for an input of the following style ::
+        Example:
+            As an example, for an input of the following style ::
 
-                >>> v = {"CoordFrontX":421.31564190349957 
-                            "Acceleration":-0.0
-                            "Pos":16.25355208592856
-                            "No":1,
-                            "CoordFrontY":-979.2497097242955
-                            "Lane\\Link\\No":6,
-                            "VehType":'630',
-                            "Speed":83.93049031871615,
-                            "Lane\\Index":1,
-                        }
-                >>> tv = SimulatorRequest.transform(v)
-                >>> # Transforms into 
-                >>> tv == {
-                >>>     "abscissa": 421.31564190349957,
-                >>>     "acceleration": -0.0,
-                >>>     "distance": 16.25355208592856,
-                >>>     "driven": False,
-                >>>     "elevation": 0.0,
-                >>>     "lane": 1,
-                >>>     "link": "6",
-                >>>     "ordinate": -979.2497097242955,
-                >>>     "speed": 23.314025088532265,
-                >>>     "vehid": 0,
-                >>>     "vehtype": "630",
-                >>> },
+            >>> v = {"CoordFrontX":421.31564190349957
+                        "Acceleration":-0.0
+                        "Pos":16.25355208592856
+                        "No":1,
+                        "CoordFrontY":-979.2497097242955
+                        "Lane\\Link\\No":6,
+                        "VehType":'630',
+                        "Speed":83.93049031871615,
+                        "Lane\\Index":1,
+                    }
+            >>> tv = SimulatorRequest.transform(v)
+            >>> # Transforms into
+            >>> tv == {
+            >>>     "abscissa": 421.31564190349957,
+            >>>     "acceleration": -0.0,
+            >>>     "distance": 16.25355208592856,
+            >>>     "driven": False,
+            >>>     "elevation": 0.0,
+            >>>     "lane": 1,
+            >>>     "link": "6",
+            >>>     "ordinate": -979.2497097242955,
+            >>>     "speed": 23.314025088532265,
+            >>>     "vehid": 0,
+            >>>     "vehtype": "630",
+            >>> },
 
         """
         for key, val in veh_data.items():
-            response[ct.FIELD_DATA_VISSIM[key]] = ct.FIELD_FORMAT_VISSIM[key](
-                val
-            )
+            response[ct.FIELD_DATA_VISSIM[key]] = ct.FIELD_FORMAT_VISSIM[key](val)
         lkey = "@etat_pilotage"
         response[ct.FIELD_DATA_VISSIM[lkey]] = ct.FIELD_FORMAT_VISSIM[lkey](
             veh_data.get(lkey)
@@ -129,14 +127,14 @@ class SimulatorRequest(DataQuery):
         return dict(response)
 
     def get_vehicle_data(self) -> list:
-        """ Extracts vehicles information from simulators response
+        """Extracts vehicles information from simulators response
 
-            Args:
-                response (list): List of list with parameters 
-            
-            Return: 
-                listdict (list): List of dictionaries 
-        
+        Args:
+            response (list): List of list with parameters
+
+        Return:
+            listdict (list): List of dictionaries
+
         """
         if self.query is not None:
             if isinstance(self.query, list):

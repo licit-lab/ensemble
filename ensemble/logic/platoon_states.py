@@ -18,21 +18,21 @@ from ensemble.metaclass.state import AbsState
 
 
 class StandAlone(AbsState):
-    """ The state which declares the vehicle in stand alone mode.
+    """The state which declares the vehicle in stand alone mode.
 
-        Note:
-            Transition: `StandAlone` to `Joining`
-        
+    Note:
+        Transition: `StandAlone` to `Joining`
+
     """
 
     def next_state(self, vehicle):
-        """ Determines the switching condition for the state: 
+        """Determines the switching condition for the state:
 
-            Note:
-                Transition: `StandAlone` to `Joining`
+        Note:
+            Transition: `StandAlone` to `Joining`
 
-            Args: 
-                truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
 
         """
         if vehicle.leader.joinable():
@@ -42,23 +42,23 @@ class StandAlone(AbsState):
 
 
 class Joining(AbsState):
-    """ The state which declares the vehicle in joining a platoon.
+    """The state which declares the vehicle in joining a platoon.
+
+    Note:
+        Transition: `Joining` to `StandAlone`
+        Transition: `Joining` to `Platooning`
+    """
+
+    def next_state(self, vehicle):
+        """Determines the switching condition for the state:
 
         Note:
             Transition: `Joining` to `StandAlone`
             Transition: `Joining` to `Platooning`
-    """
 
-    def next_state(self, vehicle):
-        """ Determines the switching condition for the state: 
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
 
-            Note:
-                Transition: `Joining` to `StandAlone`
-                Transition: `Joining` to `Platooning`
-
-            Args: 
-                truck (vehicle): Platoon vehicle containing information of the ego vehicle.
-                
         """
         if vehicle.cancel_join_request():
             return StandAlone()
@@ -73,24 +73,24 @@ class Joining(AbsState):
 
 
 class Splitting(AbsState):
-    """ The state which declares the vehicle splitting from platoon
+    """The state which declares the vehicle splitting from platoon
 
-        Note: 
-            Transition: `Splitting` to `StandAlone`
-            Transition: `Splitting` to `Platooning`
+    Note:
+        Transition: `Splitting` to `StandAlone`
+        Transition: `Splitting` to `Platooning`
 
     """
 
     def next_state(self, vehicle):
-        """ Determines the switching condition for the state: 
+        """Determines the switching condition for the state:
 
-            Note: 
-                Transition: `Splitting` to `StandAlone`
-                Transition: `Splitting` to `Platooning`
+        Note:
+            Transition: `Splitting` to `StandAlone`
+            Transition: `Splitting` to `Platooning`
 
-            Args: 
-                truck (vehicle): Platoon vehicle containing information of the ego vehicle.
-                
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
         """
 
         if vehicle.rejoin_platoon():
@@ -102,21 +102,21 @@ class Splitting(AbsState):
 
 
 class Platooning(AbsState):
-    """ The state which declares the vehicle in a platoon functionality
+    """The state which declares the vehicle in a platoon functionality
 
-        Note: 
-            Transition: `Platooning` to `Splitting`
+    Note:
+        Transition: `Platooning` to `Splitting`
     """
 
     def next_state(self, vehicle):
-        """ Determines the switching condition for the state: 
+        """Determines the switching condition for the state:
 
-            Note: 
-                Transition: `Platooning` to `Splitting`
+        Note:
+            Transition: `Platooning` to `Splitting`
 
-            Args: 
-                truck (vehicle): Platoon vehicle containing information of the ego vehicle.
-                
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
         """
         if vehicle.platoon_split():
             return Splitting()

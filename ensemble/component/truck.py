@@ -34,26 +34,27 @@ from ensemble.logic.platoon_states import (
 
 # @dataclass
 class Truck(Vehicle):
-    """ Vehicle class defined for storing data on a single vehicle: 
+    """Vehicle class defined for storing data on a single vehicle:
 
-        You need a Publisher from where the vehicle is going to take data: 
+    You need a Publisher from where the vehicle is going to take data:
 
-        Args: 
-            request (Publisher): Parser or object publishing data
-        
-        Retunrns: 
-            vehicle (Vehicle): A Dataclass with vehicle parameters
+    Args:
+        request (Publisher): Parser or object publishing data
 
-        ============================  =================================
-        **Variable**                  **Description**
-        ----------------------------  ---------------------------------
+    Retunrns:
+        vehicle (Vehicle): A Dataclass with vehicle parameters
 
-        ============================  =================================
-        
+    ============================  =================================
+    **Variable**                  **Description**
+    ----------------------------  ---------------------------------
+
+    ============================  =================================
+
     """
 
     def __init__(self, request, **kwargs):
         self.status = StandAlone
+        self.platoon = False
         super().__init__(request, **kwargs)
 
     def __hash__(self):

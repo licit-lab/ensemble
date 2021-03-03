@@ -4,13 +4,16 @@
 
 
 class Scenario(object):
-    """ 
-        This class stores pointers towards important scenario files and methods to handle cross-simulated 
-        functionalities 
+    """
+    This class stores pointers towards important scenario files and methods to handle cross-simulated
+    functionalities
     """
 
     def __init__(
-        self, scn_file: str = None, layout_file: str = None, platoon_file: str = None,
+        self,
+        scn_file: str = None,
+        layout_file: str = None,
+        platoon_file: str = None,
     ):
         self.scn_file = scn_file
         self.layout_file = layout_file
