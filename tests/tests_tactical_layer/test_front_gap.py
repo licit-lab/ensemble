@@ -8,10 +8,13 @@
 
 import platform
 import pytest
+from collections import namedtuple
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
+
+from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
 
 from ensemble.component.platoon import Platoon
 from ensemble.component.truck import Truck
@@ -23,63 +26,208 @@ from ensemble.logic.platoon_states import (
     Splitting,
 )
 
+from jinja2 import Environment, PackageLoader, select_autoescape
+
 # ============================================================================
 # TESTS AND DEFINITIONS
 # ============================================================================
 
+KEYS = (
+    "abscissa",
+    "acceleration",
+    "distance",
+    "driven",
+    "elevation",
+    "lane",
+    "link",
+    "ordinate",
+    "speed",
+    "vehid",
+    "vehtype",
+    "status",
+    "platoon",
+)
 
-def to_xml(data):
-    return str.encode(
-        '<INST nbVeh="1" val="2.00"><CREATIONS><CREATION entree="Ext_In" id="{vehid}" sortie="Ext_Out" type="VL"/></CREATIONS><SORTIES/><TRAJS><TRAJ abs="{abscissa}" acc="{acceleration}" dst="{distance}" id="{vehid}" ord="{ordinate}" tron="{link}" type="{vehtype}" vit="{speed}" voie="{lane}" z="{elevation}"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'.format(
-            **data
-        )
+trkdata = namedtuple("Truckdata", KEYS)
+
+
+@pytest.fixure
+def TEST_01():
+    return [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+        ),
+        trkdata(
+            0,
+            0,
+            50,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            2,
+            "PLT",
+            StandAlone(),
+            True,
+        ),
+    ]
+
+
+@pytest.fixture
+def TEST02():
+    return [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            1,
+            "PLT",
+            StandAlone(),
+            False,
+        ),
+        trkdata(
+            0,
+            0,
+            50,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            2,
+            "PLT",
+            StandAlone(),
+            False,
+        ),
+    ]
+
+
+@pytest.fixture
+def TEST03():
+    return [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            1,
+            "PLT",
+            StandAlone(),
+            False,
+        ),
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            1,
+            "PLT",
+            StandAlone(),
+            False,
+        ),
+        trkdata(
+            0,
+            0,
+            50,
+            False,
+            0,
+            1,
+            "LinkA",
+            100,
+            4.0,
+            2,
+            "PLT",
+            StandAlone(),
+            False,
+        ),
+    ]
+
+
+@pytest.fixture
+def symuviarequest():
+    return SymuviaRequest()
+
+
+@pytest.fixture
+def env():
+    return Environment(
+        loader=PackageLoader("ensemble", "templates"),
+        autoescape=select_autoescape(
+            [
+                "xml",
+            ]
+        ),
     )
 
 
 @pytest.fixture
-def trk01_data_test01():
-    return to_xml(
-        {
-            "abscissa": 0,
-            "acceleration": 0,
-            "distance": 200,
-            "driven": False,
-            "elevation": 0,
-            "lane": 1,
-            "link": "LinkA",
-            "ordinate": 100,
-            "speed": 4.0,
-            "vehid": 1,
-            "vehtype": "PLT",
-            "status": StandAlone(),
-            "platoon": False,
-        }
-    )
+def test_01_data(env, TEST01):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST01]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
 
 
 @pytest.fixture
-def trk02_data_test01():
-    return to_xml(
-        {
-            "abscissa": 0,
-            "acceleration": 0,
-            "distance": 50,
-            "driven": False,
-            "elevation": 0,
-            "lane": 1,
-            "link": "LinkA",
-            "ordinate": 100,
-            "speed": 4.0,
-            "vehid": 2,
-            "vehtype": "PLT",
-            "status": StandAlone(),
-            "platoon": False,
-        }
-    )
+def test_02_data(env, TEST02):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST02]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
 
 
-def test_1(trk01_data_test01, trk02_data_test02):
-    pass
+def test_01(symuviarequest, test_01_data):
+    symuviarequest.query = test_01_data
+    truck01 = Truck(symuviarequest, *(test_01_data[0]))
+    truck01.update()
+    truck02 = Truck(symuviarequest, *test_01_data)
+    truck02.update()
+    assert pytest.approx(truck01.distance, 200.00)
+    assert pytest.approx(truck02.distance, 50.00)
+    assert truck01.platoon == True
+    assert truck02.platoon == True
+
+
+def test_02(symuviarequest, test_02_data):
+    symuviarequest.query = test_02_data
+    truck01 = Truck(symuviarequest, vehid=1)
+    truck01.update()
+    truck02 = Truck(symuviarequest, vehid=2)
+    truck02.update()
+    assert pytest.approx(truck01.distance, 200.00)
+    assert pytest.approx(truck02.distance, 50.00)
+    assert truck01.platoon == False
+    assert truck02.platoon == False
+
     # veh = PlatoonVehicle(**truck_leader_data)
     # fgc = FrontGapState(veh)
     # fgc.update_state(veh)

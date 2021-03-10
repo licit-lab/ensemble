@@ -16,7 +16,7 @@ from ctypes import create_string_buffer
 # ============================================================================
 
 from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
-from ensemble.handler.vissim.stream import SimulatorRequest as Vissymuviarequest
+from ensemble.handler.vissim.stream import SimulatorRequest as Vissimrequest
 from ensemble.tools.constants import BUFFER_STRING
 
 # ============================================================================

@@ -16,9 +16,6 @@ import abc
 
 
 class AbsState(metaclass=abc.ABCMeta):
-    def __init__(self):
-        print("State:", str(self))
-
     @abc.abstractmethod
     def next_state(self):
         """ State to switch on event"""

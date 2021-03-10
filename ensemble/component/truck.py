@@ -53,7 +53,7 @@ class Truck(Vehicle):
     """
 
     def __init__(self, request, **kwargs):
-        self.status = StandAlone
+        self.status = StandAlone()
         self.platoon = False
         super().__init__(request, **kwargs)
 
