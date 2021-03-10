@@ -50,82 +50,189 @@ KEYS = (
 
 trkdata = namedtuple("Truckdata", KEYS)
 
+# Testing Data
 
-@pytest.fixure
-def TEST_01():
+@pytest.fixture
+def TEST01():
+    """StandAlone -> Join
+    No PCM Capable
+    """
     return [
         trkdata(
             0,
             0,
-            200,
+            350 - 150 * i,
             False,
             0,
             1,
             "LinkA",
-            100,
-            4.0,
-            1,
+            350 - 150 * i,
+            40 - i * 10,
+            i,
             "PLT",
             StandAlone(),
-            True,
-        ),
-        trkdata(
-            0,
-            0,
-            50,
             False,
-            0,
-            1,
-            "LinkA",
-            100,
-            4.0,
-            2,
-            "PLT",
-            StandAlone(),
-            True,
-        ),
+        )
+        for i in range(1, 3)
     ]
 
 
 @pytest.fixture
 def TEST02():
+    """StandAlone -> Join
+    Far Away
+    """
     return [
         trkdata(
             0,
             0,
-            200,
+            350 - 150 * i,
             False,
             0,
             1,
             "LinkA",
-            100,
-            4.0,
-            1,
+            350 - 150 * i,
+            40 - i * 10,
+            i,
             "PLT",
             StandAlone(),
-            False,
-        ),
-        trkdata(
-            0,
-            0,
-            50,
-            False,
-            0,
-            1,
-            "LinkA",
-            100,
-            4.0,
-            2,
-            "PLT",
-            StandAlone(),
-            False,
-        ),
+            True,
+        )
+        for i in range(1, 3)
     ]
 
 
 @pytest.fixture
 def TEST03():
-    return [
+    """StandAlone -> Join
+    Truck 7 not Joinable
+    """
+    case = [
+        trkdata(
+            0,
+            0,
+            435 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            435 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+        for i in range(1, 8)
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            1,
+            "LinkA",
+            80,
+            20,
+            8,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST04():
+    """StandAlone -> Join"""
+    case = [
+        trkdata(
+            0,
+            0,
+            380 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            380 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+        for i in range(1, 5)
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            1,
+            "LinkA",
+            80,
+            20,
+            5,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST05():
+    """StandAlone -> Join"""
+    case = [
+        trkdata(
+            0,
+            0,
+            380 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            380 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+        for i in range(1, 5)
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            1,
+            "LinkA",
+            80,
+            20,
+            5,
+            "PLT",
+            StandAlone(),
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST06():
+    case = [
         trkdata(
             0,
             0,
@@ -134,45 +241,35 @@ def TEST03():
             0,
             1,
             "LinkA",
-            100,
-            4.0,
-            1,
-            "PLT",
-            StandAlone(),
-            False,
-        ),
-        trkdata(
-            0,
-            0,
             200,
-            False,
-            0,
-            1,
-            "LinkA",
-            100,
-            4.0,
+            30,
             1,
             "PLT",
             StandAlone(),
-            False,
-        ),
-        trkdata(
-            0,
-            0,
-            50,
-            False,
-            0,
-            1,
-            "LinkA",
-            100,
-            4.0,
-            2,
-            "PLT",
-            StandAlone(),
-            False,
+            True,
         ),
     ]
 
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            1,
+            "LinkA",
+            80,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+        )
+    )
+    return case
+
+# 
 
 @pytest.fixture
 def symuviarequest():
@@ -205,11 +302,51 @@ def test_02_data(env, TEST02):
     return str.encode(template.render(vehicles=VEHICLES))
 
 
-def test_01(symuviarequest, test_01_data):
+@pytest.fixture
+def test_03_data(env, TEST03):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST03]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
+
+
+@pytest.fixture
+def test_04_data(env, TEST04):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST04]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
+
+
+@pytest.fixture
+def test_05_data(env, TEST05):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST05]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
+
+
+@pytest.fixture
+def test_06_data(env, TEST06):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST06]
+    template = env.get_template("instant.xml")
+    return str.encode(template.render(vehicles=VEHICLES))
+
+
+def test_01_standalone_to_join_no_PCM_available(
+    symuviarequest, test_01_data, TEST01
+):
     symuviarequest.query = test_01_data
-    truck01 = Truck(symuviarequest, *(test_01_data[0]))
+    truck01 = Truck(
+        symuviarequest,
+        vehid=TEST01[0].vehid,
+        status=TEST01[0].status,
+        platoon=TEST01[0].platoon,
+    )
     truck01.update()
-    truck02 = Truck(symuviarequest, *test_01_data)
+    truck02 = Truck(
+        symuviarequest,
+        vehid=TEST01[1].vehid,
+        status=TEST01[1].status,
+        platoon=TEST01[1].platoon,
+    )
     truck02.update()
     assert pytest.approx(truck01.distance, 200.00)
     assert pytest.approx(truck02.distance, 50.00)
@@ -217,7 +354,7 @@ def test_01(symuviarequest, test_01_data):
     assert truck02.platoon == True
 
 
-def test_02(symuviarequest, test_02_data):
+def test_02_standalone_to_join_far_away(symuviarequest, test_02_data, TEST02):
     symuviarequest.query = test_02_data
     truck01 = Truck(symuviarequest, vehid=1)
     truck01.update()
@@ -553,6 +690,7 @@ def test_02(symuviarequest, test_02_data):
 #     fgc = FrontGapState(veh)
 #     fgc.update_state(veh)
 #     assert veh.front_target_state == "standalone"
+
 # def test_8_join_to_standalone_leader_lost_PCM_connection():
 #     veh = PlatoonVehicle(leader_id	=	101	,
 #     leader_position	=	200	,
