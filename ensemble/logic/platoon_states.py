@@ -124,6 +124,29 @@ class Platooning(AbsState):
             return self
 
 
+class Cutin(AbsState):
+    """The state which declares the vehicle in a platoon functionality
+
+    Note:
+        Transition: `Cutin` to `Splitting`
+    """
+
+    def next_state(self, vehicle):
+        """Determines the switching condition for the state:
+
+        Note:
+            Transition: `Platooning` to `Splitting`
+
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
+        """
+        if vehicle.cutin():
+            return Splitting()
+        else:
+            return self
+
+
 # class BackSplit(AbsState):
 #     """
 #     The state which declares the vehicle splitting from platoon

@@ -55,6 +55,7 @@ class Truck(Vehicle):
     def __init__(self, request, **kwargs):
         self.status = StandAlone()
         self.platoon = False
+        self.comv2x = True
         super().__init__(request, **kwargs)
 
     def __hash__(self):
