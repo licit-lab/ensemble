@@ -779,6 +779,7 @@ def TEST17():
     )
     return case
 
+
 @pytest.fixture
 def TEST18():
     case = [
@@ -835,6 +836,191 @@ def TEST18():
         )
     )
     return case
+
+
+@pytest.fixture
+def TEST19():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        (
+            0,
+            0,
+            155,
+            False,
+            0,
+            2,
+            "LinkA",
+            155,
+            30,
+            1,
+            "HDV",
+        )
+    )
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Cutin(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST20():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Cutin(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST21():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Splitting(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST22():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            140,
+            False,
+            0,
+            1,
+            "LinkA",
+            140,
+            30,
+            3,
+            "PLT",
+            Splitting(),
+            True,
+            True,
+        )
+    )
+    return case
+
 
 @pytest.fixture
 def symuviarequest():
