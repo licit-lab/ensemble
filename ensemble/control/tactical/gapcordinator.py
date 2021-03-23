@@ -1,26 +1,80 @@
-# """
-#     **Platoon Gap Coordinator**
+"""
+    **Platoon Gap Coordinator**
 
-#     This module details the implementation of the ``Front Gap`` and ``Rear Gap`` Coordinators existing in each one of the vehicles created when running a platoon. The coordinators have access to a centralized information center called ``Data Query`` to retrieve information in the vecinity of the vehicle.
+    This module details the implementation of the ``Front Gap`` and ``Rear Gap`` Coordinators existing in each one of the vehicles created when running a platoon. The coordinators have access to a centralized information center called ``Data Query`` to retrieve information in the vecinity of the vehicle.
 
-# """
+"""
 
-# from ensemble.logic.platoon_states import StandAlone, Platoon, Join, Split
+from itertools import groupby
+
+from dataclasses import dataclass
+
+from typing import Union
+
+from ensemble.control.tactical.frontandreargap import Platoon
+from ensemble.logic.platoon_states import (
+    StandAlone,
+    Platooning,
+    Joining,
+    Splitting,
+)
+from ensemble.component.vehiclelist import VehicleList
+from ensemble.component.vehicle import Vehicle
+from ensemble.logic.platoon_set import PlatoonSet
+from ensemble.tools.constants import DCT_PLT_CONST
+
+PLState = Union[StandAlone,Platooning,Joining,Splitting]
+@dataclass
+class FrontGap:
+
+    status: PLState = StandAlone()
+    platoon: bool = False
+    comv2x: bool = True
+
+    def __init__(self, vehicle: Vehicle):
+        self.leader = None
+        # Platoon state
+
+@dataclass
+class RearGap:
+    def __init__(self, vehicle: Vehicle):
+        self.follower = None
 
 
-# class Subscriber:
-#     """
-#         This models the subscriber pattern that can be used by the publisher in order to receive information.
-#     """
+@dataclass
+class VehGapCoordinator:
+    def __init__(self, vehicle: Vehicle):
+        self.ego = vehicle
+        self._fcg = FrontGap(self.ego)
+        self._rgc = RearGap(self.ego)
 
-#     def __init__(self, name):
-#         self.name = name
+@dataclass
+class GlobalGapCoordinator:
+    def __init__(self, vehicle_registry: VehicleList):
+        self._gclist = [
+            VehGapCoordinator(veh)
+            for veh in vehicle_registry
+            if veh.vehtype in DCT_PLT_CONST.get("platoon_types")
+        ]
+        self._platoons = []
 
-#     def update(self, message):
-#         print('{} got message "{}"'.format(self.name, message))
+    def solve_platoons(self):
 
-#     def getegoinfo(self):
-#         pass
+        # This grooups vehicles per road type
+        vtf = lambda x: x.ego.link
+
+        # Group by link (Vehicle in same link)
+        for _, group_gc in groupby(self._gclist, vtf):
+            for gc in group_gc:
+                if len(self._platoons) >= 1:
+                    tmp = self._platoons[-1] + PlatoonSet(gc)
+                    if len(tmp) > self._platoons[-1]:
+                        self._platoons[-1] = tmp
+                    else:
+                        self._platoons.append(PlatoonSet(gc))
+                else:
+                    self._platoons.append(PlatoonSet((gc,)))
+
 
 
 # class FrontGap(Subscriber, StateMachine):
