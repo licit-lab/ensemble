@@ -119,7 +119,9 @@ class Configurator:
         key = (self.simulation_platform, self.platform)
         self.library_path = DCT_DEFAULT_PATHS[key]
 
-        log_success("Simulator path set to default value:", f"\t{self.library_path}")
+        log_success(
+            "Simulator path set to default value:", f"\t{self.library_path}"
+        )
         return
 
     def update_values(self, **kwargs) -> None:
@@ -137,7 +139,9 @@ class Configurator:
             )
 
         if kwargs.get("scenario_files"):
-            self.scenario_files = kwargs.get("scenario_files", self.scenario_files)
+            self.scenario_files = kwargs.get(
+                "scenario_files", self.scenario_files
+            )
 
             log_verify(
                 "Setting new scenario file(s) path to user input:",
@@ -169,6 +173,17 @@ class Configurator:
 
     def query_data(self):
         self.connector.query_data()
+
+    def create_vehicle_registry(self):
+        """ Creates a vehicle registry for all vehicles in simulation """
+        self.vehicle_registry = VehicleList(self.connector.request)
+
+    def update_vehicle_registry(self):
+        """ Updates vehicle registry in case it exists"""
+        if hasattr(self, "vehicle_registry"):
+            self.vehicle_registry.update_list()
+            return
+        self.create_vehicle_registry()
 
     def create_platoon_registry(self):
         """ Creates a platoon registry for all coordinators (FGC-RGC) """
