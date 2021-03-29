@@ -11,7 +11,6 @@ from dataclasses import dataclass
 
 from typing import Union
 
-from ensemble.control.tactical.frontandreargap import Platoon
 from ensemble.logic.platoon_states import (
     StandAlone,
     Platooning,
