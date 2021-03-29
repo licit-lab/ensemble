@@ -23,7 +23,12 @@ from ensemble.component.vehicle import Vehicle
 from ensemble.logic.platoon_set import PlatoonSet
 from ensemble.tools.constants import DCT_PLT_CONST
 
-PLState = Union[StandAlone,Platooning,Joining,Splitting]
+PLState = Union[StandAlone, Platooning, Joining, Splitting]
+
+MAXTRKS = DCT_PLT_CONST["max_platoon_length"]
+MAXNDST = DCT_PLT_CONST["max_connection_distance"]
+
+
 @dataclass
 class FrontGap:
 
@@ -31,22 +36,66 @@ class FrontGap:
     platoon: bool = False
     comv2x: bool = True
 
-    def __init__(self, vehicle: Vehicle):
-        self.leader = None
-        # Platoon state
+    def __init__(self, vehicle: Vehicle = None):
+        self.vehicle = vehicle
+
 
 @dataclass
 class RearGap:
-    def __init__(self, vehicle: Vehicle):
-        self.follower = None
+    def __init__(self, vehicle: Vehicle = None):
+        self.vehicle = vehicle
 
 
 @dataclass
 class VehGapCoordinator:
     def __init__(self, vehicle: Vehicle):
         self.ego = vehicle
-        self._fcg = FrontGap(self.ego)
+        self._fgc = FrontGap(self.ego)
         self._rgc = RearGap(self.ego)
+        self._platoonid = 0
+
+    def __hash__(self):
+        return hash((type(self), self.ego.vehid))
+
+    @property
+    def x(self):
+        """ Ego current position in link """
+        return self.ego.distance
+
+    @property
+    def leader(self):
+        """ Returns the leader vehicle in the platoon"""
+        return self._fgc.vehicle if self._fgc.vehicle is not None else self.ego
+
+    @property
+    def follower(self):
+        """ Returns the follower vehicle in the platoon"""
+        return self._fgc.vehicle if self._fgc.vehicle is not None else self.ego
+
+    @property
+    def is_head(self):
+        """ Determines if the vehicle is head of the platoon"""
+        return self.leader is self.ego
+
+    @property
+    def is_tail(self):
+        """ Determines if the vehicle is tail of the platoon """
+        return self.follower is self.ego
+
+    @property
+    def dx(self):
+        """ Ego current headway space"""
+        return self.leader.ttd - self.ego.ttd
+
+    @property
+    def pid(self):
+        """ Platoon id 0-index notation to denote position on the platoon"""
+        return self._platoonid
+
+    @property
+    def joinable(self):
+        return (self.pid < MAXTRKS) and (self.dx < MAXNDST) and self._fgc.comv2x
+
 
 @dataclass
 class GlobalGapCoordinator:
@@ -74,38 +123,3 @@ class GlobalGapCoordinator:
                         self._platoons.append(PlatoonSet(gc))
                 else:
                     self._platoons.append(PlatoonSet((gc,)))
-
-
-
-# class FrontGap(Subscriber, StateMachine):
-#     def __init__(self, veh=PlatoonVehicle()):
-#         if veh.state == "STANDALONE":
-#             self.currentState = StandAlone()
-#         elif veh.state == "JOIN":
-#             self.currentState = Join()
-#         elif veh.state == "PLATOON":
-#             self.currentState = Platoon()
-#         else:
-#             self.currentState = Split()
-
-#     def update_front(self, vehicle_env):
-#         """ update informatino from ego vehicle + leader"""
-#         self.ego = vehicle_env["ego"]
-#         self.leader = vehicle_env["leader"]
-
-
-# class RearGap(Subscriber, StateMachine):
-#     def __init__(self, veh=PlatoonVehicle()):
-#         if veh.follower().state == "STANDALONE":
-#             self.currentState = StandAlone()
-#         elif veh.follower().state == "JOIN":
-#             self.currentState = Join()
-#         elif veh.follower().state == "PLATOON":
-#             self.currentState = Platoon()
-#         else:
-#             self.currentState = Split()
-
-#     def update_back(self, vehicle_env):
-#         """ update informatino from ego vehicle + follower"""
-#         self.ego = vehicle_env["ego"]
-#         self.back = vehicle_env["follower"]
