@@ -89,6 +89,10 @@ class Vehicle(Subscriber):
     vehid: int = 0
     vehtype: str = ""
 
+    _ttdpivot: float = 0
+    _ttdprev: float = 0
+    _ttddist: float = 0
+
     def __init__(self, request, **kwargs):
         """This initializer creates a Vehicle"""
         # Undefined properties
@@ -138,3 +142,28 @@ class Vehicle(Subscriber):
     def a(self):
         """ Return vehicle acceleration """
         return self.acceleration
+
+    @property
+    def ttd(self):
+        """ Total travel distance by a single vehicle"""
+        # this is for the full sequence functionality we need something for a step by step thing. So the idea is that it should check the internals of the for condition, we should keep the pivot, prev, dist as values
+        # pivot = 0
+        # prev = 0
+        # dist = 0
+        # lst = []
+        # for i in seq:
+        #     if i <= prev:
+        #         print(f"Prev {prev}, Current {i}")
+        #         pivot += prev
+        #         print(f"Now pivot {pivot}")
+        #     dist = pivot + i
+        #     print(f"Current {dist}")
+        #     prev = i
+        #     lst.append(dist)
+        # return lst
+
+        if self.x < self._ttdprev:
+            self._ttdpivot += self._ttdprev
+        self._ttddist = self._ttdpivot + self.x
+        self._ttdprev = self.x
+        return self._ttddist
