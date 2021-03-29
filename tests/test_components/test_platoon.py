@@ -10,7 +10,6 @@ from collections.abc import Container, Sized, Iterable, Sequence, Hashable, Set
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.component.platoon import Platoon
 from ensemble.handler.symuvia.stream import SimulatorRequest
 
 # ============================================================================

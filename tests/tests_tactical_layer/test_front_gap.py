@@ -16,7 +16,6 @@ from collections import namedtuple
 
 from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
 
-from ensemble.component.platoon import Platoon
 from ensemble.component.truck import Truck
 
 from ensemble.logic.platoon_states import (
@@ -1047,7 +1046,7 @@ def transform_data(TEST):
     return str.encode(template.render(vehicles=VEHICLES))
 
 
-# ============================================================================
+# ============================:================================================
 # TESTS
 # ============================================================================
 
@@ -1072,8 +1071,8 @@ def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
     assert pytest.approx(truck02.distance, 50.00)
 
 
-def test_02_standalone_to_join_far_away(symuviarequest, test_02_data, TEST02):
-    symuviarequest.query = test_02_data
+def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
+    symuviarequest.query = transform_data(TEST02)
     truck01 = Truck(symuviarequest, vehid=1)
     truck01.update()
     truck02 = Truck(symuviarequest, vehid=2)
@@ -1081,39 +1080,106 @@ def test_02_standalone_to_join_far_away(symuviarequest, test_02_data, TEST02):
     assert pytest.approx(truck01.distance, 200.00)
     assert pytest.approx(truck02.distance, 50.00)
 
-    # veh = PlatoonVehicle(**truck_leader_data)
-    # fgc = FrontGapState(veh)
-    # fgc.update_state(veh)
-    # assert veh.front_target_state == "standalone"
+
+def test_03_standalone_to_join(symuviarequest, TEST03):
+    symuviarequest.query = transform_data(TEST03)
+    assert True
 
 
-# @pytest.fixture
-# def truck_leader_data():
-#     return {
-#         leader_PCM_capable=1,
-#         leader_split_request=False,
-#         ego_distance_gap_to_leader=0,
-#         leader_id=1,
-#         leader_length=5.0,
-#         ego_split_request=False,
-#         ego_standalone_time_gap=1,
-#         front_target_state="join",
-#         ego_speed=4.0,
-#         ego_position=0,
-#         leader_position=0,
-#         desired_gap=1,
-#         standalone_gap=1,
-#         platoon_id=1,
-#         platoon_length=1,
-#         front_id=2,
-#         intruder=True,
-#         ego_platoon_position=1,
-#         leader_platoon_position=2,
-#         maximum_platoon_length=7,
-#         platoon_desired_speed=50,
-#         platoon_desired_time_gap=2,
-#         max_connection_distance=100,
-#     }
+def test_04_(symuviarequest, TEST04):
+    symuviarequest.query = TEST04
+    assert True
+
+
+def test_05_(symuviarequest, TEST05):
+    symuviarequest.query = TEST05
+    assert True
+
+
+def test_06_(symuviarequest, TEST06):
+    symuviarequest.query = TEST06
+    assert True
+
+
+def test_07_(symuviarequest, TEST07):
+    symuviarequest.query = TEST07
+    assert True
+
+
+def test_08_(symuviarequest, TEST08):
+    symuviarequest.query = TEST08
+    assert True
+
+
+def test_09_(symuviarequest, TEST09):
+    symuviarequest.query = TEST09
+    assert True
+
+
+def test_10_(symuviarequest, TEST10):
+    symuviarequest.query = TEST10
+    assert True
+
+
+def test_11_(symuviarequest, TEST11):
+    symuviarequest.query = TEST11
+    assert True
+
+
+def test_12_(symuviarequest, TEST12):
+    symuviarequest.query = TEST12
+    assert True
+
+
+def test_13_(symuviarequest, TEST13):
+    symuviarequest.query = TEST13
+    assert True
+
+
+def test_14_(symuviarequest, TEST14):
+    symuviarequest.query = TEST14
+    assert True
+
+
+def test_15_(symuviarequest, TEST15):
+    symuviarequest.query = TEST15
+    assert True
+
+
+def test_16_(symuviarequest, TEST16):
+    symuviarequest.query = TEST16
+    assert True
+
+
+def test_17_(symuviarequest, TEST17):
+    symuviarequest.query = TEST17
+    assert True
+
+
+def test_18_(symuviarequest, TEST18):
+    symuviarequest.query = TEST18
+    assert True
+
+
+def test_19_(symuviarequest, TEST19):
+    symuviarequest.query = TEST19
+    assert True
+
+
+def test_20_(symuviarequest, TEST20):
+    symuviarequest.query = TEST20
+    assert True
+
+
+def test_21_(symuviarequest, TEST21):
+    symuviarequest.query = TEST21
+    assert True
+
+
+def test_22_(symuviarequest, TEST22):
+    symuviarequest.query = TEST22
+    assert True
+
 
 # #
 # # def test_2():
