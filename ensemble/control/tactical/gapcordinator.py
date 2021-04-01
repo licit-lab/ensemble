@@ -69,7 +69,7 @@ class VehGapCoordinator:
     @property
     def follower(self):
         """ Returns the follower vehicle in the platoon"""
-        return self._fgc.vehicle if self._fgc.vehicle is not None else self.ego
+        return self._rgc.vehicle if self._rgc.vehicle is not None else self.ego
 
     @property
     def is_head(self):
