@@ -126,3 +126,8 @@ class PlatoonSet(SortedFrozenSet):
     def joinable(self):
         """ Exams last vehicle in the Platoon """
         return self[-1].joinable
+
+    def updatePids(self):
+        """ Exams and updates the Platoon Index Position"""
+        for i, item in enumerate(self._items):
+            item.pid = i

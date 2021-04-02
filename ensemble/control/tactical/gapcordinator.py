@@ -55,7 +55,7 @@ class VehGapCoordinator:
         self.ego = vehicle
         self._fgc = FrontGap(leader)
         self._rgc = RearGap(follower)
-        self._platoonid = 0
+        self.pid = 0
 
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
@@ -133,7 +133,7 @@ class GlobalGapCoordinator:
         # This grooups vehicles per road type
         vtf = lambda x: x.ego.link
 
-        # Group by link (Vehicle in same link)
+        # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gclist, vtf):
             for gc in group_gc:
                 if len(self._platoons) >= 1:
@@ -145,3 +145,4 @@ class GlobalGapCoordinator:
                         self._platoons[-1] = tmp
                 else:
                     self._platoons.append(PlatoonSet((gc,)))
+                self._platoons[-1].updatePids()
