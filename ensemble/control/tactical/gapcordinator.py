@@ -5,6 +5,8 @@
 
 """
 
+import numpy as np
+
 from itertools import groupby
 
 from dataclasses import dataclass
@@ -47,10 +49,12 @@ class RearGap:
 
 @dataclass
 class VehGapCoordinator:
-    def __init__(self, vehicle: Vehicle):
+    def __init__(
+        self, vehicle: Vehicle, leader: Vehicle = None, follower: Vehicle = None
+    ):
         self.ego = vehicle
-        self._fgc = FrontGap(self.ego)
-        self._rgc = RearGap(self.ego)
+        self._fgc = FrontGap(leader)
+        self._rgc = RearGap(follower)
         self._platoonid = 0
 
     def __hash__(self):
@@ -84,23 +88,41 @@ class VehGapCoordinator:
     @property
     def dx(self):
         """ Ego current headway space"""
-        return self.leader.ttd - self.ego.ttd
+        return (
+            self.leader.ttd - self.ego.ttd
+            if self.leader.vehid != self.ego.vehid
+            else MAXNDST
+        )
 
     @property
     def pid(self):
         """ Platoon id 0-index notation to denote position on the platoon"""
         return self._platoonid
 
+    @pid.setter
+    def pid(self, value):
+        """ Platoon id 0-index"""
+        self._platoonid = np.clip(value, 0, MAXTRKS)
+
     @property
     def joinable(self):
         return (self.pid < MAXTRKS) and (self.dx < MAXNDST) and self._fgc.comv2x
+
+    @property
+    def x(self):
+        """ Vehicle positions"""
+        return self.ego.x
 
 
 @dataclass
 class GlobalGapCoordinator:
     def __init__(self, vehicle_registry: VehicleList):
         self._gclist = [
-            VehGapCoordinator(veh)
+            VehGapCoordinator(
+                veh,
+                vehicle_registry.get_leader(veh),
+                vehicle_registry.get_follower(veh),
+            )
             for veh in vehicle_registry
             if veh.vehtype in DCT_PLT_CONST.get("platoon_types")
         ]
@@ -115,10 +137,11 @@ class GlobalGapCoordinator:
         for _, group_gc in groupby(self._gclist, vtf):
             for gc in group_gc:
                 if len(self._platoons) >= 1:
-                    tmp = self._platoons[-1] + PlatoonSet(gc)
-                    if len(tmp) > self._platoons[-1]:
-                        self._platoons[-1] = tmp
+                    newp = PlatoonSet((gc,))
+                    tmp = self._platoons[-1] + newp
+                    if isinstance(tmp, tuple):
+                        self._platoons.append(newp)
                     else:
-                        self._platoons.append(PlatoonSet(gc))
+                        self._platoons[-1] = tmp
                 else:
                     self._platoons.append(PlatoonSet((gc,)))

@@ -38,7 +38,7 @@ class PlatoonSet(SortedFrozenSet):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
-                key=lambda x: x.__dict__.get(key),
+                key=lambda x: getattr(x, key),
             )
         )
 
@@ -63,7 +63,9 @@ class PlatoonSet(SortedFrozenSet):
         return "{type}({arg})".format(
             type=type(self).__name__,
             arg=(
-                "[{}]".format(", ".join(map(repr, self._items))) if self._items else ""
+                "[{}]".format(", ".join(map(repr, self._items)))
+                if self._items
+                else ""
             ),
         )
 
@@ -79,10 +81,12 @@ class PlatoonSet(SortedFrozenSet):
 
         if not isinstance(rhs, type(self)):
             return NotImplemented
+
         # Join from the front
-        if self[-1].joinable():
-            return PlatoonSet(chain(self._items, rhs._items))
-        return self
+        if rhs.joinable():
+            return PlatoonSet(tuple(chain(self._items, rhs._items)))
+
+        return self, rhs
 
         # Join from the back
 
@@ -118,3 +122,7 @@ class PlatoonSet(SortedFrozenSet):
 
     def difference(self, iterable):
         return self - PlatoonSet(iterable)
+
+    def joinable(self):
+        """ Exams last vehicle in the Platoon """
+        return self[-1].joinable
