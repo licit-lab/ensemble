@@ -130,6 +130,7 @@ class Query(AbsState):
 
         if event == "control":
             configurator.query_data()
+            configurator.update_vehicle_registry()
             configurator.update_platoon_registry()
             return Control()
 

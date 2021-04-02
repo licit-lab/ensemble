@@ -28,6 +28,7 @@ from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
 
 # from ensemble.control.governor import MultiBrandPlatoonRegistry
 from ensemble.component.vehiclelist import VehicleList
+from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
 from ensemble.tools.screen import log_success, log_verify, log_warning
 
 # ============================================================================
@@ -187,13 +188,12 @@ class Configurator:
 
     def create_platoon_registry(self):
         """ Creates a platoon registry for all coordinators (FGC-RGC) """
-        self.platoon_registry = VehicleList(
-            self.connector.request
-        )  # MultiBrandPlatoonRegistry()
+        self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
+        self.platoon_registry.solve_platoons()
 
     def update_platoon_registry(self):
         if hasattr(self, "platoon_registry"):
-            self.platoon_registry.update_list()
+            self.platoon_registry.update_platoons()
             return
         self.create_platoon_registry()
 
