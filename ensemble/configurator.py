@@ -189,7 +189,6 @@ class Configurator:
     def create_platoon_registry(self):
         """ Creates a platoon registry for all coordinators (FGC-RGC) """
         self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
-        self.platoon_registry.solve_platoons()
 
     def update_platoon_registry(self):
         if hasattr(self, "platoon_registry"):

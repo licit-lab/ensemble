@@ -127,8 +127,12 @@ class GlobalGapCoordinator:
             if veh.vehtype in DCT_PLT_CONST.get("platoon_types")
         ]
         self._platoons = []
+        self.solve_platoons()
 
     def solve_platoons(self):
+        """First iteration to fill the platoon registry based on the current
+        vehicle information.
+        """
 
         # This grooups vehicles per road type
         vtf = lambda x: x.ego.link
@@ -146,3 +150,8 @@ class GlobalGapCoordinator:
                 else:
                     self._platoons.append(PlatoonSet((gc,)))
                 self._platoons[-1].updatePids()
+
+    def update_platoons(self):
+        if len(self._platoons) > 1:
+            return
+        self.solve_platoons()
