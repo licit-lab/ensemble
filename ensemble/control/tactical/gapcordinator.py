@@ -5,11 +5,12 @@
 
 """
 
+import pandas as pd
 import numpy as np
-
+import networkx as nx
 from itertools import groupby
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from typing import Union
 
@@ -23,42 +24,55 @@ from ensemble.component.vehiclelist import VehicleList
 from ensemble.component.vehicle import Vehicle
 from ensemble.logic.platoon_set import PlatoonSet
 from ensemble.tools.constants import DCT_PLT_CONST
+from ensemble.metaclass.coordinator import AbsSingleGapCoord
 
 PLState = Union[StandAlone, Platooning, Joining, Splitting]
 
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
+
 MAXTRKS = DCT_PLT_CONST["max_platoon_length"]
 MAXNDST = DCT_PLT_CONST["max_connection_distance"]
+PLT_TYP = DCT_PLT_CONST["platoon_types"]
 
 
 @dataclass
 class FrontGap:
+    def __init__(self, vehicle: AbsSingleGapCoord = None):
+        self.vgc = vehicle
+
+
+@dataclass
+class RearGap:
+    def __init__(self, vehicle: AbsSingleGapCoord = None):
+        self.vgc = vehicle
+
+
+@dataclass
+class VehGapCoordinator(AbsSingleGapCoord):
 
     status: PLState = StandAlone()
     platoon: bool = False
     comv2x: bool = True
 
-    def __init__(self, vehicle: Vehicle = None):
-        self.vehicle = vehicle
-
-
-@dataclass
-class RearGap:
-    def __init__(self, vehicle: Vehicle = None):
-        self.vehicle = vehicle
-
-
-@dataclass
-class VehGapCoordinator:
-    def __init__(
-        self, vehicle: Vehicle, leader: Vehicle = None, follower: Vehicle = None
-    ):
+    def __init__(self, vehicle: Vehicle):
         self.ego = vehicle
-        self._fgc = FrontGap(leader)
-        self._rgc = RearGap(follower)
+        self._fgc = None
+        self._rgc = None
         self.pid = 0
+        # self.solve_fgc_state()
 
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
+
+    def set_leader(self, leader: AbsSingleGapCoord):
+        self._fgc = leader
+
+    def solve_fgc_state(self):
+        """Logic solver for the platoon state machine."""
+        if self._fgc is not None:
+            self._fgc.status.next_state(self)
 
     @property
     def x(self):
@@ -68,12 +82,12 @@ class VehGapCoordinator:
     @property
     def leader(self):
         """ Returns the leader vehicle in the platoon"""
-        return self._fgc.vehicle if self._fgc.vehicle is not None else self.ego
+        return self._fgc if self._fgc is not None else self.ego
 
     @property
     def follower(self):
         """ Returns the follower vehicle in the platoon"""
-        return self._rgc.vehicle if self._rgc.vehicle is not None else self.ego
+        return self._rgc if self._rgc is not None else self.ego
 
     @property
     def is_head(self):
@@ -84,6 +98,16 @@ class VehGapCoordinator:
     def is_tail(self):
         """ Determines if the vehicle is tail of the platoon """
         return self.follower is self.ego
+
+    @property
+    def ttd(self):
+        """ Total travel time"""
+        return self.ego.ttd
+
+    @property
+    def vehid(self):
+        """ Vehicle positions"""
+        return self.ego.vehid
 
     @property
     def dx(self):
@@ -106,28 +130,72 @@ class VehGapCoordinator:
 
     @property
     def joinable(self):
-        return (self.pid < MAXTRKS) and (self.dx < MAXNDST) and self._fgc.comv2x
+        return (
+            (self.pid < MAXTRKS - 1)
+            and (self.dx < MAXNDST)
+            and self._fgc.comv2x
+        )
 
-    @property
-    def x(self):
-        """ Vehicle positions"""
-        return self.ego.x
+    def cancel_join_request(self, value: bool = False):
+        return not self.joinable and value
 
 
 @dataclass
 class GlobalGapCoordinator:
     def __init__(self, vehicle_registry: VehicleList):
-        self._gclist = [
-            VehGapCoordinator(
-                veh,
-                vehicle_registry.get_leader(veh),
-                vehicle_registry.get_follower(veh),
-            )
-            for veh in vehicle_registry
-            if veh.vehtype in DCT_PLT_CONST.get("platoon_types")
-        ]
+        self._gcnet = nx.DiGraph()
+
+        # Add all vehicles gap coord
+        for veh in vehicle_registry:
+            if veh.vehtype in DCT_PLT_CONST.get("platoon_types"):
+                self._gcnet.add_node(veh.vehid, vgc=VehGapCoordinator(veh))
+        self._set_leaders(vehicle_registry)
+
         self._platoons = []
-        self.solve_platoons()
+        # self.solve_platoons()
+
+    def _set_leaders(self, vehicle_registry: VehicleList):
+        """ Set initial leaders for the formation"""
+
+        for veh in vehicle_registry:
+            leader = vehicle_registry.get_leader(veh, distance=MAXNDST)
+            if leader is not None and leader.vehtype in PLT_TYP:
+                self._gcnet.add_edge(veh.vehid, leader.vehid)
+                self._gcnet.nodes()[veh.vehid].get("vgc").set_leader(
+                    self._gcnet.nodes()[leader.vehid].get("vgc")
+                )
+
+    def __getitem__(self, index):
+        result = self._gcnet.nodes()[index].get("vgc")
+        return result
+
+    def _to_pandas(self) -> pd.DataFrame:
+        """Transforms vehicle list into a pandas for rendering purposes
+
+        Returns:
+            df (DataFrame): Returns a table with pandas data.
+
+        """
+        veh_data = []
+        for i, vgc in self._gcnet.nodes(data=True):
+            data = vgc.get("vgc")
+            d = asdict(data)
+            d = dict(d, **asdict(data.ego))
+            veh_data.append(d)
+            df = pd.DataFrame(veh_data)
+        return df.drop(["_ttdpivot", "_ttdprev", "_ttddist"], axis=1)
+
+        return pd.DataFrame([asdict(v) for v in self._items])
+
+    def __str__(self):
+        if self._gcnet is None:
+            return "No vehicles have been registered"
+        return str(self._to_pandas())
+
+    def __repr__(self):
+        if self._gcnet is None:
+            return "No vehicles have been registered"
+        return repr(self._to_pandas())
 
     def solve_platoons(self):
         """First iteration to fill the platoon registry based on the current
@@ -135,20 +203,20 @@ class GlobalGapCoordinator:
         """
 
         # This grooups vehicles per road type
-        vtf = lambda x: x.ego.link
+        vtf = lambda x: x[1].get("vgc").ego.link
 
         # Gap Coord (gc) Group by link (Vehicle in same link)
-        for _, group_gc in groupby(self._gclist, vtf):
-            for gc in group_gc:
+        for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
+            for _, gc in group_gc:
                 if len(self._platoons) >= 1:
-                    newp = PlatoonSet((gc,))
+                    newp = PlatoonSet((gc.get("vgc"),))
                     tmp = self._platoons[-1] + newp
                     if isinstance(tmp, tuple):
                         self._platoons.append(newp)
                     else:
                         self._platoons[-1] = tmp
                 else:
-                    self._platoons.append(PlatoonSet((gc,)))
+                    self._platoons.append(PlatoonSet((gc.get("vgc"),)))
                 self._platoons[-1].updatePids()
 
     def update_platoons(self):
