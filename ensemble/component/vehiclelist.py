@@ -86,25 +86,33 @@ class VehicleList(SortedFrozenSet):
         """
         return self._get_vehicles_attribute("distance")
 
-    def distance_filter(self, ego: Vehicle, type: str = "downstream"):
+    def distance_filter(
+        self, ego: Vehicle, type: str = "downstream", radius: float = 100
+    ):
         """
         Returns all vehicles' downstream or
         """
         case = {
             "downstream": [
-                v.distance for v in self._items if v.distance > ego.distance
+                v.distance
+                for v in self._items
+                if v.distance > ego.distance
+                and v.distance < ego.distance + radius
             ],
             "upstream": [
-                v.distance for v in self._items if v.distance < ego.distance
+                v.distance
+                for v in self._items
+                if v.distance < ego.distance
+                and v.distance > ego.distance - radius
             ],
         }
         return case.get(type)
 
-    def get_leader(self, ego: Vehicle) -> Vehicle:
+    def get_leader(self, ego: Vehicle, distance: float = 100) -> Vehicle:
         """
         Returns ego vehicle immediate leader
         """
-        array = np.asarray(self.distance_filter(ego, "downstream"))
+        array = np.asarray(self.distance_filter(ego, "downstream", distance))
         if array.size > 0:
             idx = (np.abs(array - ego.distance)).argmin()
             closest = array[idx]
