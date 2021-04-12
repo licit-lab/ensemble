@@ -15,6 +15,11 @@
 # ============================================================================
 
 from ensemble.metaclass.state import AbsState
+from ensemble.metaclass.coordinator import AbsSingleGapCoord
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 
 class StandAlone(AbsState):
@@ -25,18 +30,18 @@ class StandAlone(AbsState):
 
     """
 
-    def next_state(self, vehicle):
+    def next_state(self, vgc: AbsSingleGapCoord):
         """Determines the switching condition for the state:
 
         Note:
             Transition: `StandAlone` to `Joining`
 
         Args:
-            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+            truck (fgc): Platoon vehicle containing information of the ego vehicle.
 
         """
-        if vehicle.leader.joinable():
-            return Joining()
+        if vgc.leader.joinable:
+            return Joining().next_state(vgc)
         else:
             return self
 
@@ -49,7 +54,7 @@ class Joining(AbsState):
         Transition: `Joining` to `Platooning`
     """
 
-    def next_state(self, vehicle):
+    def next_state(self, vgc: AbsSingleGapCoord):
         """Determines the switching condition for the state:
 
         Note:
@@ -60,9 +65,9 @@ class Joining(AbsState):
             truck (vehicle): Platoon vehicle containing information of the ego vehicle.
 
         """
-        if vehicle.cancel_join_request():
-            return StandAlone()
-        elif vehicle.confirm_platoon():
+        if vgc.cancel_join_request(False):
+            return StandAlone() 
+        elif vgc.confirm_platoon():
             return Platooning()
             # vehicle.ego_position = (
             #     platoonvehicle.leader.ego_position + 1
