@@ -13,7 +13,7 @@ Vehicle model acts as an instance to trace individual vehicle data and modify ve
 from typing import Dict, List
 import itertools
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -89,9 +89,9 @@ class Vehicle(Subscriber):
     vehid: int = 0
     vehtype: str = ""
 
-    _ttdpivot: float = 0
-    _ttdprev: float = 0
-    _ttddist: float = 0
+    _ttdpivot: float = field(default=0, repr=False)
+    _ttdprev: float = field(default=0, repr=False)
+    _ttddist: float = field(default=0, repr=False)
 
     def __init__(self, request, **kwargs):
         """This initializer creates a Vehicle"""
