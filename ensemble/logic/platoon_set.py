@@ -17,10 +17,15 @@ from bisect import bisect_left
 # ============================================================================
 
 from ensemble.logic.frozen_set import SortedFrozenSet
+from ensemble.tools.constants import DCT_PLT_CONST
+
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+MAXTRKS = DCT_PLT_CONST["max_platoon_length"]
+MAXNDST = DCT_PLT_CONST["max_connection_distance"]
 
 
 class PlatoonSet(SortedFrozenSet):
@@ -82,9 +87,10 @@ class PlatoonSet(SortedFrozenSet):
         if not isinstance(rhs, type(self)):
             return NotImplemented
 
-        # Join from the front
-        if rhs.joinable():
-            return PlatoonSet(tuple(chain(self._items, rhs._items)))
+        if len(self._items) + len(rhs._items) < MAXTRKS:
+            # Join from the front
+            if rhs.joinable():
+                return PlatoonSet(tuple(chain(self._items, rhs._items)))
 
         return self, rhs
 
