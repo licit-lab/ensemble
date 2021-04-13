@@ -35,12 +35,12 @@ class Subscriber(AbsObserver):
             >>> query = DataQuery(channels)
     """
 
-    def __init__(self, publisher, channel="default"):
+    def __init__(self, publisher, channel="default", callback=None):
         self._counter = count(0)
         self._call = next(self._counter)
         self._publisher = publisher
         self._channel = channel
-        publisher.attach(self, channel)
+        publisher.attach(self, channel, callback)
 
     def update(self):
         self._call = next(self._counter)
