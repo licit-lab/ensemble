@@ -63,8 +63,8 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     Example:
         Call of the default simulator ::
 
-            >>> from symupy.api import Simulator
-            >>> simulator = Simulator()
+            >>> from ensemble.handler.symuvia import SymuViaConnector
+            >>> simulator = SymuViaConnector()
 
     :return: Symuvia simulator object with simulation parameters
     :rtype: Simulator
@@ -74,13 +74,13 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     Example:
         To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
-            >>> from symupy.api import Simulator
+            >>> from ensemble.handler.symuvia import SymuViaConnector
             >>> path_symuvia = "path/to/libSymuyVia.dylib"
-            >>> simulator = Simulator(library_path=path_symuvia)
+            >>> simulator = SymuViaConnector(library_path=path_symuvia)
 
     This object describes is a configurator manager for the interface between the traffic simulator and the python interface. For more details on the optinal keyword parameters please refer to :py:class:`~symupy.utils.configurator.Configurator` class.
 
-    :raises SymupyLoadLibraryError:
+    :raises EnsembleAPILoadFileError:
         Error raised whenever the SymuVia library is not found
 
     :raises SymupyFileLoadError:
@@ -133,7 +133,9 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
             log_success("\t Library successfully loaded!")
         except OSError:
             log_error("\t SymuVia is currently unavailable!")
-            raise EnsembleAPILoadLibraryError("Library not found", self.library_path)
+            raise EnsembleAPILoadLibraryError(
+                "Library not found", self.library_path
+            )
         self.__library = lib_symuvia
 
     def load_scenario(self, scenario: SymuviaScenario):
@@ -146,7 +148,9 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
                 log_verify("\t Scenario successfully loaded!")
                 return
             except:
-                raise EnsembleAPILoadFileError(f"\t Simulation could not be loaded")
+                raise EnsembleAPILoadFileError(
+                    f"\t Simulation could not be loaded"
+                )
         EnsembleAPIWarning(f"\tSimulation could not be loaded.")
 
     def register_simulation(self, scenarioPath: str) -> None:
