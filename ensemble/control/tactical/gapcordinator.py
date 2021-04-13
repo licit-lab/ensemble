@@ -188,7 +188,7 @@ class GlobalGapCoordinator(Subscriber):
             d = asdict(data)
             d = dict(d, **asdict(data.ego))
             veh_data.append(d)
-            df = pd.DataFrame(veh_data)
+        df = pd.DataFrame(veh_data)
         return df.drop(["_ttdpivot", "_ttdprev", "_ttddist"], axis=1)
 
         return pd.DataFrame([asdict(v) for v in self._items])
