@@ -20,13 +20,14 @@ import numpy as np
 
 from .vehicle import Vehicle
 from ensemble.logic.frozen_set import SortedFrozenSet
+from ensemble.logic.publisher import Publisher
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
-class VehicleList(SortedFrozenSet):
+class VehicleList(SortedFrozenSet, Publisher):
     """Class defining a set of vehicles. This class is based on a sorted
     frozen set and supports multiple operations in between sets. You can define a list based on a simluator request and the list will update automatically via a single method.
 
@@ -47,7 +48,8 @@ class VehicleList(SortedFrozenSet):
     def __init__(self, request):
         self._request = request
         data = [Vehicle(request, **v) for v in request.get_vehicle_data()]
-        super().__init__(data)
+        SortedFrozenSet.__init__(self, data)
+        Publisher.__init__(self)
 
     def update_list(self):
         """Update vehicle data according to an update in the request."""

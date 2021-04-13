@@ -23,6 +23,7 @@ from ensemble.logic.platoon_states import (
 from ensemble.component.vehiclelist import VehicleList
 from ensemble.component.vehicle import Vehicle
 from ensemble.logic.platoon_set import PlatoonSet
+from ensemble.logic.subscriber import Subscriber
 from ensemble.tools.constants import DCT_PLT_CONST
 from ensemble.metaclass.coordinator import AbsSingleGapCoord
 
@@ -141,18 +142,20 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
 
 @dataclass
-class GlobalGapCoordinator:
+class GlobalGapCoordinator(Subscriber):
     def __init__(self, vehicle_registry: VehicleList):
         self._gcnet = nx.DiGraph()
+        super().__init__(vehicle_registry)
+        self._platoons = []
+        self._add_vehicle_gc()
+        self.solve_platoons()
 
+    def _add_vehicle_gc(self):
         # Add all vehicles gap coord
-        for veh in vehicle_registry:
+        for veh in self._publisher:
             if veh.vehtype in DCT_PLT_CONST.get("platoon_types"):
                 self._gcnet.add_node(veh.vehid, vgc=VehGapCoordinator(veh))
-        self._set_leaders(vehicle_registry)
-
-        self._platoons = []
-        # self.solve_platoons()
+        self._set_leaders(self._publisher)
 
     def _set_leaders(self, vehicle_registry: VehicleList):
         """ Set initial leaders for the formation"""
@@ -164,6 +167,9 @@ class GlobalGapCoordinator:
                 self._gcnet.nodes()[veh.vehid].get("vgc").set_leader(
                     self._gcnet.nodes()[leader.vehid].get("vgc")
                 )
+
+    def __hash__(self):
+        return hash(self._publisher)
 
     def __getitem__(self, index):
         result = self._gcnet.nodes()[index].get("vgc")
@@ -201,6 +207,9 @@ class GlobalGapCoordinator:
         """First iteration to fill the platoon registry based on the current
         vehicle information.
         """
+
+        # Add new vehicle gap coordinators
+        self._add_vehicle_gc()
 
         # This grooups vehicles per road type
         vtf = lambda x: x[1].get("vgc").ego.link
