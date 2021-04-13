@@ -61,7 +61,7 @@ class SimulatorRequest(DataQuery):
             simdata (OrderedDict): Simulator data parsed from XML
         """
         try:
-            dataveh = parse(self._str_response)
+            dataveh = parse(self._str_response.value)
             # Transform ordered dictionary into new keys
             return dataveh
         except ExpatError:
@@ -121,7 +121,9 @@ class SimulatorRequest(DataQuery):
         for key, val in veh_data.items():
             response[ct.FIELD_DATA[key]] = ct.FIELD_FORMAT[key](val)
         lkey = "@etat_pilotage"
-        response[ct.FIELD_DATA[lkey]] = ct.FIELD_FORMAT[lkey](veh_data.get(lkey))
+        response[ct.FIELD_DATA[lkey]] = ct.FIELD_FORMAT[lkey](
+            veh_data.get(lkey)
+        )
         return dict(response)
 
     def is_vehicle_driven(self, vehid: int) -> bool:
