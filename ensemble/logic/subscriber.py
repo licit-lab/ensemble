@@ -14,7 +14,7 @@ from itertools import count
 # INTERNAL IMPORTS
 # ============================================================================
 
-from symupy.metaclass import AbsSubject, AbsObserver
+from ensemble.metaclass.observer import AbsObserver
 
 # ============================================================================
 # CLASS AND DEFINITIONS

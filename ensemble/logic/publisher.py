@@ -8,7 +8,7 @@ This module dedicates a generic object to generate a publisher pattern implement
 # STANDARD  IMPORTS
 # ============================================================================
 
-from symupy.metaclass import AbsSubject
+from ensemble.metaclass.subject import AbsSubject
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -33,7 +33,8 @@ class Publisher(AbsSubject):
     def __init__(self, channels=("default",)):
         # maps event names to subscribers
         # str -> dict
-        self._channels = {channel: {} for channel in channels}
+        # self._channels = {channel: {} for channel in channels}
+        self._channels = {channel: set() for channel in channels}
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.channels})"
@@ -55,9 +56,13 @@ class Publisher(AbsSubject):
             observer(observer): observer object
             callback(callable): method to be executed when publisher notifies.
         """
-        if callback == None:
-            callback = getattr(observer, "update")
-        self.get_subscribers(channel)[observer] = callback
+        self._channels[channel].add(observer)
+
+        # Dictionary implementation has an issue
+        # Old alternative: Not working since dictionary keys are immutable
+        # if callback == None:
+        #     callback = getattr(observer, "update")
+        # self.get_subscribers(channel)[observer] = callback
 
     def detach(self, observer, channel: str):
         """Detach observer from the subject
@@ -67,16 +72,19 @@ class Publisher(AbsSubject):
             observer(observer): observer object
             callback(callable): method to be executed when publisher notifies.
         """
-        del self.get_subscribers(channel)[observer]
+        # del self.get_subscribers(channel)[observer]
+        self.get_subscribers(channel).remove(observer)
 
-    def dispatch(self, channel: str = "default"):
+    def dispatch(self, channel: str = "default", callback: str = "update"):
         """Dispatches a message to a specific channel
 
         Args:
             channel(str): channel name
         """
-        for _, callback in self.get_subscribers(channel).items():
-            callback()
+        for obj in self.get_subscribers(channel):
+            getattr(obj, callback)()  # Every object needs an update method
+        # for _, callback in self.get_subscribers(channel).items():
+        #     callback()
 
     def foo(self):
         """ Demo function"""
