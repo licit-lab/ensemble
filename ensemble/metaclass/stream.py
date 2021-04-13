@@ -9,21 +9,26 @@ This module handles the Simulation response converting it into proper formats fo
 # ============================================================================
 
 import abc
-from typing import List
+from typing import Union, Dict, List, Tuple
+from collections import defaultdict
 from ctypes import create_string_buffer
-
-from symupy.logic.publisher import Publisher
-from symupy.utils.parser import vlists, vdata
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
+from ensemble.logic.publisher import Publisher
 import ensemble.tools.constants as ct
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+vtypes = Union[float, int, str]
+vdata = Tuple[vtypes]
+vmaps = Dict[str, vtypes]
+vlists = List[vmaps]
+response = defaultdict(lambda: False)
 
 
 class DataQuery(Publisher, metaclass=abc.ABCMeta):

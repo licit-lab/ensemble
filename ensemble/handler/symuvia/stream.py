@@ -11,18 +11,25 @@ This module is able to receive the stream of data comming from the SymuVia platf
 from xmltodict import parse
 from xml.parsers.expat import ExpatError
 from ctypes import create_string_buffer
+from typing import Union, Dict, List, Tuple
+from collections import defaultdict
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 from ensemble.metaclass.stream import DataQuery
-from symupy.utils.parser import vlists, response
 import ensemble.tools.constants as ct
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+vtypes = Union[float, int, str]
+vdata = Tuple[vtypes]
+vmaps = Dict[str, vtypes]
+vlists = List[vmaps]
+response = defaultdict(lambda: False)
 
 
 class SimulatorRequest(DataQuery):
@@ -88,7 +95,7 @@ class SimulatorRequest(DataQuery):
         return []
 
     @staticmethod
-    def transform(veh_data: dict):
+    def transform(veh_data: dict) -> dict:
         """Transform vehicle data from string format to coherent format
 
         Args:

@@ -8,21 +8,25 @@ This module is able to receive the stream of data comming from the Vissim platfo
 # STANDARD  IMPORTS
 # ============================================================================
 
-from typing import List
-from symupy.components import Vehicle, VehicleList
+from typing import Union, Dict, List, Tuple
+from collections import defaultdict
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 from ensemble.metaclass.stream import DataQuery
-from symupy.utils.parser import response
 import ensemble.tools.constants as ct
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
+vtypes = Union[float, int, str]
+vdata = Tuple[vtypes]
+vmaps = Dict[str, vtypes]
+vlists = List[vmaps]
+response = defaultdict(lambda: False)
 vissim_response = List[List]
 
 
@@ -117,7 +121,9 @@ class SimulatorRequest(DataQuery):
 
         """
         for key, val in veh_data.items():
-            response[ct.FIELD_DATA_VISSIM[key]] = ct.FIELD_FORMAT_VISSIM[key](val)
+            response[ct.FIELD_DATA_VISSIM[key]] = ct.FIELD_FORMAT_VISSIM[key](
+                val
+            )
         lkey = "@etat_pilotage"
         response[ct.FIELD_DATA_VISSIM[lkey]] = ct.FIELD_FORMAT_VISSIM[lkey](
             veh_data.get(lkey)
