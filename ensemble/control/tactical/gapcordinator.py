@@ -162,7 +162,11 @@ class GlobalGapCoordinator(Subscriber):
 
         for veh in vehicle_registry:
             leader = vehicle_registry.get_leader(veh, distance=MAXNDST)
-            if leader is not None and leader.vehtype in PLT_TYP:
+            if (
+                leader is not None
+                and leader.vehtype in PLT_TYP
+                and veh.vehtype in PLT_TYP
+            ):
                 self._gcnet.add_edge(veh.vehid, leader.vehid)
                 self._gcnet.nodes()[veh.vehid].get("vgc").set_leader(
                     self._gcnet.nodes()[leader.vehid].get("vgc")
@@ -227,6 +231,4 @@ class GlobalGapCoordinator(Subscriber):
                 self._platoons[-1].updatePids()
 
     def update_platoons(self):
-        if len(self._platoons) > 1:
-            return
         self.solve_platoons()
