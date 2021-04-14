@@ -88,7 +88,7 @@ def find_path(roots):
             yield from p.glob(f"**/{DCT_LIBOSNAME[SYSTEM]}")
 
 
-DEFAULT_PATH_SYMUVIA = ""
+DEFAULT_PATH_SYMUVIA = DCT_LIBOSNAME[SYSTEM]
 for path in find_path(PATHS_2_SEARCH):
     DEFAULT_PATH_SYMUVIA = (
         path if SYSTEM != "Windows" else DCT_LIBOSNAME[SYSTEM]
@@ -353,7 +353,7 @@ DCT_VEH_DATA = {
 DCT_PLT_CONST = {
     "max_platoon_length": 7,  # maximum number of vehicles allowed in platoon
     "max_connection_distance": 100,  # maximum distance for communication
-    "platoon_types": ("PLT", 201),
+    "platoon_types": ("PLT", '201'),
 }
 
 # =============================================================================
