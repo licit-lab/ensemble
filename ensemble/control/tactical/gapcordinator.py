@@ -141,6 +141,10 @@ class VehGapCoordinator(AbsSingleGapCoord):
         return not self.joinable and value
 
 
+# This grooups vehicles per road type
+vtf = lambda x: x[1].get("vgc").ego.link
+
+
 @dataclass
 class GlobalGapCoordinator(Subscriber):
     def __init__(self, vehicle_registry: VehicleList):
@@ -172,6 +176,17 @@ class GlobalGapCoordinator(Subscriber):
                     self._gcnet.nodes()[leader.vehid].get("vgc")
                 )
 
+    def _update_states(self):
+        """ Update platoon state according to current information"""
+
+        # Add new vehicle gap coordinators
+        self._add_vehicle_gc()
+
+        # Gap Coord (gc) Group by link (Vehicle in same link)
+        for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
+            for _, gc in group_gc:
+                gc.get("vgc").solve_fgc_state()
+
     def __hash__(self):
         return hash(self._publisher)
 
@@ -191,9 +206,10 @@ class GlobalGapCoordinator(Subscriber):
             data = vgc.get("vgc")
             d = asdict(data)
             d = dict(d, **asdict(data.ego))
+            d["pid"] = data.pid
             veh_data.append(d)
         df = pd.DataFrame(veh_data)
-        return df
+        return df.set_index(["pid", "vehid"]) if not df.empty else df
 
     def __str__(self):
         if self._gcnet is None:
@@ -213,9 +229,6 @@ class GlobalGapCoordinator(Subscriber):
         # Add new vehicle gap coordinators
         self._add_vehicle_gc()
 
-        # This grooups vehicles per road type
-        vtf = lambda x: x[1].get("vgc").ego.link
-
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
             for _, gc in group_gc:
@@ -229,6 +242,8 @@ class GlobalGapCoordinator(Subscriber):
                 else:
                     self._platoons.append(PlatoonSet((gc.get("vgc"),)))
                 self._platoons[-1].updatePids()
+
+        self._update_states()
 
     def update_platoons(self):
         self.solve_platoons()
