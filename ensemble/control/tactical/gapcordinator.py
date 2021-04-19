@@ -36,6 +36,7 @@ PLState = Union[StandAlone, Platooning, Joining, Splitting]
 MAXTRKS = DCT_PLT_CONST["max_platoon_length"]
 MAXNDST = DCT_PLT_CONST["max_connection_distance"]
 PLT_TYP = DCT_PLT_CONST["platoon_types"]
+MAXDSTR = DCT_PLT_CONST["max_gap_error"]
 
 
 @dataclass
@@ -56,6 +57,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
     status: PLState = StandAlone()
     platoon: bool = False
     comv2x: bool = True
+    dx_ref: float = 30
 
     def __init__(self, vehicle: Vehicle):
         self.ego = vehicle
@@ -131,6 +133,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
     @property
     def joinable(self):
+        """ Checks if a vehicle is joinable"""
         return (
             (self.pid < MAXTRKS - 1)
             and (self.dx < MAXNDST)
@@ -138,7 +141,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
         )
 
     def cancel_join_request(self, value: bool = False):
+        """ Forces ego to abandon platoon mode"""
         return not self.joinable and value
+
+    def confirm_platoon(self):
+        """ Confirms ego platoon mode"""
+        return abs(self.dx - self.dx_ref) < MAXDSTR
 
 
 # This grooups vehicles per road type
@@ -178,9 +186,6 @@ class GlobalGapCoordinator(Subscriber):
 
     def _update_states(self):
         """ Update platoon state according to current information"""
-
-        # Add new vehicle gap coordinators
-        self._add_vehicle_gc()
 
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
