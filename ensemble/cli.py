@@ -10,6 +10,7 @@ Scenario launcher for ENSEMBLE simulations
 
 import sys
 import click
+from click.core import Context
 import typing
 
 # ============================================================================
@@ -52,8 +53,9 @@ file://ensemble/docs/_build/html/index.html
 )
 @click.option("-p", "--platform", default="", help="'symuvia' or 'vissim'")
 @click.pass_context
-def main(ctx, verbose: bool, info: str, platform: str) -> int:
+def main(ctx: Context, verbose: bool, info: str, platform: str) -> int:
     """Scenario launcher for ENSEMBLE simulations"""
+    ctx.ensure_object(Configurator)
     ctx.obj = Configurator(verbose=verbose, info=info)
     ctx.obj.set_simulation_platform(platform)
     if ctx.obj.verbose:
@@ -129,4 +131,4 @@ def check(config: Configurator, scenario: str, library: str) -> bool:
 
 
 if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    sys.exit(main(Configurator(), False, False, ""))  # pragma: no cover
