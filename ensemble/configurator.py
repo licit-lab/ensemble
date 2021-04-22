@@ -8,7 +8,6 @@ A class to store parameters for runtime execution
 # STANDARD  IMPORTS
 # ============================================================================
 
-import click
 from dataclasses import dataclass, field
 import platform
 from typing import List, Any, Dict
@@ -200,10 +199,16 @@ class Configurator:
         self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
 
     def update_platoon_registry(self):
+        """ Updates the platoon vehicle registry and the tactical layer"""
         if hasattr(self, "platoon_registry"):
             self.platoon_registry.update_platoons()
             return
         self.create_platoon_registry()
+
+    def update_traffic_state(self):
+        """Update the vehicle list and the platoon corresponding vehicle state"""
+        self.update_vehicle_registry()
+        self.update_platoon_registry()
 
     @property
     def total_steps(self):
