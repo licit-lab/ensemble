@@ -70,9 +70,9 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
 
-    def solve_state(self):
+    def solve_state(self) -> PLState:
         """Logic solver for the platoon state machine."""
-        self.status.next_state(self)
+        return self.status.next_state(self)
 
     @property
     def x(self):
@@ -137,14 +137,20 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def joinable(self):
         """ Checks if a vehicle is joinable"""
         return (
-            (self.positionid < MAXTRKS - 1)
-            and (self.dx <= MAXNDST)
-            and self.comv2x
-        )
+            (self.leader.positionid < MAXTRKS - 1)
+            and (self.dx < MAXNDST)
+            and self.leader.comv2x
+        ) and (self.leader is not self)
+        # self.intruder
+
+    @property
+    def intruder(self):
+        """ Returns true when the vehtype of my immediate leader is not platoon"""
+        return self.ego.cfleader
 
     def cancel_join_request(self, value: bool = False):
         """ Forces ego to abandon platoon mode"""
-        return not self.joinable and value
+        return not self.joinable or value
 
     def confirm_platoon(self):
         """ Confirms ego platoon mode"""
@@ -192,7 +198,7 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
             for _, gc in group_gc:
-                gc.get("vgc").solve_state()
+                gc.get("vgc").status = gc.get("vgc").solve_state()
 
     def __hash__(self):
         return hash(self._publisher)

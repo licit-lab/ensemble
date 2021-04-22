@@ -40,7 +40,7 @@ class StandAlone(AbsState):
             truck (fgc): Platoon vehicle containing information of the ego vehicle.
 
         """
-        if vgc.leader.joinable:
+        if vgc.joinable:
             return Joining().next_state(vgc)
         else:
             return self
@@ -66,7 +66,7 @@ class Joining(AbsState):
 
         """
         if vgc.cancel_join_request(False):
-            return StandAlone() 
+            return StandAlone()
         elif vgc.confirm_platoon():
             return Platooning()
             # vehicle.ego_position = (

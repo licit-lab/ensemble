@@ -57,3 +57,8 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
     def comv2x(self):
         """Communication availability"""
         pass
+
+    @abc.abstractproperty
+    def positionid(self):
+        """ Position within the platoon"""
+        pass
