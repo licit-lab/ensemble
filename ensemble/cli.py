@@ -79,8 +79,11 @@ def main(ctx, verbose: bool, info: str, platform: str) -> int:
     "-l", "--library", default="", type=str, help="Full path towards library."
 )
 @click.option("--check", is_flag=True, help="Enable check flag")
+@click.option("--steps", default=0, help="Simulates n time steps")
 @pass_config
-def launch(config: Configurator, scenario: str, library: str, check: bool) -> None:
+def launch(
+    config: Configurator, scenario: str, library: str, check: bool, steps: int
+) -> None:
     """Launches an escenario for a specific platform"""
     click.echo(
         "Launching Scenario on platform: "
@@ -88,7 +91,9 @@ def launch(config: Configurator, scenario: str, library: str, check: bool) -> No
     )
 
     # Update configurator
-    config.update_values(library_path=library, scenario_files=scenario)
+    config.update_values(
+        library_path=library, scenario_files=scenario, sim_steps=steps
+    )
 
     # Run optional check
     if check:

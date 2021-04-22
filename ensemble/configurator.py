@@ -66,6 +66,7 @@ class Configurator:
     platform: str = platform.system()
     simulation_platform: str = ""
     library_path: str = ""
+    sim_steps: int = 0
 
     def __init__(self, **kwargs) -> None:
         """Configurator class for containing specific simulator parameter
@@ -149,6 +150,14 @@ class Configurator:
                 f"\t{self.scenario_files}",
             )
 
+        if kwargs.get("sim_steps"):
+            self.sim_steps = kwargs.get("sim_steps", self.scenario_files)
+
+            log_verify(
+                "Simulation of time steps is set from outside:",
+                f"\t{self.sim_steps}",
+            )
+
     def load_socket(self):
         """ Determines simulation platform to connect """
         if self.simulation_platform == "symuvia":
@@ -198,7 +207,11 @@ class Configurator:
 
     @property
     def total_steps(self):
-        return self.simulation_parameters.get("total_steps")
+        return (
+            self.sim_steps
+            if self.sim_steps != 0
+            else self.simulation_parameters.get("total_steps")
+        )
 
 
 if __name__ == "__main__":
