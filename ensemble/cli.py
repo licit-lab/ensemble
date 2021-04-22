@@ -1,4 +1,4 @@
-""" 
+"""
 ENSEMBLE Command Line Interface
 ====================================
 Scenario launcher for ENSEMBLE simulations
@@ -11,13 +11,11 @@ Scenario launcher for ENSEMBLE simulations
 import sys
 import click
 from click.core import Context
-import typing
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
-import ensemble.tools.constants as ct
 from .ensemble import launch_simulation, check_consistency
 from .configurator import Configurator
 
@@ -28,7 +26,7 @@ from .configurator import Configurator
 
 pass_config = click.make_pass_decorator(Configurator)
 
-help_text = """ENSEMBLE Platooning
+HELP_TEXT = """ENSEMBLE Platooning
 
 Platform for Simulation of Multibrand Truck Platooning
 
@@ -61,7 +59,7 @@ def main(ctx: Context, verbose: bool, info: str, platform: str) -> int:
     if ctx.obj.verbose:
         click.echo(
             click.style(
-                help_text,
+                HELP_TEXT,
                 fg="green",
             )
         )
