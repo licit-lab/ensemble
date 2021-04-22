@@ -35,7 +35,7 @@ def launch_simulation(configurator):
     """
     log_in_terminal("Initializing scenario ⏱", fg="magenta")
 
-    with RuntimeDevice(configurator) as rt:
+    with RuntimeDevice(configurator):
         log_in_terminal("Finalizing simulation ⏱", fg="magenta")
 
 
