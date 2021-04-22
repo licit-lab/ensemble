@@ -47,7 +47,9 @@ file://ensemble/docs/_build/html/index.html
 
 @click.group()
 @click.option("-v", "--verbose", is_flag=True, help="Increase verbosity.")
-@click.option("-i", "--info", is_flag=True, help="Prints additional information")
+@click.option(
+    "-i", "--info", is_flag=True, help="Prints additional information"
+)
 @click.option("-p", "--platform", default="", help="'symuvia' or 'vissim'")
 @click.pass_context
 def main(ctx, verbose: bool, info: str, platform: str) -> int:
