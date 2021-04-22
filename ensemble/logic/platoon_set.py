@@ -11,6 +11,7 @@ This is a class describing a frozen set. This is a collection implementation for
 from collections.abc import Sequence, Set
 from itertools import chain
 from bisect import bisect_left
+from itertools import count
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -39,13 +40,16 @@ class PlatoonSet(SortedFrozenSet):
         Set (Set): Inherits from the `Set` collection object.
     """
 
-    def __init__(self, items=None, key="x"):
+    pid = count(0)
+
+    def __init__(self, items=None, key="x", id: int = 0):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
                 key=lambda x: getattr(x, key),
             )
         )
+        self.platoonid = id if id != 0 else next(self.__class__.pid)
 
     def __contains__(self, item):
         try:
@@ -90,7 +94,9 @@ class PlatoonSet(SortedFrozenSet):
         if len(self._items) + len(rhs._items) < MAXTRKS:
             # Join from the front
             if rhs.joinable():
-                return PlatoonSet(tuple(chain(self._items, rhs._items)))
+                return PlatoonSet(
+                    tuple(chain(self._items, rhs._items)), id=self.platoonid
+                )
 
         return self, rhs
 
@@ -135,5 +141,5 @@ class PlatoonSet(SortedFrozenSet):
 
     def updatePids(self):
         """ Exams and updates the Platoon Index Position"""
-        for i, item in enumerate(self._items):
-            item.pid = i
+        for _, item in enumerate(self._items):
+            item.platoonid = self.platoonid
