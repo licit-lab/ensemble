@@ -58,24 +58,21 @@ class VehGapCoordinator(AbsSingleGapCoord):
     platoon: bool = False
     comv2x: bool = True
     dx_ref: float = 30
+    platoonid: int = 0
 
     def __init__(self, vehicle: Vehicle):
         self.ego = vehicle
         self._fgc = None
         self._rgc = None
-        self.pid = 0
+        self.positionid = 0
         # self.solve_fgc_state()
 
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
 
-    def set_leader(self, leader: AbsSingleGapCoord):
-        self._fgc = leader
-
-    def solve_fgc_state(self):
+    def solve_state(self):
         """Logic solver for the platoon state machine."""
-        if self._fgc is not None:
-            self._fgc.status.next_state(self)
+        self.status.next_state(self)
 
     @property
     def x(self):
@@ -85,7 +82,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def leader(self):
         """ Returns the leader vehicle in the platoon"""
-        return self._fgc if self._fgc is not None else self.ego
+        return self._fgc if self._fgc is not None else self
+
+    @leader.setter
+    def leader(self, value: AbsSingleGapCoord):
+        """ Set the leader vehicle gap coordinator"""
+        self._fgc = value
 
     @property
     def follower(self):
@@ -122,22 +124,22 @@ class VehGapCoordinator(AbsSingleGapCoord):
         )
 
     @property
-    def pid(self):
+    def positionid(self):
         """ Platoon id 0-index notation to denote position on the platoon"""
         return self._platoonid
 
-    @pid.setter
-    def pid(self, value):
-        """ Platoon id 0-index"""
+    @positionid.setter
+    def positionid(self, value):
+        """ Platoon id 0-index notation to denote position on the platoon"""
         self._platoonid = np.clip(value, 0, MAXTRKS)
 
     @property
     def joinable(self):
         """ Checks if a vehicle is joinable"""
         return (
-            (self.pid < MAXTRKS - 1)
-            and (self.dx < MAXNDST)
-            and self._fgc.comv2x
+            (self.positionid < MAXTRKS - 1)
+            and (self.dx <= MAXNDST)
+            and self.comv2x
         )
 
     def cancel_join_request(self, value: bool = False):
@@ -180,9 +182,9 @@ class GlobalGapCoordinator(Subscriber):
                 and veh.vehtype in PLT_TYP
             ):
                 self._gcnet.add_edge(veh.vehid, leader.vehid)
-                self._gcnet.nodes()[veh.vehid].get("vgc").set_leader(
-                    self._gcnet.nodes()[leader.vehid].get("vgc")
-                )
+                self._gcnet.nodes()[veh.vehid].get(
+                    "vgc"
+                ).leader = self._gcnet.nodes()[leader.vehid].get("vgc")
 
     def _update_states(self):
         """ Update platoon state according to current information"""
@@ -190,7 +192,7 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
             for _, gc in group_gc:
-                gc.get("vgc").solve_fgc_state()
+                gc.get("vgc").solve_state()
 
     def __hash__(self):
         return hash(self._publisher)
@@ -207,14 +209,14 @@ class GlobalGapCoordinator(Subscriber):
 
         """
         veh_data = []
-        for i, vgc in self._gcnet.nodes(data=True):
+        for _, vgc in self._gcnet.nodes(data=True):
             data = vgc.get("vgc")
             d = asdict(data)
             d = dict(d, **asdict(data.ego))
-            d["pid"] = data.pid
+            d["platoonid"] = data.platoonid
             veh_data.append(d)
         df = pd.DataFrame(veh_data)
-        return df.set_index(["pid", "vehid"]) if not df.empty else df
+        return df.set_index(["platoonid", "vehid"]) if not df.empty else df
 
     def __str__(self):
         if self._gcnet is None:
