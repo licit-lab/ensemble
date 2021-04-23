@@ -110,7 +110,7 @@ class GlobalGapCoordinator(Subscriber):
             return "No vehicles have been registered"
         return repr(self._to_pandas())
 
-    def solve_platoons(self):
+    def update_platoons(self):
         """First iteration to fill the platoon registry based on the current
         vehicle information.
         """
@@ -133,6 +133,3 @@ class GlobalGapCoordinator(Subscriber):
                 self._platoons[-1].updatePids()
 
         self._update_states()
-
-    def update_platoons(self):
-        self.solve_platoons()
