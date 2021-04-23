@@ -16,9 +16,6 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 # ============================================================================
 
 from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
-
-from ensemble.component.truck import Truck
-
 from ensemble.logic.platoon_states import (
     StandAlone,
     Platooning,
