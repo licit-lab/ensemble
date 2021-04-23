@@ -134,7 +134,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def intruder(self):
         """ Returns true when the vehtype of my immediate leader is not platoon"""
-        return self.ego.cfleader
+        return NotImplementedError
 
     def cancel_join_request(self, value: bool = False):
         """ Forces ego to abandon platoon mode"""
