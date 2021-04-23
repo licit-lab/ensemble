@@ -44,7 +44,7 @@ class GlobalGapCoordinator(Subscriber):
         super().__init__(vehicle_registry)
         self._platoons = []
         self._add_vehicle_gc()
-        self.solve_platoons()
+        self.update_platoons()
 
     def _add_vehicle_gc(self):
         # Add all vehicles gap coord
