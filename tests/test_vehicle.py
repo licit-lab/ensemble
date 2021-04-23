@@ -14,7 +14,6 @@ import pytest
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.component.truck import Truck
 from ensemble.component.vehicle import Vehicle
 from ensemble.handler.symuvia.stream import SimulatorRequest
 
@@ -35,9 +34,9 @@ def test_constructor_vehicle(simrequest):
     assert True
 
 
-def test_constructor_truck(simrequest):
-    truck = Truck(simrequest)
-    assert isinstance(truck.status, StandAlone) == True
+# def test_constructor_truck(simrequest):
+#     truck = Truck(simrequest)
+#     assert isinstance(truck.status, StandAlone) == True
 
 
 # class TestConstruction(unittest.TestCase):
