@@ -55,6 +55,7 @@ def log_success(message, *args, **kwargs) -> None:
 
 
 if __name__ == "__main__":
+    log_in_terminal("Special", "message")
     log_error("Error", "message")
     log_verify("Verification", "message")
     log_warning("Warning", "multiple", "lines")
