@@ -9,6 +9,7 @@
 import platform
 import pytest
 from collections import namedtuple
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -26,7 +27,8 @@ from ensemble.logic.platoon_states import (
     Splitting,
 )
 
-from jinja2 import Environment, PackageLoader, select_autoescape
+from ensemble.component.vehiclelist import VehicleList
+from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
 
 # ============================================================================
 # TESTS AND DEFINITIONS
@@ -1053,131 +1055,177 @@ def transform_data(TEST):
 
 def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
     symuviarequest.query = transform_data(TEST01)
-    truck01 = Truck(
-        symuviarequest,
-        vehid=TEST01[0].vehid,
-        status=TEST01[0].status,
-        platoon=TEST01[0].platoon,
-    )
-    truck01.update()
-    truck02 = Truck(
-        symuviarequest,
-        vehid=TEST01[1].vehid,
-        status=TEST01[1].status,
-        platoon=TEST01[1].platoon,
-    )
-    truck02.update()
-    assert pytest.approx(truck01.distance, 200.00)
-    assert pytest.approx(truck02.distance, 50.00)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
 
 
 def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
     symuviarequest.query = transform_data(TEST02)
-    truck01 = Truck(symuviarequest, vehid=1)
-    truck01.update()
-    truck02 = Truck(symuviarequest, vehid=2)
-    truck02.update()
-    assert pytest.approx(truck01.distance, 200.00)
-    assert pytest.approx(truck02.distance, 50.00)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
 
 
 def test_03_standalone_to_join(symuviarequest, TEST03):
     symuviarequest.query = transform_data(TEST03)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_04_(symuviarequest, TEST04):
-    symuviarequest.query = TEST04
+    symuviarequest.query = transform_data(TEST04)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_05_(symuviarequest, TEST05):
-    symuviarequest.query = TEST05
+    symuviarequest.query = transform_data(TEST05)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_06_(symuviarequest, TEST06):
-    symuviarequest.query = TEST06
+    symuviarequest.query = transform_data(TEST06)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_07_(symuviarequest, TEST07):
-    symuviarequest.query = TEST07
+    symuviarequest.query = transform_data(TEST07)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_08_(symuviarequest, TEST08):
-    symuviarequest.query = TEST08
+    symuviarequest.query = transform_data(TEST08)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_09_(symuviarequest, TEST09):
-    symuviarequest.query = TEST09
+    symuviarequest.query = transform_data(TEST09)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_10_(symuviarequest, TEST10):
-    symuviarequest.query = TEST10
+    symuviarequest.query = transform_data(TEST10)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_11_(symuviarequest, TEST11):
-    symuviarequest.query = TEST11
+    symuviarequest.query = transform_data(TEST11)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_12_(symuviarequest, TEST12):
-    symuviarequest.query = TEST12
+    symuviarequest.query = transform_data(TEST12)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_13_(symuviarequest, TEST13):
-    symuviarequest.query = TEST13
+    symuviarequest.query = transform_data(TEST13)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_14_(symuviarequest, TEST14):
-    symuviarequest.query = TEST14
+    symuviarequest.query = transform_data(TEST14)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_15_(symuviarequest, TEST15):
-    symuviarequest.query = TEST15
+    symuviarequest.query = transform_data(TEST15)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_16_(symuviarequest, TEST16):
-    symuviarequest.query = TEST16
+    symuviarequest.query = transform_data(TEST16)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_17_(symuviarequest, TEST17):
-    symuviarequest.query = TEST17
+    symuviarequest.query = transform_data(TEST17)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_18_(symuviarequest, TEST18):
-    symuviarequest.query = TEST18
+    symuviarequest.query = transform_data(TEST18)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_19_(symuviarequest, TEST19):
-    symuviarequest.query = TEST19
+    symuviarequest.query = transform_data(TEST19)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_20_(symuviarequest, TEST20):
-    symuviarequest.query = TEST20
+    symuviarequest.query = transform_data(TEST20)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_21_(symuviarequest, TEST21):
-    symuviarequest.query = TEST21
+    symuviarequest.query = transform_data(TEST21)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
 def test_22_(symuviarequest, TEST22):
-    symuviarequest.query = TEST22
+    symuviarequest.query = transform_data(TEST22)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
     assert True
 
 
