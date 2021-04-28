@@ -43,7 +43,6 @@ class GlobalGapCoordinator(Subscriber):
         self._gcnet = nx.DiGraph()
         super().__init__(vehicle_registry)
         self._platoons = []
-        self._add_vehicle_gc()
         self.update_platoons()
 
     def _add_vehicle_gc(self):
