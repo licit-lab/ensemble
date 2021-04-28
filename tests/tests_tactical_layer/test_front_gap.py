@@ -10,6 +10,7 @@ import platform
 import pytest
 from collections import namedtuple
 from jinja2 import Environment, PackageLoader, select_autoescape
+from ctypes import create_string_buffer
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -1042,7 +1043,7 @@ env = Environment(
 def transform_data(TEST):
     VEHICLES = [dict(zip(KEYS, v)) for v in TEST]
     template = env.get_template("instant.xml")
-    return str.encode(template.render(vehicles=VEHICLES))
+    return create_string_buffer(str.encode(template.render(vehicles=VEHICLES)))
 
 
 # ============================================================================
@@ -1055,7 +1056,8 @@ def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
     ggc.update_platoons()
-    assert True
+    assert isinstance(ggc[1].status, StandAlone)
+    assert isinstance(ggc[2].status, StandAlone)
 
 
 def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
@@ -1063,7 +1065,8 @@ def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
     ggc.update_platoons()
-    assert True
+    assert isinstance(ggc[1].status, StandAlone)
+    assert isinstance(ggc[2].status, StandAlone)
 
 
 def test_03_standalone_to_join(symuviarequest, TEST03):
