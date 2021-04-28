@@ -120,15 +120,16 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
             for _, gc in group_gc:
+                vgc = gc.get("vgc")
+                newplatoon = PlatoonSet((vgc,))
                 if len(self._platoons) >= 1:
-                    newp = PlatoonSet((gc.get("vgc"),))
-                    tmp = self._platoons[-1] + newp
+                    tmp = self._platoons[-1] + newplatoon
                     if isinstance(tmp, tuple):
-                        self._platoons.append(newp)
+                        self._platoons.append(newplatoon)
                     else:
                         self._platoons[-1] = tmp
                 else:
-                    self._platoons.append(PlatoonSet((gc.get("vgc"),)))
+                    self._platoons.append(newplatoon)
                 self._platoons[-1].updatePids()
 
         self._update_states()

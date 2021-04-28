@@ -42,14 +42,15 @@ class PlatoonSet(SortedFrozenSet):
 
     pid = count(0)
 
-    def __init__(self, items=None, key="x", id: int = 0):
+    def __init__(self, items=None, key="x", id: int = -1):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
                 key=lambda x: getattr(x, key),
             )
         )
-        self.platoonid = id if id != 0 else next(self.__class__.pid)
+        self.platoonid = id if id >= 0 else next(self.__class__.pid)
+        self.updatePids()
 
     def __contains__(self, item):
         try:
@@ -69,8 +70,9 @@ class PlatoonSet(SortedFrozenSet):
         return PlatoonSet(result) if isinstance(index, slice) else result
 
     def __repr__(self):
-        return "{type}({arg})".format(
+        return "{type}-{id}({arg})".format(
             type=type(self).__name__,
+            id=self.platoonid,
             arg=(
                 "[{}]".format(", ".join(map(repr, self._items)))
                 if self._items
@@ -94,8 +96,9 @@ class PlatoonSet(SortedFrozenSet):
         if len(self._items) + len(rhs._items) < MAXTRKS:
             # Join from the front
             if rhs.joinable():
+                PlatoonSet.setPid(rhs.platoonid)
                 return PlatoonSet(
-                    tuple(chain(self._items, rhs._items)), id=self.platoonid
+                    tuple(chain(self._items, rhs._items)), id=self[-1].platoonid
                 )
 
         return self, rhs
@@ -143,3 +146,8 @@ class PlatoonSet(SortedFrozenSet):
         """ Exams and updates the Platoon Index Position"""
         for _, item in enumerate(self._items):
             item.platoonid = self.platoonid
+
+    @classmethod
+    def setPid(cls, value):
+        """ Set counter for the platoons """
+        cls.pid = count(value)
