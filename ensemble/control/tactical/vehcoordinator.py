@@ -58,6 +58,31 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
 
+    def __eq__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.ego == rhs.ego
+
+    def __lt__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.ego.vehid < rhs.ego.vehid
+
+    def __gt__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.ego.vehid > rhs.ego.vehid
+
+    def __leq__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.ego.vehid <= rhs.ego.vehid
+
+    def __geq__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.ego.vehid >= rhs.ego.vehid
+
     def solve_state(self) -> PLState:
         """Logic solver for the platoon state machine."""
         return self.status.next_state(self)
