@@ -3,17 +3,24 @@ import ctypes
 ERROR_CODE = -1
 import numpy as np
 
-class operationalLayerTest():
+class oem(object):
+    def __init__(self,
+                 ):
+        self.a = []
+        self.v = []
+        self.x = []
 
+class operationalLayerTest():
     def __init__(self,):
         self.loadingSucceded = False
         self.loadLib()
-        self.lead_speed_ts = []
-        self.lead_accel_ts = []
-        self.lead_position_ts = []
-        self.veh_speed_ts = []
-        self.veh_accel_ts = []
-        self.veh_position_ts = []
+        # self.lead_speed_ts = []
+        # self.lead_accel_ts = []
+        # self.lead_position_ts = []
+        # self.veh_speed_ts = []
+        # self.veh_accel_ts = []
+        # self.veh_position_ts = []
+        self.testDurationInSeconds = 600
         if self.loadingSucceded:
             self.initializePars()
         self.veh_autonomous_operational_acceleration = ctypes.c_double(0)
@@ -23,6 +30,7 @@ class operationalLayerTest():
         self.veh_cruisecontrol_acceleration = ctypes.c_double(1)
         self.success = ctypes.c_int(0)
         self.initializePars()
+        self.sPars = dict()
 
     def run(self,):
         self.call()
@@ -71,8 +79,13 @@ class operationalLayerTest():
         'prev_veh_cruisecontrol_acceleration':2.0,
         'prev_veh_distance_headway':20.0,
         'prev_veh_executed_acceleration':-2.0}
+    def setMetaPars(self,
+                    ):
+        self.sPars['v0'] = 32
+        self.sPars['lead_position'] = 100
 
-    def setPars(self,):
+    def setPars(self,
+                scenario = 'stop-go'):
         self.varDict['curr_lead_veh_acceleration'] = 0 #SET
         self.varDict['curr_lead_veh_id'] = 1
         self.varDict['curr_lead_veh_rel_velocity'] = 0 #--> observed
@@ -90,24 +103,27 @@ class operationalLayerTest():
         self.varDict['curr_veh_ACC_h'] = 1.6 # [s]
         self.varDict['curr_veh_CACC_h'] = .6
 
-        self.varDict['curr_veh_used_rel_vel'] = 0 #--> delayed for ACC
+        self.varDict['curr_veh_used_rel_vel'] = self.varDict['curr_lead_veh_rel_velocity'] #--> delayed for ACC
         #this
-        self.varDict['curr_veh_velocity'] = 32 # m/s!
+        self.varDict['curr_veh_velocity'] = self.sPars['v0'] # m/s!
         self.varDict['curr_veh_autonomous_operational_warning'] = 0 #0
         self.varDict['curr_veh_platooning_max_acceleration'] = 1 #2
 
         self.varDict['prev_veh_cc_setpoint'] = 32
         self.varDict['prev_veh_cruisecontrol_acceleration'] = 0 # to prevent jerk
-        self.varDict['prev_veh_executed_acceleration'] = 0 #
 
         self.lead_speed = self.varDict['curr_veh_velocity'] - self.varDict['curr_lead_veh_rel_velocity']
         self.varDict['curr_veh_used_distance_headway'] = (
             self.varDict['curr_veh_velocity'] * self.varDict['curr_veh_ACC_h'] + 2
             ) #
         self.varDict['prev_veh_distance_headway'] = self.varDict['curr_veh_used_distance_headway']
-        self.lead_position = 100
+        self.lead_position = self.sPars['lead_position']
         self.veh_length = 4
         self.veh_position = self.lead_position - self.varDict['curr_veh_used_distance_headway'] - self.veh_length
+        if scenario == 'cut-in':
+             self.veh_position -= self.sPars['extraGap']
+
+        self.varDict['prev_veh_executed_acceleration'] = 0 #
 
     def setAloneScenario(self,):
         self.varDict['curr_lead_veh_acceleration'] = 999 #SET
@@ -147,7 +163,7 @@ class operationalLayerTest():
         self.veh_position = self.lead_position - self.varDict['curr_veh_used_distance_headway'] - self.veh_length
 
         deltat = self.varDict['curr_ts_length']
-        self.time = np.arange(0,10*60,deltat)
+        self.time = np.arange(0,self.testDurationInSeconds,deltat)
         lead_accel = self.varDict['curr_lead_veh_acceleration']
         lead_speed = self.lead_speed
         lead_position = self.lead_position
@@ -159,68 +175,102 @@ class operationalLayerTest():
         self.lead_accel_ts = np.array(self.lead_accel_ts)
         self.lead_position_ts = np.array(self.lead_position_ts)
 
-    def defineLeaderProfile(self,):
-        self.setPars()
+    def defineLeaderProfile(self,
+                            scenario = 'stop-go'):
+        vehicle = oem()
+        self.setPars(scenario=scenario)
         stopTime = 0
         interval = 50
         #initial values
-        lead_accel = self.varDict['curr_lead_veh_acceleration']
         deltat = self.varDict['curr_ts_length']
+        lead_accel = self.varDict['curr_lead_veh_acceleration']
         lead_speed = self.lead_speed
         lead_position = self.lead_position
-        self.time = np.arange(0,10*60,deltat)
+        self.time = np.arange(0,self.testDurationInSeconds,deltat)
+        speed_ts = []
+        accel_ts = []
+        position_ts = []
         #evolved values
-        for t in self.time:
-            if t == interval:
-                lead_accel = -9.8/80
-            if t > interval and lead_accel == -9.8/80 and lead_speed <= 0:
-                lead_accel = 0
-                stopTime = t
-            if t > interval and lead_accel == 0 and (t-stopTime) > interval:
-                lead_accel = 9.8/80
-            lead_speed = lead_speed + lead_accel * deltat
-            lead_position = (
-                + lead_position
-                + lead_speed * deltat
-                + .5 * lead_accel * deltat**2
-                )
-            self.lead_speed_ts.append(lead_speed)
-            self.lead_accel_ts.append(lead_accel)
-            self.lead_position_ts.append(lead_position)
-        self.lead_speed_ts = np.array(self.lead_speed_ts)
-        self.lead_accel_ts = np.array(self.lead_accel_ts)
-        self.lead_position_ts = np.array(self.lead_position_ts)
+        if scenario == 'stop-go':
+            for t in self.time:
+                if t == interval:
+                    lead_accel = -9.8/80
+                if t > interval and lead_accel == -9.8/80 and lead_speed <= 0:
+                    lead_accel = 0
+                    stopTime = t
+                if t > interval and lead_accel == 0 and (t-stopTime) > interval:
+                    lead_accel = 9.8/80
+                lead_speed = lead_speed + lead_accel * deltat
+                lead_position = (
+                    + lead_position
+                    + lead_speed * deltat
+                    + .5 * lead_accel * deltat**2
+                    )
+                speed_ts.append(lead_speed)
+                accel_ts.append(lead_accel)
+                position_ts.append(lead_position)
+        elif scenario == 'cut-in':
+            for t in self.time:
+                lead_position = (
+                    + lead_position
+                    + lead_speed * deltat
+                    + .5 * lead_accel * deltat**2
+                    )
+                speed_ts.append(lead_speed)
+                accel_ts.append(lead_accel)
+                position_ts.append(lead_position)
+        vehicle.v = np.array(speed_ts)
+        vehicle.a = np.array(accel_ts)
+        vehicle.x = np.array(position_ts)
+        return vehicle
 
-    def timeEvolveEgo(self,):
+    def timeEvolveEgo(self,
+                      leader,
+                      ):
         #set initial conditions
+        vehicle = oem()
         self.setPars()
+        speed_ts = []
+        accel_ts = []
+        position_ts = []
+        speed_ts.append(self.varDict['curr_veh_velocity'])
+        accel_ts.append(0)
+        position_ts.append(self.veh_position)
         for i in range(self.time.shape[0]):
             #Set time and leader stuff
             self.varDict['curr_timestep'] = self.time[i]
-            self.varDict['curr_lead_veh_acceleration'] = self.lead_accel_ts[i]
-            self.lead_speed = self.lead_speed_ts[i]
+            self.varDict['curr_lead_veh_acceleration'] = leader.a[i]
+            self.lead_speed = leader.v[i]
+            self.lead_position = leader.x[i]
             #call OL
             self.call()
             #Set follower
-            self.varDict['curr_veh_velocity'] = (
-                + self.varDict['curr_veh_velocity']
-                + self.veh_autonomous_operational_acceleration.value * self.varDict['curr_ts_length']
-                )
-            self.varDict['curr_lead_veh_rel_velocity'] = self.varDict['curr_veh_velocity'] - self.lead_speed
             self.veh_position = (
                 + self.veh_position
                 + self.varDict['curr_veh_velocity'] * self.varDict['curr_ts_length']
                 + .5 * self.veh_autonomous_operational_acceleration.value * self.varDict['curr_ts_length']**2
                 )
+            self.varDict['curr_veh_velocity'] = (
+                + self.varDict['curr_veh_velocity']
+                + self.veh_autonomous_operational_acceleration.value * self.varDict['curr_ts_length']
+                )
+            self.varDict['curr_lead_veh_rel_velocity'] = self.varDict['curr_veh_velocity'] - self.lead_speed
             self.varDict['curr_veh_setspeed'] = self.veh_cc_setpoint.value
-            self.varDict['curr_veh_used_distance_headway'] = self.lead_position - self.veh_position - self.veh_length
 
-            self.veh_speed_ts.append(self.varDict['curr_veh_velocity'])
-            self.veh_accel_ts.append(self.veh_autonomous_operational_acceleration.value)
-            self.veh_position_ts.append(self.veh_position)
-        self.veh_speed_ts = np.array(self.veh_speed_ts)
-        self.veh_accel_ts = np.array(self.veh_accel_ts)
-        self.veh_position_ts = np.array(self.veh_position_ts)
+            self.varDict['prev_veh_cc_setpoint'] = self.veh_cc_setpoint.value
+
+            self.varDict['curr_veh_used_distance_headway'] = self.lead_position - self.veh_position - self.veh_length
+            self.varDict['prev_veh_distance_headway'] = self.lead_position - self.veh_position - self.veh_length
+            self.varDict['prev_veh_cruisecontrol_acceleration'] = self.veh_cruisecontrol_acceleration.value
+            self.varDict['prev_veh_executed_acceleration'] = self.veh_autonomous_operational_acceleration.value
+
+            speed_ts.append(self.varDict['curr_veh_velocity'])
+            accel_ts.append(self.veh_autonomous_operational_acceleration.value)
+            position_ts.append(self.veh_position)
+        vehicle.v = np.array(speed_ts)
+        vehicle.a = np.array(accel_ts)
+        vehicle.x = np.array(position_ts)
+        return vehicle
 
     def printOutput(self,):
         # Print the return values
@@ -294,12 +344,41 @@ class operationalLayerTest():
         ctypes.byref(self.veh_cruisecontrol_acceleration),
         ctypes.byref(self.success))
 
+    def  runFullScenario(self,):
+        self.sPars['extraGap'] = 30
+        self.sPars['lead_position'] = 800
+        self.setMetaPars()
+        l = self.defineLeaderProfile(scenario = 'cut-in')
+        self.sPars['lead_position'] = 800 + 25
+        v4 = self.timeEvolveEgo(leader = l)
+        for i in range(0,self.testDurationInSeconds):
+            if i < 500:
+                v4.x[i] = l.x[i];
+        self.sPars['extraGap'] = 0
+        self.sPars['lead_position'] = 800
+        self.sPars['lead_position'] = v4.x[0]
+        v = self.timeEvolveEgo(v4)
+        self.sPars['lead_position'] = v.x[0]
+        v2 = self.timeEvolveEgo(v)
+        self.sPars['lead_position'] = v2.x[0]
+        v3 = self.timeEvolveEgo(v2)
+        self.sPars['lead_position'] = v3.x[0]
+        fleet = []
+        fleet.append(l)
+        fleet.append(v)
+        fleet.append(v2)
+        fleet.append(v3)
+        fleet.append(v4)
+        return fleet
+
 def main():
     olt = operationalLayerTest()
+    olt.runFullScenario()
     # olt.setPars()
     #olt.run()
-    olt.defineLeaderProfile()
-    olt.timeEvolveEgo()
+    # v = olt.defineLeaderProfile()
+    # v1 = olt.timeEvolveEgo(leader = v)
+
 
 if __name__ == '__main__':
     main()
