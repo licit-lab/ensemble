@@ -68,7 +68,7 @@ def main(ctx, verbose: bool, info: str, platform: str) -> int:
 @click.option(
     "-s",
     "--scenario",
-    default="",
+    default=[],
     multiple=True,
     help="Scenario file(s) under analysis.",
 )
@@ -104,7 +104,7 @@ def launch(
 @click.option(
     "-s",
     "--scenario",
-    default="",
+    default=[],
     multiple=True,
     help="Scenario file under analysis.",
 )
