@@ -8,6 +8,7 @@ Scenario launcher for ENSEMBLE simulations
 # STANDARD  IMPORTS
 # ============================================================================
 
+from platform import platform
 import sys
 import click
 import typing
@@ -17,7 +18,11 @@ import typing
 # ============================================================================
 
 import ensemble.tools.constants as ct
-from .ensemble import launch_simulation, check_consistency
+from .ensemble import (
+    launch_simulation,
+    check_consistency,
+    run_operational_runtime,
+)
 from .configurator import Configurator
 
 # ============================================================================
@@ -120,6 +125,12 @@ def check(config: Configurator, scenario: str, library: str) -> bool:
     config.update_values(library_path=library, scenario_files=scenario)
 
     return check_consistency(config)
+
+
+@main.command("test-operational")
+def test_operational():
+    """Executes an operational test for illustrative purposes"""
+    run_operational_runtime()
 
 
 if __name__ == "__main__":

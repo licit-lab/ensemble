@@ -16,6 +16,7 @@ import click
 from ensemble.tools.screen import log_in_terminal
 from ensemble.tools.checkers import check_scenario_consistency
 from ensemble.logic import RuntimeDevice
+from ensemble.control.operational.basic_test import runtime_op_layer
 
 
 def launch_simulation(configurator):
@@ -47,3 +48,8 @@ def check_consistency(configurator) -> bool:
     """
     # Check only for consistency, others could be added in future
     return check_scenario_consistency(configurator)
+
+
+def run_operational_runtime():
+    """Considers a demonstration scenario to run in the operational layer with components from the framework. The purpose is to test components from the tactical layer"""
+    runtime_op_layer(scenario="platoon")
