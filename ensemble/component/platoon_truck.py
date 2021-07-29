@@ -21,56 +21,70 @@ from symupy.components import Vehicle
 
 
 from ensemble.tools.constants import DCT_PLT_CONST
+from ensemble.metaclass.dynamics import AbsDynamics
+from ensemble.component.dynamics import TruckDynamics
+from ensemble.metaclass.stream import DataQuery
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
+dynamics = TruckDynamics()
+
 
 @dataclass
 class PlatoonVehicle(Vehicle):
-    """ This is a vehicle class defined for storing data on a single vehicle.
+    """This is a vehicle class defined for storing data on a single platoon vehicle.
 
-        You need a Publisher from where the vehicle is going to take data: 
+    You need a Publisher from where the vehicle is going to take data:
 
-        Args: 
-            request (Publisher): Parser or object publishing data
-        
-        Retunrns: 
-            vehicle (Vehicle): A Dataclass with vehicle parameters
+    Args:
+        request (Publisher): Parser or object publishing data
 
-        ============================  =================================
-        **Variable**                  **Description**
-        ----------------------------  ---------------------------------
-        ``abscissa``                    Current coordinate on y axis
-        ``acceleration``                Current acceleration
-        ``distance``                    Current distance traveled on link
-        ``elevation``                   Current elevation
-        ``lane``                        Current lane
-        ``link``                        Current road vehicle is traveling
-        ``ordinate``                    Current coordinate x axis
-        ``speed``                       Current speed
-        ``vehid``                       Vehicle id
-        ``vehtype``                     Vehicle class
-        ============================  =================================
+    Returns:
+        vehicle (PlatoonVehicle): A Dataclass with vehicle parameters
 
-        Example: 
-            This is one example on how to register a new vehicle ::
+    ============================  =====================================
+    **Variable**                  **Description**
+    ----------------------------  -------------------------------------
+    ``abscissa``                    Current coordinate on y axis
+    ``acceleration``                Current acceleration
+    ``distance``                    Current distance traveled on link
+    ``elevation``                   Current elevation
+    ``lane``                        Current lane
+    ``link``                        Current road vehicle is traveling
+    ``ordinate``                    Current coordinate x axis
+    ``speed``                       Current speed
+    ``vehid``                       Vehicle id
+    ``vehtype``                     Vehicle class
+    ``ego_position``                Position of the ego vehicle
+    ``platoon_length``              Length of the platoon
+    ``desired_platoon_speed``       Desired platoon speed
+    ``maximum_speed``               Maximum speed of ego vehicle
+    ``maximum_acceleration``        Maximum acceleration ego vehicle
+    ``maximum_deceleration``        Maximum decceleration ego vehicle
+    ``state``                       Truck platoon status
+    ``intruder``                    Presence of an intruder
+    ``split_request``               Request to split
+    ============================  =====================================
 
-            >>> req = SimulatorRequest()
-            >>> veh = Vehicle(req)
-            >>> req.dispatch() # This will update vehicle data
+    Example:
+        This is one example on how to register a new vehicle ::
 
-        When having multiple vehicles please indicate the `vehid` before launching the dispatch method. This is because the vehicle object is looks for a vehicle id within the data. 
+        >>> req = SimulatorRequest()
+        >>> veh = Vehicle(req)
+        >>> req.dispatch() # This will update vehicle data
 
-        Example: 
-            This is one example on how to register two vehicles ::
+    When having multiple vehicles please indicate the `vehid` before launching the dispatch method. This is because the vehicle object is looks for a vehicle id within the data.
 
-            >>> req = SimulatorRequest()
-            >>> veh1 = Vehicle(req, vehid=0)
-            >>> veh2 = Vehicle(req, vehid=1)
-            >>> req.dispatch() # This will update vehicle data on both vehicles
-    
+    Example:
+        This is one example on how to register two vehicles ::
+
+        >>> req = SimulatorRequest()
+        >>> veh1 = Vehicle(req, vehid=0)
+        >>> veh2 = Vehicle(req, vehid=1)
+        >>> req.dispatch() # This will update vehicle data on both vehicles
+
     """
 
     ego_position: int = 1
@@ -82,6 +96,31 @@ class PlatoonVehicle(Vehicle):
     state: str = "STANDALONE"
     intruder: bool = False
     split_request: bool = False
+
+    def __init__(
+        self,
+        request: DataQuery,
+        dynamics: AbsDynamics = dynamics,
+        **kwargs,
+    ):
+        Vehicle.__init__(self, request=request, dynamics=dynamics, **kwargs)
+
+    def __hash__(self):
+        return hash((type(self), self.vehid))
+
+    def evolve(self, control: float):
+        """Compute evolution in time of the truck dynamics
+
+        Args:
+            control (float): [description]
+        """
+        state = self.dynamics(self.state, control)
+        dct_state = {
+            "distance": state[0],
+            "speed": state[1],
+            "acceleration": state[2],
+        }
+        self.update_no_request(**dct_state)
 
     def joinable(self):
         if (
