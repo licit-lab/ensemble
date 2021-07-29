@@ -101,8 +101,9 @@ class CACC:
     veh_cruisecontrol_acceleration: c_double = field(default=c_double(1))
     success: c_int = field(default=c_int(0))
 
-    def __post_init__(self):
-        self.load_library()
+    def __init__(self, path_library: str = DEFAULT_CACC_PATH):
+        self._path_library = path_library
+        self.load_library(self._path_library)
 
     def _apply_control(self):
         self.lib.operational_controller(
@@ -186,10 +187,9 @@ class CACC:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def load_library(self):
-        """Loads the control library into the controller
-        """
-        self.lib = cdll.LoadLibrary(DEFAULT_CACC_PATH)
+    def load_library(self, path_library):
+        """Loads the control library into the controller"""
+        self.lib = cdll.LoadLibrary(path_library)
 
 
 if __name__ == "__main__":
