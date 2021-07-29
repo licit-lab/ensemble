@@ -12,6 +12,7 @@ Vehicle list is a collection implementation that acts as an instance to trace in
 
 from dataclasses import asdict
 import pandas as pd
+import numpy as np
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -19,13 +20,14 @@ import pandas as pd
 
 from .vehicle import Vehicle
 from ensemble.logic.frozen_set import SortedFrozenSet
+from ensemble.logic.publisher import Publisher
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
-class VehicleList(SortedFrozenSet):
+class VehicleList(SortedFrozenSet, Publisher):
     """Class defining a set of vehicles. This class is based on a sorted
     frozen set and supports multiple operations in between sets. You can define a list based on a simluator request and the list will update automatically via a single method.
 
@@ -53,7 +55,8 @@ class VehicleList(SortedFrozenSet):
     def __init__(self, request):
         self._request = request
         data = [Vehicle(request, **v) for v in request.get_vehicle_data()]
-        super().__init__(data)
+        SortedFrozenSet.__init__(self, data)
+        Publisher.__init__(self)
 
     def update_list(self, extra=[]):
         """Update vehicle data according to an update in the request."""
@@ -85,6 +88,50 @@ class VehicleList(SortedFrozenSet):
     def distance(self) -> pd.Series:
         """Returns all vehicle's accelerations"""
         return self._get_vehicles_attribute("distance")
+
+    def distance_filter(
+        self, ego: Vehicle, type: str = "downstream", radius: float = 100
+    ):
+        """
+        Returns all vehicles' downstream or
+        """
+        case = {
+            "downstream": [
+                v.distance
+                for v in self._items
+                if v.distance > ego.distance
+                and v.distance < ego.distance + radius
+            ],
+            "upstream": [
+                v.distance
+                for v in self._items
+                if v.distance < ego.distance
+                and v.distance > ego.distance - radius
+            ],
+        }
+        return case.get(type)
+
+    def get_leader(self, ego: Vehicle, distance: float = 100) -> Vehicle:
+        """
+        Returns ego vehicle immediate leader
+        """
+        array = np.asarray(self.distance_filter(ego, "downstream", distance))
+        if array.size > 0:
+            idx = (np.abs(array - ego.distance)).argmin()
+            closest = array[idx]
+            veh = [v for v in self._items if v.distance == closest]
+            return veh[0]
+
+    def get_follower(self, ego: Vehicle) -> Vehicle:
+        """
+        Returns ego vehicle immediate leader
+        """
+        array = np.asarray(self.distance_filter(ego, "upstream"))
+        if array.size > 0:
+            idx = (np.abs(array - ego.distance)).argmin()
+            closest = array[idx]
+            veh = [v for v in self._items if v.distance == closest]
+            return veh[0]
 
     def _to_pandas(self) -> pd.DataFrame:
         """Transforms vehicle list into a pandas for rendering purposes

@@ -13,7 +13,7 @@ Vehicle model acts as an instance to trace individual vehicle data and modify ve
 from typing import Dict, List
 import itertools
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -131,3 +131,43 @@ class Vehicle(Subscriber):
             np.ndarray: [3d-array] @ k+1 [distance;speed;acceleration]
         """
         return np.array((self.distance, self.speed, self.acceleration))
+
+    @property
+    def x(self):
+        """ Return vehicle travelled ditance """
+        return self.distance
+
+    @property
+    def v(self):
+        """ Return vehicle speed """
+        return self.speed
+
+    @property
+    def a(self):
+        """ Return vehicle acceleration """
+        return self.acceleration
+
+    @property
+    def ttd(self):
+        """ Total travel distance by a single vehicle"""
+        # this is for the full sequence functionality we need something for a step by step thing. So the idea is that it should check the internals of the for condition, we should keep the pivot, prev, dist as values
+        # pivot = 0
+        # prev = 0
+        # dist = 0
+        # lst = []
+        # for i in seq:
+        #     if i <= prev:
+        #         print(f"Prev {prev}, Current {i}")
+        #         pivot += prev
+        #         print(f"Now pivot {pivot}")
+        #     dist = pivot + i
+        #     print(f"Current {dist}")
+        #     prev = i
+        #     lst.append(dist)
+        # return lst
+
+        if self.x < self._ttdprev:
+            self._ttdpivot += self._ttdprev
+        self._ttddist = self._ttdpivot + self.x
+        self._ttdprev = self.x
+        return self._ttddist

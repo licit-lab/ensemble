@@ -79,9 +79,7 @@ class CACC:
     curr_veh_autonomous_operational_warning: c_long = field(default=c_long(0))
 
     # Positive value - symmetric
-    curr_veh_platooning_max_acceleration: c_double = field(
-        default=c_double(2.0)
-    )
+    curr_veh_platooning_max_acceleration: c_double = field(default=c_double(2.0))
 
     # Past time info
     prev_veh_cc_setpoint: c_double = field(default=c_double(0))
@@ -92,9 +90,7 @@ class CACC:
     prev_veh_executed_acceleration: c_double = field(default=c_double(0))
 
     # Placeholders
-    veh_autonomous_operational_acceleration: c_double = field(
-        default=c_double(1)
-    )
+    veh_autonomous_operational_acceleration: c_double = field(default=c_double(1))
     veh_autonomous_operational_mixingmode: c_long = field(default=c_long(1))
     veh_autonomous_operational_warning: c_double = field(default=c_double(1))
     veh_cc_setpoint: c_double = field(default=c_double(1))

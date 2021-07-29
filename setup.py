@@ -59,15 +59,19 @@ setup(
     maintainer_email="andres.ladino@univ-eiffel.fr",
     url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
     download_url="https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel",
-    packages=find_packages(include=["ensemble", "ensemble.*"]),
+    packages=find_packages(
+        include=["ensemble", "ensemble.*", "*.ini", "*.xml", "*.xsd"]
+    ),
     classifiers=CLASSIFIERS,
     keywords="ensemble, truck platooning",
     include_package_data=True,
+    package_data={
+        "": ["*.ini", "*.xml", "*.xsd"],
+    },
     install_requires=requirements,
     entry_points={"console_scripts": ["ensemble=ensemble.cli:main"]},
     extra_require={"dev": dev_requirements},
     python_requires=">=3.7",
-    setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
     zip_safe=False,

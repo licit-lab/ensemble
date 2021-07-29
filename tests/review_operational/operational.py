@@ -151,3 +151,7 @@ class CACC:
 
 if __name__ == "__main__":
     c = CACC()
+    r = array() # vector
+    for reference in r:
+        
+        c(leader_veh,follower_vehicle,reference, time_step, time_sampling)

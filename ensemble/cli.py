@@ -1,4 +1,4 @@
-""" 
+"""
 ENSEMBLE Command Line Interface
 ====================================
 Scenario launcher for ENSEMBLE simulations
@@ -11,7 +11,7 @@ Scenario launcher for ENSEMBLE simulations
 from platform import platform
 import sys
 import click
-import typing
+from click.core import Context
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -32,7 +32,7 @@ from .configurator import Configurator
 
 pass_config = click.make_pass_decorator(Configurator)
 
-help_text = """ENSEMBLE Platooning
+HELP_TEXT = """ENSEMBLE Platooning
 
 Platform for Simulation of Multibrand Truck Platooning
 
@@ -70,14 +70,15 @@ file://ensemble/docs/_build/html/index.html
     help="Selects a simulation platform when available. 'symuvia' or 'vissim'",
 )
 @click.pass_context
-def main(ctx, verbose: bool, info: bool, platform: str) -> int:
+def main(ctx: Context, verbose: bool, info: str, platform: str) -> int:
     """Scenario launcher for ENSEMBLE simulations"""
+    ctx.ensure_object(Configurator)
     ctx.obj = Configurator(verbose=verbose, info=info)
     ctx.obj.set_simulation_platform(platform)
     if ctx.obj.verbose:
         click.echo(
             click.style(
-                help_text,
+                HELP_TEXT,
                 fg="green",
             )
         )
@@ -107,9 +108,11 @@ def main(ctx, verbose: bool, info: bool, platform: str) -> int:
     is_flag=True,
     help="Enable check flag. This is like dry-run mode where verification is executed",
 )
+@click.option("--check", is_flag=True, help="Enable check flag")
+@click.option("--steps", default=0, help="Simulates n time steps")
 @pass_config
 def launch(
-    config: Configurator, scenario: str, library: str, check: bool
+    config: Configurator, scenario: str, library: str, check: bool, steps: int
 ) -> None:
     """Launches an escenario for a specific platform"""
     click.echo(
@@ -118,7 +121,9 @@ def launch(
     )
 
     # Update configurator
-    config.update_values(library_path=library, scenario_files=scenario)
+    config.update_values(
+        library_path=library, scenario_files=scenario, sim_steps=steps
+    )
 
     # Run optional check
     if check:

@@ -15,86 +15,154 @@
 # ============================================================================
 
 from ensemble.metaclass.state import AbsState
-from ensemble.component.platoonvehicle import PlatoonVehicle
+from ensemble.metaclass.coordinator import AbsSingleGapCoord
+
+# ============================================================================
+# CLASS AND DEFINITIONS
+# ============================================================================
 
 
 class StandAlone(AbsState):
-    """ The state which declares the vehicle in stand alone mode.   
-        A vehicle can move from StandAlone to Join
+    """The state which declares the vehicle in stand alone mode.
+
+    Note:
+        Transition: `StandAlone` to `Joining`
+
     """
 
-    def next_state(self, platoonvehicle=PlatoonVehicle()):
-        if platoonvehicle.leader.joinable() == True:
-            return Join()
+    def next_state(self, vgc: AbsSingleGapCoord):
+        """Determines the switching condition for the state:
+
+        Note:
+            Transition: `StandAlone` to `Joining`
+
+        Args:
+            truck (fgc): Platoon vehicle containing information of the ego vehicle.
+
+        """
+        if vgc.joinable:
+            return Joining().next_state(vgc)
         else:
             return self
 
 
 class Joining(AbsState):
-    """
-    The state which declares the vehicle in joining a platoon.
-    A vehicle can move from Join state to platoon state
+    """The state which declares the vehicle in joining a platoon.
+
+    Note:
+        Transition: `Joining` to `StandAlone`
+        Transition: `Joining` to `Platooning`
     """
 
-    def run(self):
-        print("JoinMode")
+    def next_state(self, vgc: AbsSingleGapCoord):
+        """Determines the switching condition for the state:
 
-    def next_state(self, platoonvehicle=PlatoonVehicle()):
-        if platoonvehicle.cancel_join_request() == True:
+        Note:
+            Transition: `Joining` to `StandAlone`
+            Transition: `Joining` to `Platooning`
+
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
+        """
+        if vgc.cancel_join_request(False):
             return StandAlone()
-        elif platoonvehicle.confirm_platoon() == True:
-            platoonvehicle.ego_position = (
-                platoonvehicle.leader.ego_position + 1
-            )  # update position in platoon
-            platoonvehicle.state = "PLATOON"  # update  vehicle state
-            return Platoon()
+        elif vgc.confirm_platoon():
+            return Platooning()
+            # vehicle.ego_position = (
+            #     platoonvehicle.leader.ego_position + 1
+            # )  # update position in platoon
+            # platoonvehicle.state = "PLATOON"  # update  vehicle state
         else:
             return self
 
 
-class Platoon(AbsState):
-    """
-    The state which declares the vehicle in a platoon
-    A vehicle can move from platoon to split because of  cut-in(intruder) or to a split(requested  by ego vehicle or front target)
-    """
+class Splitting(AbsState):
+    """The state which declares the vehicle splitting from platoon
 
-    def run(self):
-        print("PlatoonMode")
+    Note:
+        Transition: `Splitting` to `StandAlone`
+        Transition: `Splitting` to `Platooning`
 
-    def next_state(self, platoonvehicle=PlatoonVehicle()):
-        if platoonvehicle.platoon_split() == True:
-            return Split()
-        else:
-            return self
-
-
-class Split(AbsState):
-    """
-    The state which declares the vehicle splitting from platoon
-    A vehicle can move from split to platoon or to standalone
     """
 
-    def next_state(self, platoonvehicle=PlatoonVehicle()):
+    def next_state(self, vehicle):
+        """Determines the switching condition for the state:
 
-        if platoonvehicle.rejoin_platoon() == True:
-            return Platoon()
-        elif platoonvehicle.leave_platoon() == True:
-            return StandAlone()
-        else:
-            return self
+        Note:
+            Transition: `Splitting` to `StandAlone`
+            Transition: `Splitting` to `Platooning`
 
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
 
-class BackSplit(AbsState):
-    """
-    The state which declares the vehicle splitting from platoon
-    A vehicle can move from split to platoon or to standalone
-    """
+        """
 
-    def next_state(self, platoonvehicle=PlatoonVehicle()):
-
-        if platoonvehicle.rejoin_platoon() == True:
-            return Platoon()
-        elif platoonvehicle.leave_platoon() == True:
+        if vehicle.rejoin_platoon():
+            return Platooning()
+        elif vehicle.leave_platoon():
             return StandAlone()
         else:
             return self
+
+
+class Platooning(AbsState):
+    """The state which declares the vehicle in a platoon functionality
+
+    Note:
+        Transition: `Platooning` to `Splitting`
+    """
+
+    def next_state(self, vehicle):
+        """Determines the switching condition for the state:
+
+        Note:
+            Transition: `Platooning` to `Splitting`
+
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
+        """
+        if vehicle.platoon_split():
+            return Splitting()
+        else:
+            return self
+
+
+class Cutin(AbsState):
+    """The state which declares the vehicle in a platoon functionality
+
+    Note:
+        Transition: `Cutin` to `Splitting`
+    """
+
+    def next_state(self, vehicle):
+        """Determines the switching condition for the state:
+
+        Note:
+            Transition: `Platooning` to `Splitting`
+
+        Args:
+            truck (vehicle): Platoon vehicle containing information of the ego vehicle.
+
+        """
+        if vehicle.cutin():
+            return Splitting()
+        else:
+            return self
+
+
+# class BackSplit(AbsState):
+#     """
+#     The state which declares the vehicle splitting from platoon
+#     A vehicle can move from split to platoon or to standalone
+#     """
+
+#     def next_state(self, vehicle):
+
+#         if vehicle.rejoin_platoon() == True:
+#             return Platooning()
+#         elif vehicle.leave_platoon() == True:
+#             return StandAlone()
+#         else:
+#             return self

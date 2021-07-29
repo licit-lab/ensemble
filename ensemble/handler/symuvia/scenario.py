@@ -33,7 +33,7 @@ from ensemble.tools import constants as ct
 
 class SymuviaScenario(Scenario):
     """
-        Scenario class for Vissim
+    Scenario class for Vissim
     """
 
     @classmethod
@@ -66,15 +66,14 @@ class SymuviaScenario(Scenario):
         raise EnsembleAPILoadFileError(f"Provided files are not found", args)
 
     def load_xml_tree(self) -> None:
-        """ Load XML file_name
-        """
+        """Load XML file_name"""
         # TODO: Add validation with DTD
         tree = etree.parse(self.filename())
         root = tree.getroot()
         self.xmltree = root
 
     def get_simulation_parameters(self) -> tuple:
-        """ Get simulation parameters
+        """Get simulation parameters
 
         :return: tuple with XML dictionary containing parameters
         :rtype: tuple
@@ -84,7 +83,7 @@ class SymuviaScenario(Scenario):
         return tuple(par.attrib for par in sim_params)
 
     def get_vehicletype_information(self) -> tuple:
-        """ Get the vehicle parameters
+        """Get the vehicle parameters
 
         :return: tuple of dictionaries containing vehicle parameters
         :rtype: tuple
@@ -94,7 +93,7 @@ class SymuviaScenario(Scenario):
         return tuple(v.attrib for v in vehicle_types)
 
     def get_network_endpoints(self) -> tuple:
-        """ Get networks endpoint names
+        """Get networks endpoint names
 
         :return: tuple containing endpoint names
         :rtype: tuple
@@ -104,7 +103,7 @@ class SymuviaScenario(Scenario):
         return tuple(ep.attrib["id"] for ep in end_points)
 
     def get_network_links(self) -> tuple:
-        """ Get network link names
+        """Get network link names
 
         :return: tuple containing link names
         :rtype: tuple
@@ -128,19 +127,17 @@ class SymuviaScenario(Scenario):
             self.get_simulation_parameters()[simid].get("fin"), ct.HOUR_FORMAT
         )
         t = t2 - t1
-        n = t.seconds / float(
-            self.get_simulation_parameters()[simid].get("pasdetemps")
-        )
+        n = t.seconds / float(self.get_simulation_parameters()[simid].get("pasdetemps"))
         return range(int(n))
 
     def filename(self, encoding: str = "UTF8"):
         """
-            This method returns the value of encoding of the simulation scenario under consideration
+        This method returns the value of encoding of the simulation scenario under consideration
 
-            :param encoding: enconder UTF8, defaults to None
-            :type encoding: string, optional
-            :return: Full path of scenario
-            :rtype: string
+        :param encoding: enconder UTF8, defaults to None
+        :type encoding: string, optional
+        :return: Full path of scenario
+        :rtype: string
         """
         if encoding == "UTF8":
             return self.scn_file.encode(encoding)

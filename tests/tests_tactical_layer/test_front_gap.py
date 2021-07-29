@@ -1,35 +1,1234 @@
-# import pytest
-# from mypackage.frontgap2 import FrontGapState
-# from mypackage.vehicle2 import PlatoonVehicle
-# # def test_1():
-# #     veh=PlatoonVehicle(leader_PCM_capable=1,
-# #     leader_split_request=False,
-# #     ego_distance_gap_to_leader=0,
-# #     leader_id=1,
-# #     leader_speed=4.0,
-# #     leader_length=5.0,
-# #     gap_distance_error=0,
-# #     ego_split_request=False,
-# #     ego_standalone_time_gap=1,
-# #     front_target_state="join",
-# #     ego_speed=4.0,
-# #     ego_position=0,
-# #     leader_position=0,
-# #     desired_gap=1,
-# #     standalone_gap=1,
-# #     platoon_id=1,
-# #     platoon_length=1,
-# #     front_id=2,
-# #     intruder=True,
-# #     ego_platoon_position=1,
-# #     leader_platoon_position=2,
-# #     maximum_platoon_length=7,
-# #     platoon_desired_speed=50,
-# #     platoon_desired_time_gap=2,
-# #     max_connection_distance=100)
-# #     fgc = FrontGapState( veh)
-# #     fgc.update_state(veh)
-# #     assert veh.front_target_state=="standalone"
+"""
+    Unit testing Tactical Layer (Front Gap)
+"""
+
+# ============================================================================
+# STANDARD  IMPORTS
+# ============================================================================
+
+import platform
+import pytest
+from collections import namedtuple
+from jinja2 import Environment, PackageLoader, select_autoescape
+from ctypes import create_string_buffer
+
+# ============================================================================
+# INTERNAL IMPORTS
+# ============================================================================
+
+from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
+from ensemble.logic.platoon_states import (
+    StandAlone,
+    Platooning,
+    Joining,
+    Cutin,
+    Splitting,
+)
+
+from ensemble.component.vehiclelist import VehicleList
+from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
+
+# ============================================================================
+# TESTS AND DEFINITIONS
+# ============================================================================
+
+KEYS = (
+    "abscissa",
+    "acceleration",
+    "distance",
+    "driven",
+    "elevation",
+    "lane",
+    "link",
+    "ordinate",
+    "speed",
+    "vehid",
+    "vehtype",
+    "status",
+    "platoon",
+    "comv2x",
+)
+
+trkdata = namedtuple("Truckdata", KEYS)
+
+# Testing Data
+
+
+@pytest.fixture
+def TEST01():
+    """StandAlone -> Join
+    No PCM Capable
+    """
+    return [
+        trkdata(
+            0,
+            0,
+            350 - 150 * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            350 - 150 * i,
+            40 - i * 10,
+            i,
+            "PLT",
+            StandAlone(),
+            False,
+            False,
+        )
+        for i in range(1, 3)
+    ]
+
+
+@pytest.fixture
+def TEST02():
+    """StandAlone -> Join
+    Far Away
+    """
+    return [
+        trkdata(
+            0,
+            0,
+            350 - 150 * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            350 - 150 * i,
+            40 - i * 10,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(1, 3)
+    ]
+
+
+@pytest.fixture
+def TEST03():
+    """StandAlone -> Join
+    Truck 7 not Joinable
+    """
+    case = [
+        trkdata(
+            0,
+            0,
+            435 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            435 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(1, 8)
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            1,
+            "LinkA",
+            80,
+            20,
+            8,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST04():
+    """StandAlone -> Join"""
+    case = [
+        trkdata(
+            0,
+            0,
+            480 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            480 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(1, 5)
+    ]
+
+    case = case + [
+        trkdata(
+            0,
+            0,
+            445 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            445 - (30 * 1.4 + 3) * i,
+            20,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(5, 8)
+    ]
+    return case
+
+
+@pytest.fixture
+def TEST05():
+    """StandAlone -> Join"""
+    case = [
+        trkdata(
+            0,
+            0,
+            480 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            480 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(1, 5)
+    ]
+
+    case = case + [
+        trkdata(
+            0,
+            0,
+            445 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            445 - (30 * 1.4 + 3) * i,
+            20,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+        for i in range(5, 7)
+    ]
+    return case
+
+
+@pytest.fixture
+def TEST06():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        ),
+    ]
+
+    case.append(
+        (
+            0,
+            0,
+            200,
+            False,
+            0,
+            2,
+            "LinkA",
+            200,
+            30,
+            1,
+            "HDV",
+        )
+    )
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            80,
+            False,
+            0,
+            3,
+            "LinkA",
+            80,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST07():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            20,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        ),
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            90,
+            False,
+            0,
+            1,
+            "LinkA",
+            90,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST08():
+    case = [
+        trkdata(
+            0,
+            0,
+            245 - (30 * 1.4 + 3) * i,
+            False,
+            0,
+            1,
+            "LinkA",
+            245 - (30 * 1.4 + 3) * i,
+            30,
+            i,
+            "PLT",
+            StandAlone(),
+            True,
+            False,
+        )
+        for i in range(1, 2)
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            120,
+            False,
+            0,
+            1,
+            "LinkA",
+            120,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            False,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST09():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            False,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            120,
+            False,
+            0,
+            1,
+            "LinkA",
+            120,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+
+    return case
+
+
+@pytest.fixture
+def TEST10():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            120,
+            False,
+            0,
+            1,
+            "LinkA",
+            120,
+            20,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST11():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            153,
+            False,
+            0,
+            1,
+            "LinkA",
+            153,
+            30,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST12():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            156.5,
+            False,
+            0,
+            1,
+            "LinkA",
+            156.5,
+            28.9,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST13():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            154.92,
+            False,
+            0,
+            1,
+            "LinkA",
+            154.92,
+            29.99,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST14():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            False,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            155,
+            False,
+            0,
+            1,
+            "LinkA",
+            155,
+            30,
+            2,
+            "PLT",
+            Joining(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST15():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            155,
+            False,
+            0,
+            1,
+            "LinkA",
+            155,
+            30,
+            2,
+            "PLT",
+            Joining(),
+            False,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST16():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+    case.append(
+        trkdata(
+            0,
+            0,
+            155,
+            False,
+            0,
+            1,
+            "LinkA",
+            155,
+            30,
+            2,
+            "PLT",
+            Platooning(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST17():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        (
+            0,
+            0,
+            200,
+            False,
+            0,
+            2,
+            "LinkA",
+            155,
+            30,
+            1,
+            "HDV",
+        )
+    )
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Platooning(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST18():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        (
+            0,
+            0,
+            155,
+            False,
+            0,
+            2,
+            "LinkA",
+            155,
+            30,
+            1,
+            "HDV",
+        )
+    )
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Cutin(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST19():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        (
+            0,
+            0,
+            155,
+            False,
+            0,
+            2,
+            "LinkA",
+            155,
+            30,
+            1,
+            "HDV",
+        )
+    )
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Cutin(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST20():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Cutin(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST21():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            137,
+            False,
+            0,
+            1,
+            "LinkA",
+            137,
+            30,
+            3,
+            "PLT",
+            Splitting(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def TEST22():
+    case = [
+        trkdata(
+            0,
+            0,
+            200,
+            False,
+            0,
+            1,
+            "LinkA",
+            200,
+            30,
+            1,
+            "PLT",
+            StandAlone(),
+            True,
+            True,
+        )
+    ]
+
+    case.append(
+        trkdata(
+            0,
+            0,
+            140,
+            False,
+            0,
+            1,
+            "LinkA",
+            140,
+            30,
+            3,
+            "PLT",
+            Splitting(),
+            True,
+            True,
+        )
+    )
+    return case
+
+
+@pytest.fixture
+def symuviarequest():
+    return SymuviaRequest()
+
+
+# ============================================================================
+# GENERIC FUNCTIONS
+# ============================================================================
+
+env = Environment(
+    loader=PackageLoader("ensemble", "templates"),
+    autoescape=select_autoescape(
+        [
+            "xml",
+        ]
+    ),
+)
+
+
+def transform_data(TEST):
+    VEHICLES = [dict(zip(KEYS, v)) for v in TEST]
+    template = env.get_template("instant.xml")
+    return create_string_buffer(str.encode(template.render(vehicles=VEHICLES)))
+
+
+# ============================================================================
+# TESTS
+# ============================================================================
+
+
+def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
+    symuviarequest.query = transform_data(TEST01)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert isinstance(ggc[1].status, StandAlone)
+    assert isinstance(ggc[2].status, StandAlone)
+
+
+def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
+    symuviarequest.query = transform_data(TEST02)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert isinstance(ggc[1].status, StandAlone)
+    assert isinstance(ggc[2].status, StandAlone)
+
+
+def test_03_standalone_to_join(symuviarequest, TEST03):
+    symuviarequest.query = transform_data(TEST03)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_04_(symuviarequest, TEST04):
+    symuviarequest.query = transform_data(TEST04)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_05_(symuviarequest, TEST05):
+    symuviarequest.query = transform_data(TEST05)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_06_(symuviarequest, TEST06):
+    symuviarequest.query = transform_data(TEST06)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_07_(symuviarequest, TEST07):
+    symuviarequest.query = transform_data(TEST07)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_08_(symuviarequest, TEST08):
+    symuviarequest.query = transform_data(TEST08)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_09_(symuviarequest, TEST09):
+    symuviarequest.query = transform_data(TEST09)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_10_(symuviarequest, TEST10):
+    symuviarequest.query = transform_data(TEST10)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_11_(symuviarequest, TEST11):
+    symuviarequest.query = transform_data(TEST11)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_12_(symuviarequest, TEST12):
+    symuviarequest.query = transform_data(TEST12)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_13_(symuviarequest, TEST13):
+    symuviarequest.query = transform_data(TEST13)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_14_(symuviarequest, TEST14):
+    symuviarequest.query = transform_data(TEST14)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_15_(symuviarequest, TEST15):
+    symuviarequest.query = transform_data(TEST15)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_16_(symuviarequest, TEST16):
+    symuviarequest.query = transform_data(TEST16)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_17_(symuviarequest, TEST17):
+    symuviarequest.query = transform_data(TEST17)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_18_(symuviarequest, TEST18):
+    symuviarequest.query = transform_data(TEST18)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_19_(symuviarequest, TEST19):
+    symuviarequest.query = transform_data(TEST19)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_20_(symuviarequest, TEST20):
+    symuviarequest.query = transform_data(TEST20)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_21_(symuviarequest, TEST21):
+    symuviarequest.query = transform_data(TEST21)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
+def test_22_(symuviarequest, TEST22):
+    symuviarequest.query = transform_data(TEST22)
+    vehlist = VehicleList(symuviarequest)
+    ggc = GlobalGapCoordinator(vehlist)
+    ggc.update_platoons()
+    assert True
+
+
 # #
 # # def test_2():
 # #     veh=PlatoonVehicle(leader_PCM_capable=1,
@@ -321,6 +1520,7 @@
 #     fgc = FrontGapState(veh)
 #     fgc.update_state(veh)
 #     assert veh.front_target_state == "standalone"
+
 # def test_8_join_to_standalone_leader_lost_PCM_connection():
 #     veh = PlatoonVehicle(leader_id	=	101	,
 #     leader_position	=	200	,

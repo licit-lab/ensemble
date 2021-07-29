@@ -11,18 +11,25 @@ This module is able to receive the stream of data comming from the SymuVia platf
 from xmltodict import parse
 from xml.parsers.expat import ExpatError
 from ctypes import create_string_buffer
+from typing import Union, Dict, List, Tuple
+from collections import defaultdict
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 from ensemble.metaclass.stream import DataQuery
-from symupy.utils.parser import vlists, response
 import ensemble.tools.constants as ct
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+vtypes = Union[float, int, str]
+vdata = Tuple[vtypes]
+vmaps = Dict[str, vtypes]
+vlists = List[vmaps]
+response = defaultdict(lambda: False)
 
 
 class SimulatorRequest(DataQuery):
@@ -55,13 +62,13 @@ class SimulatorRequest(DataQuery):
 
     @property
     def data_query(self):
-        """ Direct parsing from the string buffer
-            
-            Returns:
-                simdata (OrderedDict): Simulator data parsed from XML
+        """Direct parsing from the string buffer
+
+        Returns:
+            simdata (OrderedDict): Simulator data parsed from XML
         """
         try:
-            dataveh = parse(self._str_response)
+            dataveh = parse(self._str_response.value)
             # Transform ordered dictionary into new keys
             return dataveh
         except ExpatError:
@@ -74,10 +81,10 @@ class SimulatorRequest(DataQuery):
     # =========================================================================
 
     def get_vehicle_data(self) -> vlists:
-        """ Extracts vehicles information from simulators response
+        """Extracts vehicles information from simulators response
 
-            Returns:
-                t_veh_data (list): list of dictionaries containing vehicle data with correct formatting
+        Returns:
+            t_veh_data (list): list of dictionaries containing vehicle data with correct formatting
 
         """
         if self.data_query.get("INST", {}).get("TRAJS") is not None:
@@ -88,34 +95,34 @@ class SimulatorRequest(DataQuery):
         return []
 
     @staticmethod
-    def transform(veh_data: dict):
-        """ Transform vehicle data from string format to coherent format
+    def transform(veh_data: dict) -> dict:
+        """Transform vehicle data from string format to coherent format
 
-            Args: 
-                veh_data (dict): vehicle data as received from simulator
+        Args:
+            veh_data (dict): vehicle data as received from simulator
 
-            Returns:
-                t_veh_data (dict): vehicle data with correct formatting 
+        Returns:
+            t_veh_data (dict): vehicle data with correct formatting
 
 
-            Example: 
-                As an example, for an input of the following style ::
+        Example:
+            As an example, for an input of the following style ::
 
-                >>> v = OrderedDict([('@abs', '25.00'), ('@acc', '0.00'), ('@dst', '25.00'), ('@id', '0'), ('@ord', '0.00'), ('@tron', 'Zone_001'), ('@type', 'VL'), ('@vit', '25.00'), ('@voie', '1'),('@z', '0')])
-                >>> tv = SimulatorRequest.transform(v)
-                >>> # Transforms into 
-                >>> tv == {
-                >>>     "abscissa": 25.0,
-                >>>     "acceleration": 0.0,
-                >>>     "distance": 25.0,
-                >>>     "elevation": 0.0,
-                >>>     "lane": 1,
-                >>>     "link": "Zone_001",
-                >>>     "ordinate": 0.0,
-                >>>     "speed": 25.0,
-                >>>     "vehid": 0,
-                >>>     "vehtype": "VL",
-                >>> },
+            >>> v = OrderedDict([('@abs', '25.00'), ('@acc', '0.00'), ('@dst', '25.00'), ('@id', '0'), ('@ord', '0.00'), ('@tron', 'Zone_001'), ('@type', 'VL'), ('@vit', '25.00'), ('@voie', '1'),('@z', '0')])
+            >>> tv = SimulatorRequest.transform(v)
+            >>> # Transforms into
+            >>> tv == {
+            >>>     "abscissa": 25.0,
+            >>>     "acceleration": 0.0,
+            >>>     "distance": 25.0,
+            >>>     "elevation": 0.0,
+            >>>     "lane": 1,
+            >>>     "link": "Zone_001",
+            >>>     "ordinate": 0.0,
+            >>>     "speed": 25.0,
+            >>>     "vehid": 0,
+            >>>     "vehtype": "VL",
+            >>> },
 
         """
         for key, val in veh_data.items():
@@ -127,14 +134,14 @@ class SimulatorRequest(DataQuery):
         return dict(response)
 
     def is_vehicle_driven(self, vehid: int) -> bool:
-        """ Returns true if the vehicle state is exposed to a driven state
+        """Returns true if the vehicle state is exposed to a driven state
 
-            Args:
-                vehid (str):
-                    vehicle id
-            
-            Returns: 
-                driven (bool): True if veh is driven
+        Args:
+            vehid (str):
+                vehicle id
+
+        Returns:
+            driven (bool): True if veh is driven
         """
         if self.is_vehicle_in_network(vehid):
 

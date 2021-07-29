@@ -30,11 +30,13 @@ LINE_SEP = "*".join(["*"] * 40)
 
 
 def check_library_path(library_path: str, simulation_platform: str):
-    """ Returns true if platform is available
-    """
+    """Returns true if platform is available"""
 
     log_verify(
-        LINE_SEP, f"Looking for library path:", f"{library_path}", LINE_SEP,
+        LINE_SEP,
+        f"Looking for library path:",
+        f"{library_path}",
+        LINE_SEP,
     )
 
     if simulation_platform == "symuvia":
@@ -65,8 +67,7 @@ def check_library_path(library_path: str, simulation_platform: str):
 
 
 def check_scenario_path(scenario_files: tuple) -> bool:
-    """ Returns true if all scenario file(s) are available
-    """
+    """Returns true if all scenario file(s) are available"""
     log_verify(
         LINE_SEP,
         f"Looking for scenario files: ",
@@ -93,7 +94,9 @@ def check_scenario_consistency(configurator) -> bool:
 
     # Print info
     log_verify(
-        LINE_SEP, "Checking consistency of files", LINE_SEP,
+        LINE_SEP,
+        "Checking consistency of files",
+        LINE_SEP,
     )
 
     # Check for Library
