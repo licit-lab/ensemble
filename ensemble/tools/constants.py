@@ -158,12 +158,26 @@ DCT_LIB_CACC = {
     "Linux": "OperationalDLL.so",
 }
 
+DCT_LIB_TRUCK = {
+    "Windows": "truckDynamics.dll",
+    "Darwin": "truckDynamics.dylib",
+    "Linux": "truckDynamics.so",
+}
+
 DEFAULT_CACC_PATH = os.path.join(
     os.getcwd(),
     "ensemble",
     "libs",
     platform.system().lower(),
     DCT_LIB_CACC[platform.system()],
+)
+
+DEFAULT_TRUCK_PATH = os.path.join(
+    os.getcwd(),
+    "ensemble",
+    "libs",
+    platform.system().lower(),
+    DCT_LIB_TRUCK[platform.system()],
 )
 
 
