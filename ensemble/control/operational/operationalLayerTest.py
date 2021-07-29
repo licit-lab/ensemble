@@ -44,7 +44,7 @@ class operationalLayerTest():
             file_dll = '../x64/Debug/OperationalDLL.dll'
         elif platform.system() == 'Darwin':
             print('Running on mac')
-            file_dll = 'OperationalDLL.dylib'
+            file_dll = '../../libs/darwin/OperationalDLL.dylib'
         else:
             print('System not supported')
             sys.exit()
