@@ -26,21 +26,28 @@ from ensemble.logic.frozen_set import SortedFrozenSet
 
 
 class VehicleList(SortedFrozenSet):
-    """ Class defining a set of vehicles. This class is based on a sorted 
-        frozen set and supports multiple operations in between sets. You can define a list based on a simluator request and the list will update automatically via a single method. 
+    """Class defining a set of vehicles. This class is based on a sorted
+    frozen set and supports multiple operations in between sets. You can define a list based on a simluator request and the list will update automatically via a single method.
 
-        Args: 
-            request (Publisher): Publisher of information 
+    Args:
+        request (Publisher): Publisher of information
 
-        Example: 
-            Define a list of vehicles to trace the requests ::
-                >>> simrequest = SimulatorRequest()
-                >>> simrequest.query = one_vehicle_xml
-                >>> vl = VehicleList(simrequest)
-                >>> simrequest.query = second_vehicle_xml
-                >>> vl.update_list() # This updates manually
+    Example:
+        Define a list of vehicles to trace the requests ::
+            >>> simrequest = SimulatorRequest()
+            >>> simrequest.query = one_vehicle_xml
+            >>> vl = VehicleList(simrequest)
+            >>> simrequest.query = second_vehicle_xml
+            >>> vl.update_list() # This updates manually
 
-        The list could be eventually updated as an observer but for simplicity reasons it is kept like this. 
+    Example:
+        Define a list of vehicles to be used manually::
+            >>> simrequest = SimulatorRequest()
+            >>> vl = VehicleList(simrequest)
+            >>> v1 = Vehicle(simrequest, vehid=1)
+            >>> v2 = Vehicle(simrequest, vehid=2)
+            >>> vl.update_list(optional=[v1,v2]) # Adds vehicles to the list
+    The list could be eventually updated as an observer but for simplicity reasons it is kept like this.
     """
 
     def __init__(self, request):
@@ -48,49 +55,42 @@ class VehicleList(SortedFrozenSet):
         data = [Vehicle(request, **v) for v in request.get_vehicle_data()]
         super().__init__(data)
 
-    def update_list(self):
-        """ Update vehicle data according to an update in the request.
-        """
-        data = self + VehicleList(self._request)
+    def update_list(self, extra=[]):
+        """Update vehicle data according to an update in the request."""
+        data = self + VehicleList(self._request) + SortedFrozenSet(extra)
         self._items = data._items
 
     def _get_vehicles_attribute(self, attribute: str) -> pd.Series:
-        """ Retrieve list of parameters 
-        
-            Args: 
-                attribute (str): One of the vehicles attribute e.g. 'distance'
-            
-            Returns 
-                dataframe (series): Returns values for a set of vehicles 
+        """Retrieve list of parameters
+
+        Args:
+            attribute (str): One of the vehicles attribute e.g. 'distance'
+
+        Returns
+            dataframe (series): Returns values for a set of vehicles
         """
         return self._to_pandas()[attribute]
 
     @property
     def acceleration(self) -> pd.Series:
-        """
-            Returns all vehicle's accelerations 
-        """
+        """Returns all vehicle's accelerations"""
         return self._get_vehicles_attribute("acceleration")
 
     @property
     def speed(self) -> pd.Series:
-        """
-            Returns all vehicle's accelerations 
-        """
+        """Returns all vehicle's accelerations"""
         return self._get_vehicles_attribute("speed")
 
     @property
     def distance(self) -> pd.Series:
-        """
-            Returns all vehicle's accelerations 
-        """
+        """Returns all vehicle's accelerations"""
         return self._get_vehicles_attribute("distance")
 
     def _to_pandas(self) -> pd.DataFrame:
-        """ Transforms vehicle list into a pandas for rendering purposes 
-        
-            Returns: 
-                df (DataFrame): Returns a table with pandas data.
+        """Transforms vehicle list into a pandas for rendering purposes
+
+        Returns:
+            df (DataFrame): Returns a table with pandas data.
 
         """
         return pd.DataFrame([asdict(v) for v in self._items])
