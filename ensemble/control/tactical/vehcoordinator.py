@@ -25,6 +25,8 @@ from ensemble.logic.platoon_states import (
 )
 from ensemble.tools.constants import DCT_PLT_CONST
 from ensemble.metaclass.coordinator import AbsSingleGapCoord
+from ensemble.control.operational.reference import ReferenceHeadway
+
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -54,6 +56,17 @@ class VehGapCoordinator(AbsSingleGapCoord):
         self._rgc = None
         self.positionid = 0
         # self.solve_fgc_state()
+
+    def init_reference(self):
+        """Initialices the reference class for the gap coordinator. In particular the initial conditions should be already computed."""
+        if self.leader is self:
+            self._reference = ReferenceHeadway()
+        else:
+            self._reference = ReferenceHeadway(gap0=self.dx)
+
+    @property
+    def reference(self):
+        return self._reference
 
     def __hash__(self):
         return hash((type(self), self.ego.vehid))
@@ -89,47 +102,47 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
     @property
     def x(self):
-        """ Ego current position in link """
-        return self.ego.distance
+        """Ego current position in link"""
+        return self.ego.ttd
 
     @property
     def leader(self):
-        """ Returns the leader vehicle in the platoon"""
+        """Returns the leader vehicle in the platoon"""
         return self._fgc if self._fgc is not None else self
 
     @leader.setter
     def leader(self, value: AbsSingleGapCoord):
-        """ Set the leader vehicle gap coordinator"""
+        """Set the leader vehicle gap coordinator"""
         self._fgc = value
 
     @property
     def follower(self):
-        """ Returns the follower vehicle in the platoon"""
+        """Returns the follower vehicle in the platoon"""
         return self._rgc if self._rgc is not None else self.ego
 
     @property
     def is_head(self):
-        """ Determines if the vehicle is head of the platoon"""
+        """Determines if the vehicle is head of the platoon"""
         return self.leader is self.ego
 
     @property
     def is_tail(self):
-        """ Determines if the vehicle is tail of the platoon """
+        """Determines if the vehicle is tail of the platoon"""
         return self.follower is self.ego
 
     @property
     def ttd(self):
-        """ Total travel time"""
+        """Total travel time"""
         return self.ego.ttd
 
     @property
     def vehid(self):
-        """ Vehicle positions"""
+        """Vehicle positions"""
         return self.ego.vehid
 
     @property
     def dx(self):
-        """ Ego current headway space"""
+        """Ego current headway space"""
         return (
             self.leader.ttd - self.ego.ttd
             if self.leader.vehid != self.ego.vehid
@@ -138,17 +151,17 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
     @property
     def positionid(self):
-        """ Platoon id 0-index notation to denote position on the platoon"""
+        """Platoon id 0-index notation to denote position on the platoon"""
         return self._platoonid
 
     @positionid.setter
     def positionid(self, value):
-        """ Platoon id 0-index notation to denote position on the platoon"""
+        """Platoon id 0-index notation to denote position on the platoon"""
         self._platoonid = np.clip(value, 0, MAXTRKS)
 
     @property
     def joinable(self):
-        """ Checks if a vehicle is joinable"""
+        """Checks if a vehicle is joinable"""
         return (
             (self.leader.positionid < MAXTRKS - 1)
             and (self.dx < MAXNDST)
@@ -158,13 +171,13 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
     @property
     def intruder(self):
-        """ Returns true when the vehtype of my immediate leader is not platoon"""
+        """Returns true when the vehtype of my immediate leader is not platoon"""
         return NotImplementedError
 
     def cancel_join_request(self, value: bool = False):
-        """ Forces ego to abandon platoon mode"""
+        """Forces ego to abandon platoon mode"""
         return not self.joinable or value
 
     def confirm_platoon(self):
-        """ Confirms ego platoon mode"""
+        """Confirms ego platoon mode"""
         return abs(self.dx - self.dx_ref) < MAXDSTR
