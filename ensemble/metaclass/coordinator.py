@@ -20,27 +20,27 @@ import abc
 class AbsSingleGapCoord(metaclass=abc.ABCMeta):
     @abc.abstractproperty
     def joinable(self):
-        """ Indicates if the coordinator is joinable"""
+        """Indicates if the coordinator is joinable"""
         pass
 
     @abc.abstractmethod
     def cancel_join_request(self, value):
-        """ Determines if a join request needs to be cancelled"""
+        """Determines if a join request needs to be cancelled"""
         pass
 
     @abc.abstractproperty
     def ttd(self):
-        """ Total travel distance"""
+        """Total travel distance"""
         pass
 
     @abc.abstractproperty
     def x(self):
-        """ Distance on link """
+        """Distance on link"""
         pass
 
     @abc.abstractproperty
     def vehid(self):
-        """ Vehicle identifier"""
+        """Vehicle identifier"""
         pass
 
     @abc.abstractproperty
@@ -60,5 +60,5 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
 
     @abc.abstractproperty
     def positionid(self):
-        """ Position within the platoon"""
+        """Position within the platoon"""
         pass
