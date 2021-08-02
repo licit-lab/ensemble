@@ -145,8 +145,10 @@ DCT_LIB_TRUCK = {
     "Linux": "truckDynamics.so",
 }
 
+ROOTPATH = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+
 DEFAULT_CACC_PATH = os.path.join(
-    os.getcwd(),
+    ROOTPATH,
     "ensemble",
     "libs",
     platform.system().lower(),
@@ -154,7 +156,7 @@ DEFAULT_CACC_PATH = os.path.join(
 )
 
 DEFAULT_TRUCK_PATH = os.path.join(
-    os.getcwd(),
+    ROOTPATH,
     "ensemble",
     "libs",
     platform.system().lower(),
@@ -332,9 +334,9 @@ FIELD_DATA_VISSIM = {
 
 DCT_RUNTIME_PARAM = {
     "sampling_time": 1,
-    "total_steps": 60,
-    "sampling_time_operational": 1 / 10,
-    "sampling_time_tactical": 5,
+    "total_steps": 60,  # [s]
+    "sampling_time_operational": 1 / 10,  # [s] step
+    "sampling_time_tactical": 60,  # [s] time interval
 }
 
 # Vehicles Parameters
@@ -369,6 +371,7 @@ DCT_PLT_CONST = {
     "max_connection_distance": 100,  # maximum distance for communication
     "platoon_types": ("PLT", "201"),  # platoon vehicle types
     "max_gap_error": 0.1,  # maximum distance gap error
+    "time_gap": 1.4,  # regular time gap between vehicles
 }
 
 # =============================================================================
