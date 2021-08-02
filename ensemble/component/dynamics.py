@@ -26,6 +26,8 @@ from symupy.utils.constants import TIME_STEP_OP
 
 
 from ensemble.metaclass.dynamics import AbsDynamics
+from ensemble.tools.exceptions import EnsembleAPIError
+from ensemble.tools.screen import log_warning
 from ensemble.tools import constants as ct
 from ctypes import cdll, c_double, c_int8, c_uint8, c_bool, byref
 from ensemble.tools.constants import (
@@ -188,6 +190,19 @@ class RegularDynamics(AbsDynamics):
 
     def __call__(self, state: np.ndarray, control: np.ndarray) -> np.ndarray:
         return dynamic_3rd_ego(state, control)
+
+
+@dataclass
+class SampleDynamics(AbsDynamics):
+    @property
+    def T(self):
+        pass
+
+    def __call__(self, state: np.ndarray, control: np.ndarray):
+        log_warning("Calling non-existing dynamics")
+        raise EnsembleAPIError(
+            "Trying to call non existent dynamics. Try defining `RegularDynamics` or `TruckDynamics` from the dynamics module"
+        )
 
 
 class PlatoonDynamics:

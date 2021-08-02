@@ -24,9 +24,14 @@ from ensemble.tools import constants as ct
 from ensemble.metaclass.stream import DataQuery
 from ensemble.metaclass.dynamics import AbsDynamics
 
+from ensemble.handler.symuvia.stream import SimulatorRequest
+from ensemble.component.dynamics import SampleDynamics
+
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+sample_dynamics = SampleDynamics()
 
 
 @dataclass
@@ -89,12 +94,21 @@ class Vehicle(Subscriber):
     vehid: int = 0
     vehtype: str = ""
 
-    def __init__(self, request: DataQuery, dynamics: AbsDynamics, **kwargs):
+    def __init__(
+        self,
+        request: DataQuery,
+        dynamics: AbsDynamics = sample_dynamics,
+        **kwargs
+    ):
         """This initializer creates a Vehicle"""
         # Undefined properties
         self.count = next(self.__class__.counter)
         self.dynamics = dynamics
         self.itinerary = []
+
+        # Internal
+        self._ttdprev = 0
+        self._ttdpivot = 0
 
         # Optional properties
         self.update_no_request(**kwargs)
@@ -134,22 +148,22 @@ class Vehicle(Subscriber):
 
     @property
     def x(self):
-        """ Return vehicle travelled ditance """
+        """Return vehicle travelled ditance"""
         return self.distance
 
     @property
     def v(self):
-        """ Return vehicle speed """
+        """Return vehicle speed"""
         return self.speed
 
     @property
     def a(self):
-        """ Return vehicle acceleration """
+        """Return vehicle acceleration"""
         return self.acceleration
 
     @property
     def ttd(self):
-        """ Total travel distance by a single vehicle"""
+        """Total travel distance by a single vehicle"""
         # this is for the full sequence functionality we need something for a step by step thing. So the idea is that it should check the internals of the for condition, we should keep the pivot, prev, dist as values
         # pivot = 0
         # prev = 0
@@ -171,3 +185,15 @@ class Vehicle(Subscriber):
         self._ttddist = self._ttdpivot + self.x
         self._ttdprev = self.x
         return self._ttddist
+
+
+if __name__ == "__main__":
+    # Run from base folder
+    import os
+
+    truck_path = os.path.join(
+        os.getcwd(), "ensemble", "libs", "darwin", "truckDynamics.dylib"
+    )
+
+    sim = SimulatorRequest()
+    veh = Vehicle(sim)
