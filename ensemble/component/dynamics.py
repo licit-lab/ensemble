@@ -31,7 +31,6 @@ from ctypes import cdll, c_double, c_int8, c_uint8, c_bool, byref
 from ensemble.tools.constants import (
     DEFAULT_TRUCK_PATH,
     DCT_RUNTIME_PARAM,
-    DCT_SIMULATION_INFO,
     ENGINE_CONSTANT,
 )
 
@@ -196,9 +195,14 @@ class PlatoonDynamics:
 
 
 if __name__ == "__main__":
+    # Run from base folder
     import os
 
     truck_path = os.path.join(
-        os.getcwd(), "..", "libs", "darwin", "truckDynamics.dylib"
+        os.getcwd(),
+        "ensemble",
+        "libs",
+        "darwin",
+        "truckDynamics.dylib",
     )
     t = TruckDynamics(truck_path)
