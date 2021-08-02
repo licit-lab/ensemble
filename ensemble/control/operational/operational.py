@@ -6,6 +6,7 @@
 # ============================================================================
 
 from dataclasses import dataclass, field
+from ensemble.control.operational.reference import TIME_STEP_OP
 import pandas as pd
 from ctypes import c_double, cdll, c_long, c_int, CDLL, byref
 
@@ -13,15 +14,17 @@ from ctypes import c_double, cdll, c_long, c_int, CDLL, byref
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.tools.constants import DEFAULT_CACC_PATH
+from ensemble.tools.constants import DEFAULT_CACC_PATH, DCT_RUNTIME_PARAM
+from ensemble.metaclass.controller import AbsController
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
 
 
 @dataclass
-class CACC:
+class CACC(AbsController):
     """This class performs a call to the cacc dynamic shared library.
 
     Args:
@@ -49,53 +52,133 @@ class CACC:
     """
 
     # Leader information
-    curr_lead_veh_acceleration: c_double = field(default=c_double(0))
-    curr_lead_veh_id: c_long = field(default=c_long(-1))
-    curr_lead_veh_rel_velocity: c_double = field(default=c_double(0))
-    curr_lead_veh_type: c_long = field(default=c_long(0))
+    curr_lead_veh_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_lead_veh_id: c_long = field(
+        default=c_long(-1),
+        repr=False,
+    )
+    curr_lead_veh_rel_velocity: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_lead_veh_type: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
 
     # Current time info
-    curr_timestep: c_double = field(default=c_double(0))
-    curr_ts_length: c_double = field(default=c_double(1 / 10))  # seconds
-    curr_veh_id: c_long = field(default=c_long(0))
-    curr_veh_setspeed: c_double = field(default=c_double(0))
-    curr_veh_type: c_long = field(default=c_long(1))
+    curr_timestep: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_ts_length: c_double = field(
+        default=c_double(TIME_STEP_OP),
+        repr=False,
+    )  # seconds
+    curr_veh_id: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
+    curr_veh_setspeed: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_type: c_long = field(
+        default=c_long(1),
+        repr=False,
+    )
 
     # Control under use: 1-ACC ,2-CACC
-    curr_veh_controller_in_use: c_long = field(default=c_long(2))
+    curr_veh_controller_in_use: c_long = field(
+        default=c_long(2),
+        repr=False,
+    )
 
     # Reference headways:
-    curr_veh_ACC_h: c_double = field(default=c_double(0))
-    curr_veh_CACC_h: c_double = field(default=c_double(0))
+    curr_veh_ACC_h: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_CACC_h: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Ego headway space
-    curr_veh_used_distance_headway: c_double = field(default=c_double(0))
+    curr_veh_used_distance_headway: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Ego vehicle Dv,v
-    curr_veh_used_rel_vel: c_double = field(default=c_double(0))
-    curr_veh_velocity: c_double = field(default=c_double(0))
+    curr_veh_used_rel_vel: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_velocity: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # ? Codes ?
-    curr_veh_autonomous_operational_warning: c_long = field(default=c_long(0))
+    curr_veh_autonomous_operational_warning: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
 
     # Positive value - symmetric
-    curr_veh_platooning_max_acceleration: c_double = field(default=c_double(2.0))
+    curr_veh_platooning_max_acceleration: c_double = field(
+        default=c_double(2.0),
+        repr=False,
+    )
 
     # Past time info
-    prev_veh_cc_setpoint: c_double = field(default=c_double(0))
+    prev_veh_cc_setpoint: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
     # Check placeholdeers -> veh_cruisecontrol_acceleration
-    prev_veh_cruisecontrol_acceleration: c_double = field(default=c_double(0))
-    prev_veh_distance_headway: c_double = field(default=c_double(0))
+    prev_veh_cruisecontrol_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    prev_veh_distance_headway: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
     # a
-    prev_veh_executed_acceleration: c_double = field(default=c_double(0))
+    prev_veh_executed_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Placeholders
-    veh_autonomous_operational_acceleration: c_double = field(default=c_double(1))
-    veh_autonomous_operational_mixingmode: c_long = field(default=c_long(1))
-    veh_autonomous_operational_warning: c_double = field(default=c_double(1))
-    veh_cc_setpoint: c_double = field(default=c_double(1))
-    veh_cruisecontrol_acceleration: c_double = field(default=c_double(1))
-    success: c_int = field(default=c_int(0))
+    veh_autonomous_operational_acceleration: c_double = field(
+        default=c_double(1), repr=False
+    )
+    veh_autonomous_operational_mixingmode: c_long = field(
+        default=c_long(1),
+        repr=False,
+    )
+    veh_autonomous_operational_warning: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    veh_cc_setpoint: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    veh_cruisecontrol_acceleration: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    success: c_int = field(
+        default=c_int(0),
+        repr=False,
+    )
 
     def __init__(self, path_library: str = DEFAULT_CACC_PATH):
         self._path_library = path_library
@@ -189,9 +272,4 @@ class CACC:
 
 
 if __name__ == "__main__":
-    import os
-
-    path = os.path.join(
-        os.getcwd(), "ensemble", "libs", "darwin", "OperationalDLL.dylib"
-    )
-    c = CACC(path_library=path)
+    c = CACC()
