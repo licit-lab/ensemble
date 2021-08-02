@@ -35,7 +35,7 @@ class Join(PlatoonState):
 
         if event == "platoon":
             return Platoon()
-        elif event=="standalone": # caused by cutin during joining
+        elif event == "standalone":  # caused by cutin during joining
             return StandAlone()
         else:
             return self
@@ -49,7 +49,7 @@ class Platoon(PlatoonState):
 
     def switchto(self, event):
 
-        if event=="split":
+        if event == "split":
             return Split()
         else:
             return self

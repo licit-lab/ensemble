@@ -3,24 +3,24 @@ max_gap_distance_error = 0.1
 # standalone_gap=0
 class Vehicle:
     """
-        Vehicle object defining properties and methods required to store and compute predictions according to a vehicle model.
+    Vehicle object defining properties and methods required to store and compute predictions according to a vehicle model.
 
-        Since Pythagoras, we know that :math:`a^2 + b^2 = c^2`.
+    Since Pythagoras, we know that :math:`a^2 + b^2 = c^2`.
 
-        Args:
+    Args:
 
-            abscissa (float):   x coordinate [m],
-            acceleration (float):   Acceleration [m/s2],
-            distance (float):   Distance [m],
-            vehid (int):   Unique vehicle identifier,
-            ordinate (float):  y coorindate [m],
-            link (str):  Link name,
-            vehtype (str):  Vehicle type,
-            speed (float):  speed [m/s],
-            lane (int):  lane (from right to left),
-            elevation (float):  elevation [m],
-            dynamic (VehicleDynamic): Vehicle dynamics (check )
-            itinerary (list):  list of ordered links in the network [list],
+        abscissa (float):   x coordinate [m],
+        acceleration (float):   Acceleration [m/s2],
+        distance (float):   Distance [m],
+        vehid (int):   Unique vehicle identifier,
+        ordinate (float):  y coorindate [m],
+        link (str):  Link name,
+        vehtype (str):  Vehicle type,
+        speed (float):  speed [m/s],
+        lane (int):  lane (from right to left),
+        elevation (float):  elevation [m],
+        dynamic (VehicleDynamic): Vehicle dynamics (check )
+        itinerary (list):  list of ordered links in the network [list],
 
     """
 
@@ -37,8 +37,7 @@ class Vehicle:
         lane=1,
         elevation=0,
     ):
-        """ This initializer creates a Vehicle
-        """
+        """This initializer creates a Vehicle"""
         self.abscissa = abscissa
         self.acceleration = acceleration
         self.distance = distance
@@ -63,7 +62,6 @@ class Vehicle:
     def __str__(self):
         data_dct = ", ".join(f"{k}:{v}" for k, v in self.__dict__.items())
         return f"{self.__class__.__name__}({data_dct})"
-
 
 
 class PlatoonVehicle(Vehicle):

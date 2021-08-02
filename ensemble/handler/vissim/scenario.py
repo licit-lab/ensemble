@@ -23,8 +23,6 @@ from ensemble.tools.exceptions import (
 )
 
 
-
-
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
@@ -34,9 +32,10 @@ from ensemble.tools.exceptions import (
     This module contains objects for modeling a simplified connector to handle vissim
 """
 
+
 class VissimScenario(Scenario):
     """
-        Scenario class for Vissim
+    Scenario class for Vissim
     """
 
     def __init__(self, *args):
@@ -59,11 +58,15 @@ class VissimScenario(Scenario):
             try:
                 inpx_path = find_inpx(existing_files)[0]
             except IndexError:
-                raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an INPX file")
+                raise EnsembleAPILoadFileError(
+                    f"\tProvided files do not match expected input. Provide an INPX file"
+                )
             try:
                 layx_path = find_layx(existing_files)[0]
             except IndexError:
-                raise EnsembleAPILoadFileError(f"\tProvided files do not match expected input. Provide an LAYX file")
+                raise EnsembleAPILoadFileError(
+                    f"\tProvided files do not match expected input. Provide an LAYX file"
+                )
             try:
                 platooncsv_path = find_csv(existing_files)[0]
             except IndexError:
@@ -82,5 +85,3 @@ class VissimScenario(Scenario):
     def filename_layx(self):
         """ Vissim property shortcut"""
         return self.layout_file
-
-

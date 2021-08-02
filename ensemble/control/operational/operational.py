@@ -6,6 +6,7 @@
 # ============================================================================
 
 from dataclasses import dataclass, field
+from ensemble.control.operational.reference import TIME_STEP_OP
 import pandas as pd
 from ctypes import c_double, cdll, c_long, c_int, CDLL, byref
 
@@ -13,96 +14,175 @@ from ctypes import c_double, cdll, c_long, c_int, CDLL, byref
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.tools.constants import DEFAULT_CACC_PATH
+from ensemble.tools.constants import DEFAULT_CACC_PATH, DCT_RUNTIME_PARAM
+from ensemble.metaclass.controller import AbsController
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
 
 
 @dataclass
-class CACC:
-    """ This class performs a call to the cacc dynamic shared library. 
+class CACC(AbsController):
+    """This class performs a call to the cacc dynamic shared library.
 
-        Args:
-            curr_lead_veh_acceleration (c_double): Leader current acceleration (m/s²).
-            curr_lead_veh_id (c_long): Leader vehicle id (-1 no leader).
-            curr_lead_veh_rel_velocity (c_long): Leader relative speed w.r.t leader.
-            curr_lead_veh_type (c_long): Leader vehicle type.
-            curr_timestep (c_double): Current time step (seconds).
-            curr_ts_length (c_double): Sampling time (seconds).
-            curr_veh_id (c_long): Ego vehicle id.
-            curr_veh_setspeed (c_double): Ego cruise control set speed?
-            curr_veh_type (c_long): Ego vehicle type.
-            curr_veh_controller_in_use (c_long): Control in use 1-ACC ,2-CACC.
-            curr_veh_ACC_h (c_double): ACC headway reference.
-            curr_veh_CACC_h (c_double): CACC headway reference.
-            curr_veh_used_distance_headway (c_double): Ego distance headway (m).
-            curr_veh_used_rel_vel (c_double): Ego relative speed w.r.t leader.
-            curr_veh_velocity (c_double): Ego speed (m/s).
-            curr_veh_autonomous_operational_warning (c_long): From output
-            curr_veh_platooning_max_acceleration (c_double): Max acceleration >0 (m/s²).
-            prev_veh_cc_setpoint (c_double): Desired speed (m/s).
-            prev_veh_cruisecontrol_acceleration (c_double):  From output 
-            prev_veh_distance_headway (c_double): Past distance headway
-            prev_veh_executed_acceleration: Past control output
+    Args:
+        curr_lead_veh_acceleration (c_double): Leader current acceleration (m/s²).
+        curr_lead_veh_id (c_long): Leader vehicle id (-1 no leader).
+        curr_lead_veh_rel_velocity (c_long): Leader relative speed w.r.t leader.
+        curr_lead_veh_type (c_long): Leader vehicle type.
+        curr_timestep (c_double): Current time step (seconds).
+        curr_ts_length (c_double): Sampling time (seconds).
+        curr_veh_id (c_long): Ego vehicle id.
+        curr_veh_setspeed (c_double): Ego cruise control set speed?
+        curr_veh_type (c_long): Ego vehicle type.
+        curr_veh_controller_in_use (c_long): Control in use 1-ACC ,2-CACC.
+        curr_veh_ACC_h (c_double): ACC headway reference.
+        curr_veh_CACC_h (c_double): CACC headway reference.
+        curr_veh_used_distance_headway (c_double): Ego distance headway (m).
+        curr_veh_used_rel_vel (c_double): Ego relative speed w.r.t leader.
+        curr_veh_velocity (c_double): Ego speed (m/s).
+        curr_veh_autonomous_operational_warning (c_long): From output
+        curr_veh_platooning_max_acceleration (c_double): Max acceleration >0 (m/s²).
+        prev_veh_cc_setpoint (c_double): Desired speed (m/s).
+        prev_veh_cruisecontrol_acceleration (c_double):  From output
+        prev_veh_distance_headway (c_double): Past distance headway
+        prev_veh_executed_acceleration: Past control output
     """
 
     # Leader information
-    curr_lead_veh_acceleration: c_double = field(default=c_double(0))
-    curr_lead_veh_id: c_long = field(default=c_long(-1))
-    curr_lead_veh_rel_velocity: c_double = field(default=c_double(0))
-    curr_lead_veh_type: c_long = field(default=c_long(0))
+    curr_lead_veh_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_lead_veh_id: c_long = field(
+        default=c_long(-1),
+        repr=False,
+    )
+    curr_lead_veh_rel_velocity: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_lead_veh_type: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
 
     # Current time info
-    curr_timestep: c_double = field(default=c_double(0))
-    curr_ts_length: c_double = field(default=c_double(1 / 10))  # seconds
-    curr_veh_id: c_long = field(default=c_long(0))
-    curr_veh_setspeed: c_double = field(default=c_double(0))
-    curr_veh_type: c_long = field(default=c_long(1))
+    curr_timestep: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_ts_length: c_double = field(
+        default=c_double(TIME_STEP_OP),
+        repr=False,
+    )  # seconds
+    curr_veh_id: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
+    curr_veh_setspeed: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_type: c_long = field(
+        default=c_long(1),
+        repr=False,
+    )
 
     # Control under use: 1-ACC ,2-CACC
-    curr_veh_controller_in_use: c_long = field(default=c_long(2))
+    curr_veh_controller_in_use: c_long = field(
+        default=c_long(2),
+        repr=False,
+    )
 
     # Reference headways:
-    curr_veh_ACC_h: c_double = field(default=c_double(0))
-    curr_veh_CACC_h: c_double = field(default=c_double(0))
+    curr_veh_ACC_h: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_CACC_h: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Ego headway space
-    curr_veh_used_distance_headway: c_double = field(default=c_double(0))
+    curr_veh_used_distance_headway: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Ego vehicle Dv,v
-    curr_veh_used_rel_vel: c_double = field(default=c_double(0))
-    curr_veh_velocity: c_double = field(default=c_double(0))
+    curr_veh_used_rel_vel: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    curr_veh_velocity: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # ? Codes ?
-    curr_veh_autonomous_operational_warning: c_long = field(default=c_long(0))
+    curr_veh_autonomous_operational_warning: c_long = field(
+        default=c_long(0),
+        repr=False,
+    )
 
     # Positive value - symmetric
     curr_veh_platooning_max_acceleration: c_double = field(
-        default=c_double(2.0)
+        default=c_double(2.0),
+        repr=False,
     )
 
     # Past time info
-    prev_veh_cc_setpoint: c_double = field(default=c_double(0))
+    prev_veh_cc_setpoint: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
     # Check placeholdeers -> veh_cruisecontrol_acceleration
-    prev_veh_cruisecontrol_acceleration: c_double = field(default=c_double(0))
-    prev_veh_distance_headway: c_double = field(default=c_double(0))
+    prev_veh_cruisecontrol_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    prev_veh_distance_headway: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
     # a
-    prev_veh_executed_acceleration: c_double = field(default=c_double(0))
+    prev_veh_executed_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
 
     # Placeholders
     veh_autonomous_operational_acceleration: c_double = field(
-        default=c_double(1)
+        default=c_double(1), repr=False
     )
-    veh_autonomous_operational_mixingmode: c_long = field(default=c_long(1))
-    veh_autonomous_operational_warning: c_double = field(default=c_double(1))
-    veh_cc_setpoint: c_double = field(default=c_double(1))
-    veh_cruisecontrol_acceleration: c_double = field(default=c_double(1))
-    success: c_int = field(default=c_int(0))
+    veh_autonomous_operational_mixingmode: c_long = field(
+        default=c_long(1),
+        repr=False,
+    )
+    veh_autonomous_operational_warning: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    veh_cc_setpoint: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    veh_cruisecontrol_acceleration: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    success: c_int = field(
+        default=c_int(0),
+        repr=False,
+    )
 
-    def __post_init__(self):
-        self.load_library()
+    def __init__(self, path_library: str = DEFAULT_CACC_PATH):
+        self._path_library = path_library
+        self.load_library(self._path_library)
 
     def _apply_control(self):
         self.lib.operational_controller(
@@ -140,23 +220,23 @@ class CACC:
         )
 
     def __call__(self, leader, ego, r_ego, t, T):
-        """ Asumes 0 index for lead 1 for follower
-            
-            a: real acceleration
-            x: postition
-            v: speed
-            s: spacing 
-            u: control 
+        """Asumes 0 index for lead 1 for follower
 
-            D: delta
-            P: past
+        a: real acceleration
+        x: postition
+        v: speed
+        s: spacing
+        u: control
 
-            Args:
-                leader(dict): vehicle 0 keys, a,x,v,Dv,Pu,Ps
-                ego(dict): vehicle 1, keys, a,x,v,Dv,Pu,Ps
-                r_ego(dict): reference 1 keys, v,vp  
-                t(float): time stamp
-                T(float): sampling time
+        D: delta
+        P: past
+
+        Args:
+            leader(dict): vehicle 0 keys, a,x,v,Dv,Pu,Ps
+            ego(dict): vehicle 1, keys, a,x,v,Dv,Pu,Ps
+            r_ego(dict): reference 1 keys, v,vp
+            t(float): time stamp
+            T(float): sampling time
         """
         self.curr_lead_veh_acceleration = c_double(leader["a"])
         self.curr_lead_veh_id = c_long(leader["id"])
@@ -186,10 +266,9 @@ class CACC:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def load_library(self):
-        """Loads the control library into the controller
-        """
-        self.lib = cdll.LoadLibrary(DEFAULT_CACC_PATH)
+    def load_library(self, path_library):
+        """Loads the control library into the controller"""
+        self.lib = cdll.LoadLibrary(path_library)
 
 
 if __name__ == "__main__":

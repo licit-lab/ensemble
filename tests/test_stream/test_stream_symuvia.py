@@ -16,7 +16,7 @@ from ctypes import create_string_buffer
 # ============================================================================
 
 from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
-from ensemble.handler.vissim.stream import SimulatorRequest as Vissymuviarequest
+from ensemble.handler.vissim.stream import SimulatorRequest as Vissimrequest
 from ensemble.tools.constants import BUFFER_STRING
 
 # ============================================================================
@@ -28,60 +28,60 @@ from ensemble.tools.constants import BUFFER_STRING
 def no_trajectory_xml():
     """ Emulates  a XML response for no trajectory case """
     STREAM = b'<INST nbVeh="0" val="1.00"><CREATIONS><CREATION entree="Ext_In" id="0" sortie="Ext_Out" type="VL"/></CREATIONS><SORTIES/><TRAJS/><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def one_vehicle_xml():
     """ Emulates a XML response for 1 vehicle trajectory"""
     STREAM = b'<INST nbVeh="1" val="2.00"><CREATIONS><CREATION entree="Ext_In" id="1" sortie="Ext_Out" type="VL"/></CREATIONS><SORTIES/><TRAJS><TRAJ abs="25.00" acc="0.00" dst="25.00" id="0" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def two_vehicle_xml():
     """ Emulates  a XML response for 2 vehicle trajectories"""
     STREAM = b'<INST nbVeh="2" val="4.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="75.00" acc="0.00" dst="75.00" id="0" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="44.12" acc="0.00" dst="44.12" id="1" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def one_vehicle_forced_xml():
     """ Emulates a XML response for 1 vehicle forced trajectory"""
     STREAM = b'<INST nbVeh="1" val="3.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="48.00" acc="-2.00" dst="48.00" etat_pilotage="force (ecoulement respecte)" id="0" ord="0.00" tron="Zone_001" type="VL" vit="23.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def two_vehicle_one_forced_xml():
     """ Emulates a XML response for 1 vehicle forced amont 2 trajectories"""
     STREAM = b'<INST nbVeh="1" val="3.00"><CREATIONS><CREATION entree="Ext_In" id="2" sortie="Ext_Out" type="VL"/></CREATIONS><SORTIES/><TRAJS><TRAJ abs="50.00" acc="0.00" dst="50.00" etat_pilotage="force (ecoulement respecte)" id="0" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="19.12" acc="0.00" dst="19.12" id="1" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def three_vehicle_xml():
     """ Emulate a XML response for 3 vehicle trajectories"""
     STREAM = b'<INST nbVeh="3" val="6.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="125.00" acc="0.00" dst="125.00" id="0" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="94.12" acc="0.00" dst="94.12" id="1" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="50.00" acc="0.00" dst="50.00" id="2" ord="0.00" tron="Zone_001" type="VL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
-    return STREAM
+    return create_string_buffer(STREAM)
 
 
 @pytest.fixture
 def no_trajectory_dct(no_trajectory_xml):
     """ Dictionary expected answer """
-    return parse(no_trajectory_xml)
+    return parse(no_trajectory_xml.value)
 
 
 @pytest.fixture
 def one_vehicle_dct(one_vehicle_xml):
     """ Dictionary expected answer """
-    return parse(one_vehicle_xml)
+    return parse(one_vehicle_xml.value)
 
 
 @pytest.fixture
 def two_vehicle_dct(two_vehicle_xml):
     """ Dictionary expected answer """
-    return parse(two_vehicle_xml)
+    return parse(two_vehicle_xml.value)
 
 
 @pytest.fixture

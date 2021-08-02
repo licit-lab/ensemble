@@ -1,4 +1,4 @@
-""" 
+"""
 ENSEMBLE Command Line Interface
 ====================================
 Scenario launcher for ENSEMBLE simulations
@@ -8,16 +8,21 @@ Scenario launcher for ENSEMBLE simulations
 # STANDARD  IMPORTS
 # ============================================================================
 
+from platform import platform
 import sys
 import click
-import typing
+from click.core import Context
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 import ensemble.tools.constants as ct
-from .ensemble import launch_simulation, check_consistency
+from .ensemble import (
+    launch_simulation,
+    check_consistency,
+    run_operational_runtime,
+)
 from .configurator import Configurator
 
 # ============================================================================
@@ -27,7 +32,7 @@ from .configurator import Configurator
 
 pass_config = click.make_pass_decorator(Configurator)
 
-help_text = """ENSEMBLE Platooning
+HELP_TEXT = """ENSEMBLE Platooning
 
 Platform for Simulation of Multibrand Truck Platooning
 
@@ -46,18 +51,37 @@ file://ensemble/docs/_build/html/index.html
 
 
 @click.group()
-@click.option("-v", "--verbose", is_flag=True, help="Increase verbosity.")
 @click.option(
-    "-i", "--info", is_flag=True, help="Prints additional information"
+    "-v",
+    "--verbose",
+    is_flag=True,
+    help="Increase verbosity to print suplementary information",
 )
-@click.option("-p", "--platform", default="", help="'symuvia' or 'vissim'")
+@click.option(
+    "-i",
+    "--info",
+    is_flag=True,
+    help="Prints additional information regarding the simulation",
+)
+@click.option(
+    "-p",
+    "--platform",
+    default="",
+    help="Selects a simulation platform when available. 'symuvia' or 'vissim'",
+)
 @click.pass_context
-def main(ctx, verbose: bool, info: str, platform: str) -> int:
+def main(ctx: Context, verbose: bool, info: str, platform: str) -> int:
     """Scenario launcher for ENSEMBLE simulations"""
+    ctx.ensure_object(Configurator)
     ctx.obj = Configurator(verbose=verbose, info=info)
     ctx.obj.set_simulation_platform(platform)
     if ctx.obj.verbose:
-        click.echo(click.style(help_text, fg="green",))
+        click.echo(
+            click.style(
+                HELP_TEXT,
+                fg="green",
+            )
+        )
     return 0
 
 
@@ -68,27 +92,38 @@ def main(ctx, verbose: bool, info: str, platform: str) -> int:
 @click.option(
     "-s",
     "--scenario",
-    default="",
+    default=[],
     multiple=True,
     help="Scenario file(s) under analysis.",
 )
 @click.option(
-    "-l", "--library", default="", type=str, help="Full path towards library."
+    "-l",
+    "--library",
+    default="",
+    type=str,
+    help="Full path towards the simulatorlibrary.",
+)
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Enable check flag. This is like dry-run mode where verification is executed",
 )
 @click.option("--check", is_flag=True, help="Enable check flag")
+@click.option("--steps", default=0, help="Simulates n time steps")
 @pass_config
 def launch(
-    config: Configurator, scenario: str, library: str, check: bool
+    config: Configurator, scenario: str, library: str, check: bool, steps: int
 ) -> None:
-    """ Launches an escenario for a specific platform 
-    """
+    """Launches an escenario for a specific platform"""
     click.echo(
         "Launching Scenario on platform: "
         + click.style((f"{config.platform}"), fg="green")
     )
 
     # Update configurator
-    config.update_values(library_path=library, scenario_files=scenario)
+    config.update_values(
+        library_path=library, scenario_files=scenario, sim_steps=steps
+    )
 
     # Run optional check
     if check:
@@ -104,7 +139,7 @@ def launch(
 @click.option(
     "-s",
     "--scenario",
-    default="",
+    default=[],
     multiple=True,
     help="Scenario file under analysis.",
 )
@@ -113,8 +148,7 @@ def launch(
 )
 @pass_config
 def check(config: Configurator, scenario: str, library: str) -> bool:
-    """ Diagnoses files consistancy and simulator availability
-    """
+    """Diagnoses files consistancy and simulator availability"""
 
     # Update configurator
     config.update_values(library_path=library, scenario_files=scenario)
@@ -122,5 +156,11 @@ def check(config: Configurator, scenario: str, library: str) -> bool:
     return check_consistency(config)
 
 
+@main.command("test-operational")
+def test_operational():
+    """Executes an operational test for illustrative purposes"""
+    run_operational_runtime()
+
+
 if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    sys.exit(main(ctx={}, verbose=False, info=False, platform="symuvia"))

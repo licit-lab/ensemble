@@ -19,7 +19,6 @@ The states are defined as:
 # STANDARD  IMPORTS
 # ============================================================================
 
-import click
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -31,7 +30,7 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadLibraryError,
     EnsembleAPILoadFileError,
 )
-from ensemble.tools.screen import log_warning
+from ensemble.tools.screen import log_in_terminal, log_warning, log_error
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -43,9 +42,9 @@ class Compliance(AbsState):
     The state which declares an status to check file compliance .
     """
 
-    def on_event(self, event: str, configurator) -> None:
-        """ Returns next state 
-        
+    def next_state(self, event: str, configurator) -> AbsState:
+        """Returns next state
+
         :param event: Event keyword for next state "connect"
         :type event: str
         :return: Connect object in case of switch
@@ -57,13 +56,13 @@ class Compliance(AbsState):
                 return Connect()
             return self
         except:
-            click.echo("Something happened with the files")
+            log_error("Something happened with the files")
             return Terminate()
 
     def perform_check(self, configurator):
-        """ This function triggers the check validation for the files raises errors in case files are not found 
-        
-        :param configurator: Configuration descriptor 
+        """This function triggers the check validation for the files raises errors in case files are not found
+
+        :param configurator: Configuration descriptor
         :type configurator: Configurator
         """
         return check_scenario_consistency(configurator)
@@ -74,7 +73,7 @@ class Connect(AbsState):
     The state which declares the creation of a connection with the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
 
         try:
             configurator.load_socket()
@@ -93,7 +92,7 @@ class Initialize(AbsState):
     The state which initializes values for the scenario simulation
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
 
         try:
             configurator.load_scenario()
@@ -102,6 +101,7 @@ class Initialize(AbsState):
             return Terminate()
 
         if event == "preroutine":
+            log_in_terminal("Start of Runtime ⏱", fg="magenta")
             return PreRoutine()
 
         return self
@@ -112,7 +112,7 @@ class PreRoutine(AbsState):
     The state which performs task previous to the interaction with the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
         if event == "query":
             return Query()
 
@@ -124,13 +124,25 @@ class Query(AbsState):
     The state which retrieves information from the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
 
         # TODO: call simulator step by step.
 
         if event == "control":
-            configurator.query_data()
-            configurator.update_platoon_registry()
+
+            # Retrieves data
+            configurator.query_data()  # Retreives + notifies
+
+            # Updates vehicle + platoon registry
+            configurator.update_traffic_state()
+
+            if configurator.verbose:
+                log_in_terminal(
+                    "Vehicle registry:", str(configurator.vehicle_registry)
+                )
+                log_in_terminal(
+                    "Platoon Registry:", str(configurator.platoon_registry)
+                )
             return Control()
 
         return self
@@ -138,10 +150,10 @@ class Query(AbsState):
 
 class Control(AbsState):
     """
-    The state which computes the control decision  
+    The state which computes the control decision
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
         if event == "push":
             return Push()
 
@@ -153,7 +165,7 @@ class Push(AbsState):
     The state which pushes data back to the simulator
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
         if event == "postroutine":
             return PostRoutine()
 
@@ -162,10 +174,10 @@ class Push(AbsState):
 
 class PostRoutine(AbsState):
     """
-    The state which logs information or compute step indicators 
+    The state which logs information or compute step indicators
     """
 
-    def on_event(self, event: str, configurator):
+    def next_state(self, event: str, configurator) -> AbsState:
         if event == "preroutine":
             return PreRoutine()
         elif event == "terminate":
@@ -179,8 +191,8 @@ class Terminate(AbsState):
     The state which declares the end of a simulation
     """
 
-    def on_event(self, event: str, configurator):
-        click.echo(click.style("Succesfully accomplished ⏱", fg="magenta"))
+    def next_state(self, event: str, configurator) -> AbsState:
+        log_in_terminal("End of Runtime ⏱", fg="magenta")
         return self
 
 

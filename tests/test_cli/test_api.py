@@ -80,3 +80,9 @@ def test_cli_08_launch_files_check_files_not_found(runner):
     )
     "Input File: fileA.csv. Not Found " == result.output
     "Input File: fileB.xml. Not Found " == result.output
+
+
+def test_cli_09_launch_bottleneck01(runner, bottleneck01):
+    """Run: ensemble launch -s path/bottleneck01.xml"""
+    result = runner.invoke(cli.main, ["launch", "-s", bottleneck01])
+    f"Input File: {bottleneck01} Found\n" in result.output

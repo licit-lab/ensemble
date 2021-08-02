@@ -11,12 +11,14 @@ dependencies:
   - matplotlib>=3.0.0
   - sqlalchemy>=1.3.5
   - pandas>=1.0.0
+  - numba>=0.53
   - scipy>=1.4.1
-  - click>=7.0
+  - click>=8.0
   - python-decouple>=3.3
   - pytest
   - coverage
   - ipython
+  - ipykernel
   - symuvia=1.0.0
   - symupy=0.5.0
   - pandoc
@@ -24,7 +26,6 @@ dependencies:
   - recommonmark
   - nbsphinx
   - sphinx-book-theme
-  - ipykernel
   - pip
   - pytest
   - bump2version

@@ -8,7 +8,6 @@ A class to store parameters for runtime execution
 # STANDARD  IMPORTS
 # ============================================================================
 
-import click
 from dataclasses import dataclass, field
 import platform
 from typing import List, Any, Dict
@@ -28,6 +27,7 @@ from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
 
 # from ensemble.control.governor import MultiBrandPlatoonRegistry
 from ensemble.component.vehiclelist import VehicleList
+from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
 from ensemble.tools.screen import log_success, log_verify, log_warning
 
 # ============================================================================
@@ -37,7 +37,38 @@ from ensemble.tools.screen import log_success, log_verify, log_warning
 
 @dataclass
 class Configurator:
-    """ Configurator class for containing specific simulator parameter
+    """Configurator class for containing specific simulator parameter
+
+    Args:
+
+    verbose (bool):
+        Indicates if verbosity is required within the exit
+
+    info (bool):
+        Prints project information
+
+    platform (str):
+        Platform to run: Windows, Darwin, Linux
+
+    simulation_platform (str):
+        Traffic simulation platform: vissim, symuvia
+
+    scenario_files (list):
+        List of absolute files containing traffic scenarios
+
+    simulation_parameters (dict):
+        List of simulatio parameters. Check ``constants`` module for more information
+    """
+
+    verbose: bool = False
+    info: bool = True
+    platform: str = platform.system()
+    simulation_platform: str = ""
+    library_path: str = ""
+    sim_steps: int = 0
+
+    def __init__(self, **kwargs) -> None:
+        """Configurator class for containing specific simulator parameter
 
         Args:
 
@@ -58,36 +89,6 @@ class Configurator:
 
         simulation_parameters (dict):
             List of simulatio parameters. Check ``constants`` module for more information
-    """
-
-    verbose: bool = False
-    info: bool = True
-    platform: str = platform.system()
-    simulation_platform: str = ""
-    library_path: str = ""
-
-    def __init__(self, **kwargs) -> None:
-        """ Configurator class for containing specific simulator parameter
-
-            Args:
-
-            verbose (bool):
-                Indicates if verbosity is required within the exit
-
-            info (bool):
-                Prints project information
-
-            platform (str):
-                Platform to run: Windows, Darwin, Linux
-
-            simulation_platform (str):
-                Traffic simulation platform: vissim, symuvia
-
-            scenario_files (list):
-                List of absolute files containing traffic scenarios
-
-            simulation_parameters (dict):
-                List of simulatio parameters. Check ``constants`` module for more information
         """
 
         for key, value in kwargs.items():
@@ -97,10 +98,10 @@ class Configurator:
         self.simulation_parameters = DCT_RUNTIME_PARAM
 
     def set_simulation_platform(self, simulation_platform: str = "") -> None:
-        """ A simpler setter for the simulation platform based on OS
+        """A simpler setter for the simulation platform based on OS
 
-            Args:
-                simulation_platform (str): "symuvia" or "vissim", defaults to ""
+        Args:
+            simulation_platform (str): "symuvia" or "vissim", defaults to ""
         """
         if simulation_platform:
             self.simulation_platform = simulation_platform
@@ -125,8 +126,8 @@ class Configurator:
         return
 
     def update_values(self, **kwargs) -> None:
-        """ Configurator updater, pass a with keyword arguments to update. 
-            Just pass the desired parameter as a kewyword argument.
+        """Configurator updater, pass a with keyword arguments to update.
+        Just pass the desired parameter as a kewyword argument.
         """
 
         if kwargs.get("library_path"):
@@ -146,6 +147,14 @@ class Configurator:
             log_verify(
                 "Setting new scenario file(s) path to user input:",
                 f"\t{self.scenario_files}",
+            )
+
+        if kwargs.get("sim_steps"):
+            self.sim_steps = kwargs.get("sim_steps", self.scenario_files)
+
+            log_verify(
+                "Simulation of time steps is set from outside:",
+                f"\t{self.sim_steps}",
             )
 
     def load_socket(self):
@@ -174,21 +183,40 @@ class Configurator:
     def query_data(self):
         self.connector.query_data()
 
+    def create_vehicle_registry(self):
+        """ Creates a vehicle registry for all vehicles in simulation """
+        self.vehicle_registry = VehicleList(self.connector.request)
+
+    def update_vehicle_registry(self):
+        """ Updates vehicle registry in case it exists"""
+        if hasattr(self, "vehicle_registry"):
+            self.vehicle_registry.update_list()
+            return
+        self.create_vehicle_registry()
+
     def create_platoon_registry(self):
         """ Creates a platoon registry for all coordinators (FGC-RGC) """
-        self.platoon_registry = VehicleList(
-            self.connector.request
-        )  # MultiBrandPlatoonRegistry()
+        self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
 
     def update_platoon_registry(self):
+        """ Updates the platoon vehicle registry and the tactical layer"""
         if hasattr(self, "platoon_registry"):
-            self.platoon_registry.update_list()
+            self.platoon_registry.update_platoons()
             return
         self.create_platoon_registry()
 
+    def update_traffic_state(self):
+        """Update the vehicle list and the platoon corresponding vehicle state"""
+        self.update_vehicle_registry()
+        self.update_platoon_registry()
+
     @property
     def total_steps(self):
-        return self.simulation_parameters.get("total_steps")
+        return (
+            self.sim_steps
+            if self.sim_steps != 0
+            else self.simulation_parameters.get("total_steps")
+        )
 
 
 if __name__ == "__main__":
