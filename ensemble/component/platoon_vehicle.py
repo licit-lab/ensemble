@@ -13,7 +13,7 @@ The platoon vehicle model acts as an instance to trace individual vehicle data a
 # from ensemble.component.vehicles import Vehicle
 
 from dataclasses import dataclass
-from symupy.components import Vehicle
+from ensemble.component.vehicle import Vehicle
 
 # ============================================================================
 # INTERNAL IMPORTS
