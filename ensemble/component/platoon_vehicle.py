@@ -20,7 +20,7 @@ from ensemble.component.vehicle import Vehicle
 # ============================================================================
 
 
-from ensemble.tools.constants import DCT_PLT_CONST
+from ensemble.tools.constants import DCT_PLT_CONST, DCT_XO_DEFAUT
 from ensemble.metaclass.dynamics import AbsDynamics
 from ensemble.component.dynamics import TruckDynamics
 from ensemble.metaclass.stream import DataQuery
@@ -28,8 +28,6 @@ from ensemble.metaclass.stream import DataQuery
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
-
-dynamics = TruckDynamics()
 
 
 @dataclass
@@ -100,9 +98,15 @@ class PlatoonVehicle(Vehicle):
     def __init__(
         self,
         request: DataQuery,
-        dynamics: AbsDynamics = dynamics,
         **kwargs,
     ):
+        dynamics = TruckDynamics(
+            vehid=kwargs.get("vehid", 0),
+            x=kwargs.get("distance", DCT_XO_DEFAUT.get("x", 0)),
+            v=kwargs.get("speed", DCT_XO_DEFAUT.get("v", 0)),
+            a=kwargs.get("acceleration", DCT_XO_DEFAUT.get("a", 0)),
+        )
+        kwargs["driven"] = True
         Vehicle.__init__(self, request=request, dynamics=dynamics, **kwargs)
 
     def __hash__(self):

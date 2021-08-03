@@ -17,6 +17,8 @@ import abc
 
 
 class AbsDynamics(metaclass=abc.ABCMeta):
+
+    
     @abc.abstractproperty
     def T(self):
         """Current time step"""

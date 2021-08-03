@@ -27,6 +27,7 @@ from ensemble.control.tactical.vehcoordinator import (
     MAXNDST,
     PLT_TYP,
 )
+from ensemble.metaclass.controller import AbsController
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -53,7 +54,7 @@ class GlobalGapCoordinator(Subscriber):
         self._set_leaders(self._publisher)
 
     def _set_leaders(self, vehicle_registry: VehicleList):
-        """ Set initial leaders for the formation"""
+        """Set initial leaders for the formation"""
 
         for veh in vehicle_registry:
             leader = vehicle_registry.get_leader(veh, distance=MAXNDST)
@@ -68,7 +69,7 @@ class GlobalGapCoordinator(Subscriber):
                 ).leader = self._gcnet.nodes()[leader.vehid].get("vgc")
 
     def _update_states(self):
-        """ Update platoon state according to current information"""
+        """Update platoon state according to current information"""
 
         # Gap Coord (gc) Group by link (Vehicle in same link)
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
@@ -133,3 +134,15 @@ class GlobalGapCoordinator(Subscriber):
                 self._platoons[-1].updatePids()
 
         self._update_states()
+
+    def attach_control(self, control: AbsController):
+        """Assigns the control and initialize the reference for each vehicle control
+
+        Args:
+            control (AbsController): Callable, stateless cacc.
+        """
+        self._ccac = control
+        # Gap Coord (gc) Group by link (Vehicle in same link)
+        for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
+            for _, gc in group_gc:
+                gc.get("vgc").init_reference()
