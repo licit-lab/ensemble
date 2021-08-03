@@ -17,8 +17,6 @@ import typing
 import numpy as np
 from dataclasses import dataclass
 
-from symupy.utils.constants import TIME_STEP_OP
-
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -39,7 +37,6 @@ from ensemble.tools.constants import (
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
-
 
 TIME_STEP = DCT_RUNTIME_PARAM["sampling_time_operational"]
 TAU = ENGINE_CONSTANT
