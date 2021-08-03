@@ -21,14 +21,21 @@ def bottleneck01():
     )
 
 
+@pytest.fixture
+def bottleneck04():
+    return os.path.join(
+        os.getcwd(), "tests", "mocks", "bottlenecks", "bottleneck_004.xml"
+    )
+
+
 def test_cli_01_main(runner):
-    """ Run: ensemble"""
+    """Run: ensemble"""
     result = runner.invoke(cli.main)
     result.exit_code == 0
 
 
 def test_cli_02_main_help(runner):
-    """ Run: ensemble --help """
+    """Run: ensemble --help"""
     result = runner.invoke(cli.main, ["--help"])
     result.exit_code == 0
     "--help" in result.output
@@ -85,4 +92,10 @@ def test_cli_08_launch_files_check_files_not_found(runner):
 def test_cli_09_launch_bottleneck01(runner, bottleneck01):
     """Run: ensemble launch -s path/bottleneck01.xml"""
     result = runner.invoke(cli.main, ["launch", "-s", bottleneck01])
+    f"Input File: {bottleneck01} Found\n" in result.output
+
+
+def test_cli_09_launch_bottleneck04(runner, bottleneck04):
+    """Run: ensemble launch -s path/bottleneck01.xml"""
+    result = runner.invoke(cli.main, ["launch", "-s", bottleneck04])
     f"Input File: {bottleneck01} Found\n" in result.output
