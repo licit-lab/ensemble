@@ -18,13 +18,18 @@ import numpy as np
 # INTERNAL IMPORTS
 # ============================================================================
 
-from .vehicle import Vehicle
+from ensemble.component.vehicle import Vehicle
+from ensemble.component.platoon_vehicle import PlatoonVehicle
+from ensemble.tools.constants import DCT_PLT_CONST
+
 from ensemble.logic.frozen_set import SortedFrozenSet
 from ensemble.logic.publisher import Publisher
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+
+PLT_TYPE = DCT_PLT_CONST["platoon_types"]
 
 
 class VehicleList(SortedFrozenSet, Publisher):
@@ -54,7 +59,12 @@ class VehicleList(SortedFrozenSet, Publisher):
 
     def __init__(self, request):
         self._request = request
-        data = [Vehicle(request, **v) for v in request.get_vehicle_data()]
+        data = [
+            PlatoonVehicle(request, **v)
+            if v.get("vehtype") in PLT_TYPE
+            else Vehicle(request, **v)
+            for v in request.get_vehicle_data()
+        ]
         SortedFrozenSet.__init__(self, data)
         Publisher.__init__(self)
 

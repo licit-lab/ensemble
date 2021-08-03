@@ -384,7 +384,19 @@ BUFFER_CONTROL = 10  # Amount of control samples stored in memory
 # VEHICLE DYNAMICS
 # =============================================================================
 
-ENGINE_CONSTANT = 0.2
+DCT_TRUCK_PARAM = {
+    "width": 2.49,
+    "length": 5.92,
+    "mass": 26450.0,
+    "interAxes": 0.75,
+    "engineTau": 0.2,
+}
+
+DCT_XO_DEFAUT = {
+    "x": 0,
+    "v": 25.0,
+    "a": 0,
+}
 
 # =============================================================================
 # COMMUNICATION
