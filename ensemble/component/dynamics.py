@@ -15,7 +15,8 @@ This module contains a set of models to explain the truck dynamics. The way in w
 
 import typing
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from ctypes import c_double, c_int, byref
 
 
 # ============================================================================
@@ -31,7 +32,7 @@ from ctypes import cdll, c_double, c_int8, c_uint8, c_bool, byref
 from ensemble.tools.constants import (
     DEFAULT_TRUCK_PATH,
     DCT_RUNTIME_PARAM,
-    ENGINE_CONSTANT,
+    DCT_TRUCK_PARAM,
 )
 
 # ============================================================================
@@ -39,7 +40,11 @@ from ensemble.tools.constants import (
 # ============================================================================
 
 TIME_STEP = DCT_RUNTIME_PARAM["sampling_time_operational"]
-TAU = ENGINE_CONSTANT
+TAU = DCT_TRUCK_PARAM["engineTau"]
+LENGTH = DCT_TRUCK_PARAM["length"]
+WIDTH = DCT_TRUCK_PARAM["width"]
+MASS = DCT_TRUCK_PARAM["mass"]
+INTERAXES = DCT_TRUCK_PARAM["interAxes"]
 
 
 def dynamic_3rd_ego(state: np.ndarray, control: np.ndarray) -> np.ndarray:
@@ -83,38 +88,22 @@ def dynamic_2nd_ego(state: np.ndarray, control: np.ndarray) -> np.ndarray:
 class TruckDynamics(AbsDynamics):
     """External truck model"""
 
-    position: float = 0
-    acceleration: float = 0
-    speed: float = 0
+    vehid: c_int = field(repr=True)
+    x: c_double = field(repr=True)
+    a: c_double = field(repr=True)
+    v: c_double = field(repr=True)
+    width: c_double = field(default=c_double(WIDTH), repr=False)
+    length: c_double = field(default=c_double(LENGTH), repr=False)
+    interAxes: c_double = field(default=c_double(INTERAXES), repr=False)
+    mass: c_double = field(default=c_double(MASS), repr=False)
+    library: str = field(default=DEFAULT_TRUCK_PATH, repr=False)
 
-    def __init__(self, path_library: str = DEFAULT_TRUCK_PATH):
-        self._path_library = path_library
-        self.load_library(self._path_library)
-
-        self.a = c_double(0)
-        self.b = c_double(0)
-        self.c = c_double(0)
-        self.d = c_double(0)
-        self.e = c_double(0)
-        self.f = c_double(0)
-
-        self.h = c_double(0)
-        self.i = c_double(0)
-        self.j = c_double(0)
-        self.k = c_double(0)
-        self.l = c_double(0)
-        self.m = c_double(0)
-        self.n = c_double(0)
-        self.o = c_double(0)
-        self.p = c_double(0)
-        self.q = c_double(0)
-        self.r = c_double(0)
-        self.s = c_int8(0)
-        self.t = c_int8(0)
-        self.u = c_uint8(0)
-        self.v = c_uint8(0)
-        self.w = c_bool(False)
-        self.y = c_bool(False)
+    def __init__(self, vehid: int, x: float, v: float, a: float):
+        self.vehid = c_int(vehid)
+        self.x = c_double(x)
+        self.v = c_double(v)
+        self.a = c_double(a)
+        self.load_library(self.library)
 
     def load_library(self, path_library):
         """Loads the truck library into the class"""
@@ -133,33 +122,18 @@ class TruckDynamics(AbsDynamics):
         Returns:
             np.ndarray: Truck acceleration for state computation.
         """
-        acc = self.lib.TruckDynamics_dll(
+        self.lib.TruckDynamics_dll(
+            self.vehid,
             c_double(external_acc),
-            byref(self.a),
-            byref(self.b),
-            byref(self.c),
-            byref(self.d),
-            byref(self.e),
-            byref(self.f),
-            byref(self.h),  ####
-            byref(self.i),
-            byref(self.j),
-            byref(self.k),
-            byref(self.l),
-            byref(self.m),
-            byref(self.n),
-            byref(self.o),
-            byref(self.p),
-            byref(self.q),
-            byref(self.r),
-            byref(self.s),
-            byref(self.t),
-            byref(self.u),
+            byref(self.x),
             byref(self.v),
-            byref(self.w),
-            byref(self.y),
+            byref(self.a),
+            byref(self.interAxes),
+            byref(self.length),
+            byref(self.width),
+            byref(self.mass),
         )
-        return np.array((acc,))
+        return np.array([self.x.value, self.v.value, self.a.value])
 
     def __call__(self, state: np.ndarray, control: np.ndarray) -> np.ndarray:
         """Computes the dynamics passing through the truck
@@ -172,8 +146,18 @@ class TruckDynamics(AbsDynamics):
             np.ndarray:
         """
 
-        acc = self.getAcceleration(control[:1])
-        return dynamic_2nd_ego(state, acc)
+        self.lib.TruckDynamics_dll(
+            self.vehid,
+            c_double(control[-1]),
+            byref(self.x),
+            byref(self.v),
+            byref(self.a),
+            byref(self.interAxes),
+            byref(self.length),
+            byref(self.width),
+            byref(self.mass),
+        )
+        return np.array([self.x.value, self.v.value, self.a.value])
 
 
 @dataclass
@@ -217,4 +201,4 @@ if __name__ == "__main__":
         "darwin",
         "truckDynamics.dylib",
     )
-    t = TruckDynamics(truck_path)
+    t = TruckDynamics(vehid=0, x=0, a=0, v=25)
