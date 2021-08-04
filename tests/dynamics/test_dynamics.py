@@ -15,6 +15,7 @@ from matplotlib import pyplot as plt
 import pytest
 import numpy as np
 from numpy.testing import assert_array_equal, assert_almost_equal
+import platform
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -47,6 +48,7 @@ def test_dynamic_3rd_ego():
     assert_array_equal(x_plus, np.array((2.5, 25.0, 0.05)))
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
 def test_dynamics_truck_single_step():
     t = TruckDynamics(vehid=0, x=0, a=0, v=25)
     state = t(np.array([]), np.array([1]))
@@ -57,6 +59,7 @@ def test_dynamics_truck_single_step():
     )
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
 def test_dynamics_truck_300_step():
     t = TruckDynamics(vehid=1, x=0, a=0, v=25)
     full_state = np.empty((3,))
@@ -92,6 +95,7 @@ def test_dynamics_truck_300_step():
     )
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Not .so available")
 def test_dynamics_truck_accel_ccel():
     t = TruckDynamics(vehid=2, x=0, a=0, v=0)
     full_state = np.empty((3,))
