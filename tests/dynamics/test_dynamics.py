@@ -58,7 +58,7 @@ def test_dynamics_truck_single_step():
 
 
 def test_dynamics_truck_300_step():
-    t = TruckDynamics(vehid=0, x=0, a=0, v=25)
+    t = TruckDynamics(vehid=1, x=0, a=0, v=25)
     full_state = np.empty((3,))
     state = np.empty((3,))
     full_time = []
@@ -87,20 +87,20 @@ def test_dynamics_truck_300_step():
 
     assert_almost_equal(
         full_state[-1],
-        np.array([7.410787e02, 2.472222e01, 2.742790e-01]),
-        decimal=4,
+        np.array([7.3860e02, 2.4722e01, 2.7428e-01]),
+        decimal=2,
     )
 
 
-def test_dynamics_truck_300_step():
-    t = TruckDynamics(vehid=0, x=0, a=0, v=0)
+def test_dynamics_truck_accel_ccel():
+    t = TruckDynamics(vehid=2, x=0, a=0, v=0)
     full_state = np.empty((3,))
     state = np.empty((3,))
-    full_time = []
-    for time in np.arange(0, 30, 0.1):
-        state = t(np.array([]), np.array([0.5]))
+    full_time = np.arange(0, 30, 0.1)
+    a_c = 0.5 * np.sin(2 * np.pi * 1 / 30 * full_time)
+    for time, ctr in zip(full_time, a_c):
+        state = t(np.array([]), np.array([ctr]))
         full_state = np.vstack((full_state, state))
-        full_time.append(time)
 
     f, a = plt.subplots(1, 3, figsize=(15, 5))
     a[0].plot(full_time, full_state[1:, 1])
@@ -122,6 +122,6 @@ def test_dynamics_truck_300_step():
 
     assert_almost_equal(
         full_state[-1],
-        np.array([201.1149, 13.3752, 0.5]),
-        decimal=4,
+        np.array([6.4455e01, 3.6575e-03, -2.8153e-02]),
+        decimal=3,
     )
