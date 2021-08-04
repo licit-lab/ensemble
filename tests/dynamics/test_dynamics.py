@@ -67,7 +67,7 @@ def test_dynamics_truck_300_step():
         full_state = np.vstack((full_state, state))
         full_time.append(time)
 
-    f, a = plt.subplots(1, 3, figsize=(15, 5))
+    _, a = plt.subplots(1, 3, figsize=(15, 5))
     a[0].plot(full_time, full_state[1:, 1])
     a[0].set_xlabel("Time [s]")
     a[0].set_ylabel("Speed [m/s]")
