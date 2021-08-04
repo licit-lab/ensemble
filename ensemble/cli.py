@@ -18,12 +18,12 @@ from click.core import Context
 # ============================================================================
 
 import ensemble.tools.constants as ct
-from .ensemble import (
+from ensemble.ensemble import (
     launch_simulation,
     check_consistency,
     run_operational_runtime,
 )
-from .configurator import Configurator
+from ensemble.configurator import Configurator
 
 # ============================================================================
 # CLASS AND DEFINITIONS
