@@ -59,3 +59,8 @@ def check_consistency(configurator: Configurator) -> bool:
 def run_operational_runtime():
     """Considers a demonstration scenario to run in the operational layer with components from the framework. The purpose is to test components from the tactical layer"""
     runtime_op_layer(scenario="platoon")
+
+
+if __name__=="__main__":
+    configurator = Configurator()
+    configurator.update_values()
