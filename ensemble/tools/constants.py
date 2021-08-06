@@ -371,7 +371,8 @@ DCT_PLT_CONST = {
     "max_connection_distance": 100,  # maximum distance for communication
     "platoon_types": ("PLT", "201"),  # platoon vehicle types
     "max_gap_error": 0.1,  # maximum distance gap error
-    "time_gap": 1.4,  # regular time gap between vehicles
+    "time_gap": 1.4,  # regular time gap between vehicles,
+    "cruise_speed": 25,  # set_point cruise_speed
 }
 
 # =============================================================================

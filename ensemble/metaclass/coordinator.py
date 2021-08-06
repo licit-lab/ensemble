@@ -29,13 +29,33 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractproperty
+    def dv(self):
+        """Differential speed @current time"""
+        pass
+
+    @abc.abstractproperty
+    def dx(self):
+        """Headway space @current time"""
+        pass
+
+    @abc.abstractproperty
     def ttd(self):
-        """Total travel distance"""
+        """Total travel distance @current time"""
+        pass
+
+    @abc.abstractproperty
+    def speed(self):
+        """Speed @current time"""
+        pass
+
+    @abc.abstractproperty
+    def acceleration(self):
+        """Acceleration @current time"""
         pass
 
     @abc.abstractproperty
     def x(self):
-        """Distance on link"""
+        """Distance on link @current time"""
         pass
 
     @abc.abstractproperty
@@ -44,8 +64,13 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractproperty
+    def control(self):
+        """Applied control @current time"""
+        pass
+
+    @abc.abstractproperty
     def status(self):
-        """Platoon status"""
+        """Platoon status @current time"""
         pass
 
     @abc.abstractproperty
