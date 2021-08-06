@@ -17,7 +17,6 @@ from ensemble.handler.symuvia.stream import SimulatorRequest as SymuviaRequest
 from ensemble.component.vehiclelist import VehicleList
 from ensemble.component.platoon_vehicle import PlatoonVehicle
 from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
-from ensemble.control.operational.reference import ReferenceHeadway
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -35,10 +34,14 @@ def runtime_op_layer(initial_condition: np.ndarray, scenario: str = "platoon"):
 
     log_verify(f"Test: {scenario}")
 
-    ## Controller, vehicles
+    # Controller
     cacc = CACC()
+
+    # Vehicle
     request = SymuviaRequest()  # Dummy publisher
     vehlist = VehicleList(request)
+
+    # Sintetic vehicle data
     for i, x0 in enumerate(initial_condition):
         vehicle = PlatoonVehicle(
             request,
@@ -54,39 +57,15 @@ def runtime_op_layer(initial_condition: np.ndarray, scenario: str = "platoon"):
             ]
         )
 
+    # Creating the platoon
     ggc = GlobalGapCoordinator(vehlist)
-    ggc.attach_control(cacc)
+    ggc.cacc = cacc
 
-    # Runtime
+    # Runtime evolution
     sim_time = 60  # [s]
 
-    for i in range(3):
-
-        # Get couple of states
-        list_bi_states = []
-        for lead, follow in zip(list_vehicles[:-2], list_vehicles[1:]):
-            leader = {
-                "x": lead.distance,
-                "v": lead.speed,
-                "a": lead.acceleration,
-            }
-            follower = {
-                "x": follow.distance,
-                "v": follow.speed,
-                "a": follow.acceleration,
-                "PV": lead.speed - follow.speed,
-            }
-            list_bi_states.append((leader, follower))
-
-        # compute control
-        u = []
-        for v in vehlist:
-            a = cacc(ggc[v].leader, ggc[v])
-            u.append(a)
-
-        # apply control
-        for v, control in zip(vehlist, u):
-            v.dynamics(control)
+    for t in range(sim_time):
+        ggc.apply_cacc(t)
 
 
 if __name__ == "__main__":
@@ -100,5 +79,5 @@ if __name__ == "__main__":
     )
 
     # Initial condition
-    X0 = np.array([[0, 25], [30, 26]])
+    X0 = np.array([[30, 25], [0, 26]])
     runtime_op_layer(X0)
