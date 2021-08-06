@@ -33,6 +33,7 @@ from ensemble.tools.constants import DCT_RUNTIME_PARAM, DCT_PLT_CONST, TIME_STEP
 TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
 TIME_INTERVAL = DCT_RUNTIME_PARAM["sampling_time_tactical"]
 TIME_GAP = DCT_PLT_CONST["time_gap"]
+CRUISE_SPEED = DCT_PLT_CONST["cruise_speed"]
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -51,21 +52,26 @@ class ReferenceHeadway:
     interval: float = TIME_INTERVAL
     gap0: float = TIME_GAP
     gapT: float = TIME_GAP
-    current: float = TIME_GAP
+    v0: float = CRUISE_SPEED
+    VT: float = CRUISE_SPEED
+    current_gap: float = TIME_GAP
+    current_speed: float = CRUISE_SPEED
     current_time: float = 0
 
     def __iter__(self):
         self.count = 0
-        self.running = iter(next(self.chunks))
+        self.chunk_space = iter(next(self.chunks_space))
+        self.chunk_speed = iter(next(self.chunks_speed))
         self.time_running = iter(next(self.time_chunks))
         return self
 
     def __next__(self):
         self.count += 1
         if self.count <= int(self.sim_step / self.time_step):
-            self.current = next(self.running)
+            self.current_gap = next(self.chunk_space)
+            self.current_speed = next(self.chunk_speed)
             self.current_time = next(self.time_running)
-            return self.current, self.current_time
+            return self.current_time, self.current_gap, self.current_speed
         else:
             raise StopIteration
 
@@ -82,21 +88,37 @@ class ReferenceHeadway:
         self.horizon = np.arange(0, self.interval, self.time_step)
 
         if isinstance(state, Platooning) or isinstance(state, Joining):
-            self.gap0 = self.current
+            self.gap0 = self.current_gap
             self.gapT = TIME_GAP
+            self.v0 = self.current_speed
+            self.VT = CRUISE_SPEED
 
         if isinstance(state, Splitting):
-            self.gap0 = self.current
+            self.gap0 = self.current_gap
             self.gapT = 3 * TIME_GAP
+            self.v0 = self.current_speed
+            self.VT = CRUISE_SPEED
 
-        self.reference = ReferenceHeadway.change_time_gap(
+        self.reference_headway = ReferenceHeadway.change_time_gap(
             self.horizon,
             self.gap0,
             self.gapT,
         )
-        self.chunks = iter(
+        self.reference_cruise = ReferenceHeadway.change_time_gap(
+            self.horizon,
+            self.v0,
+            self.VT,
+        )
+
+        self.chunks_space = iter(
             np.array_split(
-                self.reference,
+                self.reference_headway,
+                int(self.interval / self.sim_step),
+            )
+        )
+        self.chunks_speed = iter(
+            np.array_split(
+                self.reference_cruise,
                 int(self.interval / self.sim_step),
             )
         )
@@ -125,24 +147,45 @@ class ReferenceHeadway:
 
     def plot_case(self, state: AbsState):
         self.create_time_gap_hwy(state)
-        plt.plot(self.horizon, self.reference)
+        _, a = plt.subplots(2, 1)
+        a[0].plot(self.horizon, self.reference_headway)
+        a[0].set_ylabel("Time Gap [s]")
+        a[0].grid()
+        a[1].plot(self.horizon, self.reference_cruise)
+        a[1].set_ylabel("Cruise speed [m/s]")
+        a[1].grid()
         plt.xlabel("Time[s]")
-        plt.ylabel("Time Gap [s]")
         plt.show()
 
 
 if __name__ == "__main__":
     r = ReferenceHeadway()
-    r.plot_case(Splitting())
+    # r.plot_case(Splitting())
     c = ["r", "b"]
-    
+
+    _, a = plt.subplots(2, 1)
     r.create_time_gap_hwy(Splitting())
-    f, a = plt.subplots()
-    for j in range(40):
-        for x, t in r:
-            plt.scatter((t,), (x,), color="r")
+    for j in range(30):
+        for t, x, v in r:
+            a[0].scatter((t,), (x,), color="red")
+            a[1].scatter((t,), (v,), color="red")
+
+    r.create_time_gap_hwy(Splitting())
+    for j in range(60):
+        for t, x, v in r:
+            a[0].scatter((t,), (x,), color="blue")
+            a[1].scatter((t,), (v,), color="blue")
 
     r.create_time_gap_hwy(Joining())
     for j in range(60):
-        for x, t in r:
-            plt.scatter((t,), (x,), color="blue")
+        for t, x, v in r:
+            a[0].scatter((t,), (x,), color="orange")
+            a[1].scatter((t,), (v,), color="orange")
+
+    r.create_time_gap_hwy(Platooning())
+    for j in range(60):
+        for t, x, v in r:
+            a[0].scatter((t,), (x,), color="green")
+            a[1].scatter((t,), (v,), color="green")
+
+    plt.show()

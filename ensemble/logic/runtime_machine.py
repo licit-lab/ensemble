@@ -83,9 +83,7 @@ class RuntimeDevice:
         * postroutine
         * terminate
 
-        :param event:
-        :type event: str
-        :param configurator:
-        :type configurator: Configurator
+        Args:
+            event (str): State to go to
         """
         self.state = self.state.next_state(event, self.configurator)

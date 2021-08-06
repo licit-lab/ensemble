@@ -158,7 +158,7 @@ class Configurator:
             )
 
     def load_socket(self):
-        """ Determines simulation platform to connect """
+        """Determines simulation platform to connect"""
         if self.simulation_platform == "symuvia":
             self.connector = SymuviaConnector(
                 library_path=self.library_path, step_launch_mode="traj"
@@ -184,22 +184,22 @@ class Configurator:
         self.connector.query_data()
 
     def create_vehicle_registry(self):
-        """ Creates a vehicle registry for all vehicles in simulation """
+        """Creates a vehicle registry for all vehicles in simulation"""
         self.vehicle_registry = VehicleList(self.connector.request)
 
     def update_vehicle_registry(self):
-        """ Updates vehicle registry in case it exists"""
+        """Updates vehicle registry in case it exists"""
         if hasattr(self, "vehicle_registry"):
             self.vehicle_registry.update_list()
             return
         self.create_vehicle_registry()
 
     def create_platoon_registry(self):
-        """ Creates a platoon registry for all coordinators (FGC-RGC) """
+        """Creates a platoon registry for all coordinators (FGC-RGC)"""
         self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
 
     def update_platoon_registry(self):
-        """ Updates the platoon vehicle registry and the tactical layer"""
+        """Updates the platoon vehicle registry and the tactical layer"""
         if hasattr(self, "platoon_registry"):
             self.platoon_registry.update_platoons()
             return
@@ -209,6 +209,10 @@ class Configurator:
         """Update the vehicle list and the platoon corresponding vehicle state"""
         self.update_vehicle_registry()
         self.update_platoon_registry()
+
+    def push_data(self):
+        """Pushes data updated back to the simulator"""
+        self.connector.push_data()
 
     @property
     def total_steps(self):

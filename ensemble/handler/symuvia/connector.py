@@ -190,6 +190,10 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
             self._bContinue = False
             return -1
 
+    def push_data(self):
+        # TODO: A way to push data into the simulator.
+        pass
+
     # ==========================================================================
     # PROTOCOLS
     # ==========================================================================
@@ -246,5 +250,5 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
 
     @property
     def simulation_step(self):
-        """ Current simulation iteration"""
+        """Current simulation iteration"""
         return self._c_iter

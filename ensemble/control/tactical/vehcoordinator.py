@@ -5,26 +5,29 @@ This module details the implementation of the ``Front Gap`` and ``Rear Gap`` Coo
 """
 
 # ============================================================================
-# INTERNAL IMPORTS
+# STANDARD IMPORTS
 # ============================================================================
 
 from typing import Union
 import numpy as np
 from dataclasses import dataclass
+from functools import cached_property
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 from ensemble.component.vehicle import Vehicle
+from ensemble.component.platoon_vehicle import PlatoonVehicle
 from ensemble.logic.platoon_states import (
     StandAlone,
     Platooning,
     Joining,
     Splitting,
 )
-from ensemble.tools.constants import DCT_PLT_CONST
+from ensemble.tools.constants import DCT_PLT_CONST, DCT_RUNTIME_PARAM
 from ensemble.metaclass.coordinator import AbsSingleGapCoord
+from ensemble.metaclass.controller import AbsController
 from ensemble.control.operational.reference import ReferenceHeadway
 
 
@@ -40,6 +43,10 @@ MAXNDST = DCT_PLT_CONST["max_connection_distance"]
 PLT_TYP = DCT_PLT_CONST["platoon_types"]
 MAXDSTR = DCT_PLT_CONST["max_gap_error"]
 
+TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
+
+KEYS = ("a", "x", "v", "s", "u", "Dv", "Pu", "Ps")
+
 
 @dataclass
 class VehGapCoordinator(AbsSingleGapCoord):
@@ -50,15 +57,26 @@ class VehGapCoordinator(AbsSingleGapCoord):
     dx_ref: float = 30
     platoonid: int = 0
 
-    def __init__(self, vehicle: Vehicle):
+    def __init__(self, vehicle: PlatoonVehicle):
         self.ego = vehicle
         self._fgc = None
         self._rgc = None
         self.positionid = 0
-        # self.solve_fgc_state()
+
+        create_dct = lambda: {key: 0.0 for key in KEYS}
+        self._ctr_lead_data = create_dct()
+        self._ctr_ego_data = create_dct()
+        self._ctr_lead_data["id"] = max(self.ego.vehid - 1, 0)
+        self._ctr_ego_data["id"] = self.ego.vehid
+
+        # Historical data
+        self._history_state = np.empty((3,))
+        self._history_control = np.empty((1,))
 
     def init_reference(self):
-        """Initialices the reference class for the gap coordinator. In particular the initial conditions should be already computed."""
+        """Initializes the reference class for the gap coordinator. In particular the initial conditions should be already computed."""
+        if hasattr(self, "_reference"):
+            return
         if self.leader is self:
             self._reference = ReferenceHeadway()
         else:
@@ -98,7 +116,9 @@ class VehGapCoordinator(AbsSingleGapCoord):
 
     def solve_state(self) -> PLState:
         """Logic solver for the platoon state machine."""
-        return self.status.next_state(self)
+        new_state = self.status.next_state(self)
+        self.reference.create_time_gap_hwy(new_state)
+        return new_state
 
     @property
     def x(self):
@@ -106,7 +126,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
         return self.ego.ttd
 
     @property
-    def leader(self):
+    def leader(self) -> AbsSingleGapCoord:
         """Returns the leader vehicle in the platoon"""
         return self._fgc if self._fgc is not None else self
 
@@ -131,6 +151,16 @@ class VehGapCoordinator(AbsSingleGapCoord):
         return self.follower is self.ego
 
     @property
+    def acceleration(self):
+        """Acceleration"""
+        return self.ego.acceleration
+
+    @property
+    def speed(self):
+        """Speed"""
+        return self.ego.speed
+
+    @property
     def ttd(self):
         """Total travel time"""
         return self.ego.ttd
@@ -144,10 +174,20 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def dx(self):
         """Ego current headway space"""
         return (
-            self.leader.ttd - self.ego.ttd
+            self.leader.x - self.ego.x
             if self.leader.vehid != self.ego.vehid
             else MAXNDST
         )
+
+    @property
+    def dv(self):
+        """Ego current differential speed"""
+        return self.leader.speed - self.ego.speed
+
+    @property
+    def control(self):
+        """Ego current control"""
+        return self._ctr_ego_data.get("u")
 
     @property
     def positionid(self):
@@ -158,6 +198,22 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def positionid(self, value):
         """Platoon id 0-index notation to denote position on the platoon"""
         self._platoonid = np.clip(value, 0, MAXTRKS)
+
+    @property
+    def history_control(self):
+        return self._history_control
+
+    @history_control.setter
+    def history_control(self, value: np.ndarray):
+        self._history_control = np.vstack((self._history_control, value))
+
+    @property
+    def history_state(self):
+        return self._history_state
+
+    @history_state.setter
+    def history_state(self, value: np.ndarray):
+        self._history_state = np.vstack((self._history_state, value))
 
     @property
     def joinable(self):
@@ -181,3 +237,94 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def confirm_platoon(self):
         """Confirms ego platoon mode"""
         return abs(self.dx - self.dx_ref) < MAXDSTR
+
+    @property
+    def leader_data(self):
+        """Operational leader control data"""
+        # Lead updates
+        data = {
+            "a": self.leader.acceleration,
+            "x": self.leader.x,
+            "v": self.leader.speed,
+            "s": self.leader.dx,
+            "u": self.leader.control,
+            "Dv": self.leader.dv,
+            "Pu": self._ctr_lead_data.get("u"),
+            "Ps": self._ctr_lead_data.get("s"),
+        }
+        self._ctr_lead_data.update(data)
+        return self._ctr_lead_data
+
+    @leader_data.setter
+    def leader_data(self, value: dict):
+        """Operational leader control data (setter) - For manual update. It updates the ego data dictionary to specific values given within a dictionary structure.
+
+        * a: real acceleration
+        * x: postition
+        * v: speed
+        * s: spacing
+        * u: control
+
+        * D: delta
+        * P: past
+
+        Args:
+            value (dict): Dictionary with keys a,x,v,Dv,Pu,Ps
+
+        """
+        self._ctr_lead_data.update(value)
+
+    @property
+    def ego_data(self):
+        """Operational leader control data"""
+
+        # Ego updates
+        data = {
+            "a": self.acceleration,
+            "x": self.x,
+            "v": self.speed,
+            "s": self.dx,
+            "u": self.control,
+            "Dv": self.dv,
+            "Pu": self._ctr_ego_data.get("u"),
+            "Ps": self._ctr_ego_data.get("s"),
+        }
+        self._ctr_ego_data.update(data)
+        return self._ctr_ego_data
+
+    @ego_data.setter
+    def ego_data(self, value: dict):
+        """Operational ego control data (setter) - For manual update. It updates the ego data dictionary to specific values given within a dictionary structure.
+
+        * a: real acceleration
+        * x: postition
+        * v: speed
+        * s: spacing
+        * u: control
+
+        * D: delta
+        * P: past
+
+        Args:
+            value (dict): Dictionary with keys a,x,v,Dv,Pu,Ps
+
+        """
+        self._ctr_ego_data.update(value)
+
+    def get_step_data(self):
+        """Retrieves current time data for the operational layer"""
+
+        return self.leader_data, self.ego_data
+
+    def evolve_control(
+        self,
+        control: AbsController,
+        time: float,
+        time_step: float = TIME_STEP_OP,
+    ):
+        """Considers a one chunk of step evolution of the operational control layer
+
+        Args:
+            control (AbsController): Operational controller
+        """
+        control(self, self.reference, time, time_step)

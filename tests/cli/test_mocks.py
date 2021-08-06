@@ -15,20 +15,20 @@ def runner():
 
 @pytest.fixture
 def bottleneck_001():
-    file_path = ("tests", "mocks", "bottlenecks", "bottleneck_001.xml")
+    file_path = ("tests", "mocks", "symuvia", "bottleneck_001.xml")
     return os.path.join(os.getcwd(), *file_path)
 
 
 @pytest.fixture
 def bottleneck_002():
-    file_path = ("tests", "mocks", "bottlenecks", "bottleneck_002.xml")
+    file_path = ("tests", "mocks", "syuvia", "bottleneck_002.xml")
     return os.path.join(os.getcwd(), *file_path)
 
 
 @pytest.fixture
 def botleneck_vissim_01():
-    file_path = ("tests", "mocks", "bottlenecks", "TestNetwork.inpx")
-    file_layx_path = ("tests", "mocks", "bottlenecks", "TestNetwork.layx")
+    file_path = ("tests", "mocks", "vissim", "TestNetwork.inpx")
+    file_layx_path = ("tests", "mocks", "vissim", "TestNetwork.layx")
     mocks_path = os.path.join(os.getcwd(), *file_path)
     mocks_path_layx = os.path.join(os.getcwd(), *file_layx_path)
     return mocks_path, mocks_path_layx

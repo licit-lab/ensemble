@@ -17,14 +17,14 @@ def runner():
 @pytest.fixture
 def bottleneck01():
     return os.path.join(
-        os.getcwd(), "tests", "mocks", "bottlenecks", "bottleneck_001.xml"
+        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_001.xml"
     )
 
 
 @pytest.fixture
 def bottleneck04():
     return os.path.join(
-        os.getcwd(), "tests", "mocks", "bottlenecks", "bottleneck_004.xml"
+        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_004.xml"
     )
 
 

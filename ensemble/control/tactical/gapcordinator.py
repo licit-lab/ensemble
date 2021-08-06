@@ -51,6 +51,7 @@ class GlobalGapCoordinator(Subscriber):
         for veh in self._publisher:
             if veh.vehtype in PLT_TYP:
                 self._gcnet.add_node(veh.vehid, vgc=VehGapCoordinator(veh))
+                self[veh.vehid].init_reference()
         self._set_leaders(self._publisher)
 
     def _set_leaders(self, vehicle_registry: VehicleList):
@@ -64,9 +65,8 @@ class GlobalGapCoordinator(Subscriber):
                 and veh.vehtype in PLT_TYP
             ):
                 self._gcnet.add_edge(veh.vehid, leader.vehid)
-                self._gcnet.nodes()[veh.vehid].get(
-                    "vgc"
-                ).leader = self._gcnet.nodes()[leader.vehid].get("vgc")
+                self[veh.vehid].leader = self[leader.vehid]
+                self[veh.vehid].leader_data = {"id": leader.vehid}
 
     def _update_states(self):
         """Update platoon state according to current information"""
@@ -135,14 +135,24 @@ class GlobalGapCoordinator(Subscriber):
 
         self._update_states()
 
-    def attach_control(self, control: AbsController):
-        """Assigns the control and initialize the reference for each vehicle control
+    @property
+    def cacc(self):
+        """Returns the operational controller object"""
+        return self._cacc
+
+    @cacc.setter
+    def cacc(self, control: AbsController):
+        """A function just to attach the control of the system to the layer and initialize the references
 
         Args:
-            control (AbsController): Callable, stateless cacc.
+            control (AbsController): Callable, operational controller
         """
-        self._ccac = control
-        # Gap Coord (gc) Group by link (Vehicle in same link)
+        self._cacc = control
+
+    def apply_cacc(self, time: float):
+        """This method intends to apply the cacc over all vehicles within the platoon at specific time step"""
+
         for _, group_gc in groupby(self._gcnet.nodes(data=True), vtf):
             for _, gc in group_gc:
-                gc.get("vgc").init_reference()
+                vcg = gc.get("vgc")
+                vcg.evolve_control(self.cacc, time)
