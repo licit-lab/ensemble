@@ -156,7 +156,8 @@ class Control(AbsState):
     def next_state(self, event: str, configurator) -> AbsState:
         if event == "push":
             return Push()
-
+        # TODO: Add apply cacc
+        # configurator.platoon.apply_cacc(configurator.connector.time)
         return self
 
 
@@ -168,7 +169,8 @@ class Push(AbsState):
     def next_state(self, event: str, configurator) -> AbsState:
         if event == "postroutine":
             return PostRoutine()
-
+        # TODO: Add methods
+        # configurator.push_data()
         return self
 
 

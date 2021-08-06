@@ -57,25 +57,33 @@ class VissimConnector(AbsConnector, VissimConfigurator):
         self.load_simulator()
 
     def load_simulator(self) -> None:
-        """ load Vissim COM interface"""
+        """load Vissim COM interface"""
         try:
             lib_vissim = com.gencache.EnsureDispatch(self.library_path)
             log_success("\t Library successfully loaded!")
         except OSError:
             log_error("\t Vissim is currently unavailable!")
-            raise EnsembleAPILoadLibraryError("Library not found", self.library_path)
+            raise EnsembleAPILoadLibraryError(
+                "Library not found", self.library_path
+            )
         except com_error:
             log_error("\t Vissim is currently unavailable!")
             lib_vissim = None
-            raise EnsembleAPILoadLibraryError("Library not found", self.library_path)
+            raise EnsembleAPILoadLibraryError(
+                "Library not found", self.library_path
+            )
         self.__library = lib_vissim
 
     def load_scenario(self, scenario):
         """checks existance and load scenario . Also get simulation parameters"""
         if isinstance(scenario, VissimScenario):
             try:
-                self.__library.LoadNet(scenario.filename, scenario.bread_additional)
-                self.sim_period = self.__library.Simulation.AttValue("SimPeriod")
+                self.__library.LoadNet(
+                    scenario.filename, scenario.bread_additional
+                )
+                self.sim_period = self.__library.Simulation.AttValue(
+                    "SimPeriod"
+                )
                 self.sim_sec = self.__library.Simulation.AttValue("SimSec")
                 self.sim_res = self.__library.Simulation.AttValue("SimRes")
                 self.rand_seed = self.__library.Simulation.AttValue("RandSeed")
@@ -124,10 +132,13 @@ class VissimConnector(AbsConnector, VissimConfigurator):
             vehsAttributesNamesVissim
         )
         vehData = [
-            dict(zip(vehsAttributesNamesVissim, item)) for item in vehsAttributes
+            dict(zip(vehsAttributesNamesVissim, item))
+            for item in vehsAttributes
         ]
         self.request.query = vehData  # List[Dicts]
-        self.request.sim_sec = self.__library.Simulation.AttValue("SimSec")#self.sim_sec
+        self.request.sim_sec = self.__library.Simulation.AttValue(
+            "SimSec"
+        )  # self.sim_sec
 
     def run_single_step(self):
         """Run simulation next step
@@ -152,6 +163,10 @@ class VissimConnector(AbsConnector, VissimConfigurator):
         except StopIteration:
             self._bContinue = False
             return -1
+
+    def push_data(self):
+        """Pushes data back to the simulator"""
+        pass
 
     # =========================================================================
     # PROTOCOLS
@@ -189,7 +204,7 @@ class VissimConnector(AbsConnector, VissimConfigurator):
     # =========================================================================
 
     def get_simulation_steps(self) -> range:
-        """ Gets the list of simulation steps starting from 0 to end of simulation in step of simulation resolution"""
+        """Gets the list of simulation steps starting from 0 to end of simulation in step of simulation resolution"""
         return range(0, self.sim_period, self.sim_res)
 
     @property
@@ -213,5 +228,5 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     @property
     def simulation_step(self):
-        """ Current simulation iteration"""
+        """Current simulation iteration"""
         return self._c_iter
