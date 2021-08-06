@@ -11,13 +11,17 @@ This module implements a general metaclass for a vehicle gap coordinator.
 
 import abc
 
-
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
 
 class AbsSingleGapCoord(metaclass=abc.ABCMeta):
+    # @abc.abstractproperty
+    # def ego(self):
+    #     """Ego vehicle information"""
+    #     pass
+
     @abc.abstractproperty
     def joinable(self):
         """Indicates if the coordinator is joinable"""
@@ -86,4 +90,19 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
     @abc.abstractproperty
     def positionid(self):
         """Position within the platoon"""
+        pass
+
+    @abc.abstractproperty
+    def history_state(self):
+        """Historical status"""
+        pass
+
+    @abc.abstractproperty
+    def history_control(self):
+        """Historical control"""
+        pass
+
+    @abc.abstractmethod
+    def get_step_data(self) -> tuple:
+        """Get single step data"""
         pass

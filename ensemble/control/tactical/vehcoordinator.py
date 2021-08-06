@@ -200,6 +200,22 @@ class VehGapCoordinator(AbsSingleGapCoord):
         self._platoonid = np.clip(value, 0, MAXTRKS)
 
     @property
+    def history_control(self):
+        return self._history_control
+
+    @history_control.setter
+    def history_control(self, value: np.ndarray):
+        self._history_control = np.vstack((self._history_control, value))
+
+    @property
+    def history_state(self):
+        return self._history_state
+
+    @history_state.setter
+    def history_state(self, value: np.ndarray):
+        self._history_state = np.vstack((self._history_state, value))
+
+    @property
     def joinable(self):
         """Checks if a vehicle is joinable"""
         return (
