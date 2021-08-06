@@ -17,7 +17,7 @@ import numpy as np
 from ensemble.tools.constants import DEFAULT_CACC_PATH, DCT_RUNTIME_PARAM
 from ensemble.metaclass.controller import AbsController
 from ensemble.control.operational.reference import ReferenceHeadway
-from ensemble.control.tactical.vehcoordinator import VehGapCoordinator
+from ensemble.metaclass.coordinator import AbsSingleGapCoord
 from ensemble.metaclass.dynamics import AbsDynamics
 
 # ============================================================================
@@ -242,7 +242,7 @@ class CACC(AbsController):
 
     def __call__(
         self,
-        ego: VehGapCoordinator,
+        vgc: AbsSingleGapCoord,
         reference: ReferenceHeadway,
         t: float,
         T: float,
@@ -250,7 +250,7 @@ class CACC(AbsController):
         """This performs a multiple step call of the operational layer per vehicle.
 
         Args:
-            ego (VehGapCoordinator): Ego vehicle gap coordinator
+            vgc (AbsSingleGapCoord): vgc vehicle gap coordinator
             reference (ReferenceHeadway): Reference object
             t (float): simulation current time
             T (float): operational time step
@@ -260,8 +260,8 @@ class CACC(AbsController):
             [type]: [description]
         """
 
-        for i, r in enumerate(reference):
-            data_leader, data_ego = ego.get_step_data()
+        for _, r in enumerate(reference):
+            data_leader, data_ego = vgc.get_step_data()
             r_dct = {"t": r[0], "g_cacc": r[1], "g_acc": r[1], "v": r[2]}
             control = self.single_call_control(
                 data_leader,
@@ -277,12 +277,8 @@ class CACC(AbsController):
                     data_ego.get("a"),
                 ]
             )
-            ego._history_state = np.vstack(
-                (
-                    ego._history_state,
-                    ego.ego.dynamics(state, np.array([control])),
-                )
-            )
+            vgc.history_state = vgc.ego.dynamics(state, np.array([control]))
+            vgc.history_control = np.array([control])
 
     def single_call_control(
         self,
