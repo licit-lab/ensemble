@@ -29,6 +29,7 @@ from ensemble.handler.vissim.connector import VissimConnector, VissimScenario
 from ensemble.component.vehiclelist import VehicleList
 from ensemble.control.tactical.gapcordinator import GlobalGapCoordinator
 from ensemble.tools.screen import log_success, log_verify, log_warning
+from ensemble.control.operational import CACC
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -197,6 +198,11 @@ class Configurator:
     def create_platoon_registry(self):
         """Creates a platoon registry for all coordinators (FGC-RGC)"""
         self.platoon_registry = GlobalGapCoordinator(self.vehicle_registry)
+        self.initialize_operational_layer()
+
+    def initialize_operational_layer(self):
+        """Initialize the Operational layer"""
+        self.platoon_registry.cacc = CACC()
 
     def update_platoon_registry(self):
         """Updates the platoon vehicle registry and the tactical layer"""
