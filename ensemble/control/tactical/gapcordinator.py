@@ -110,6 +110,11 @@ class GlobalGapCoordinator(Subscriber):
             return "No vehicles have been registered"
         return repr(self._to_pandas())
 
+    def __len__(self):
+        if self._gcnet is None:
+            return 0
+        return len(self._gcnet.nodes)
+
     def update_platoons(self):
         """First iteration to fill the platoon registry based on the current
         vehicle information.

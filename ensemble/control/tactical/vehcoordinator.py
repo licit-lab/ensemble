@@ -203,6 +203,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def history_control(self):
         return self._history_control
 
+    @property
+    def last_control(self):
+        if len(self._history_control.shape) == 1:
+            return self.history_control
+        return self._history_control[-1]
+
     @history_control.setter
     def history_control(self, value: np.ndarray):
         self._history_control = np.vstack((self._history_control, value))
@@ -210,6 +216,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def history_state(self):
         return self._history_state
+
+    @property
+    def last_state(self):
+        if len(self._history_state.shape) == 1:
+            return self.history_state
+        return self._history_state[-1]
 
     @history_state.setter
     def history_state(self, value: np.ndarray):
