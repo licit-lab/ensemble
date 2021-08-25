@@ -155,9 +155,10 @@ class Control(AbsState):
 
     def next_state(self, event: str, configurator) -> AbsState:
         if event == "push":
+            configurator.platoon_registry.apply_cacc(
+                configurator.connector.time
+            )
             return Push()
-        # TODO: Add apply cacc
-        # configurator.platoon.apply_cacc(configurator.connector.time)
         return self
 
 

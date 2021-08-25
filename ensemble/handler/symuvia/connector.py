@@ -50,6 +50,8 @@ from ensemble.tools.screen import log_verify, log_success, log_error
 
 import ensemble.tools.constants as CT
 
+from ensemble.tools.constants import TIME_STEP
+
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -252,3 +254,8 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     def simulation_step(self):
         """Current simulation iteration"""
         return self._c_iter
+
+    @property
+    def time(self):
+        """Current simulation time"""
+        return self.simulation_step * TIME_STEP
