@@ -161,3 +161,13 @@ class VehicleList(SortedFrozenSet, Publisher):
         if not self._items:
             return "No vehicles have been registered"
         return repr(self._to_pandas())
+
+    def __iter__(self):
+        """Protocol sorting data by largest distance on link"""
+        self.__tmpit = iter(
+            sorted(self._items, key=lambda x: x.distance, reverse=True)
+        )
+        return self.__tmpit
+
+    def __next__(self):
+        return next(self.__tmpit)
