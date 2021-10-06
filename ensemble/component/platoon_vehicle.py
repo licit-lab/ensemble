@@ -106,7 +106,7 @@ class PlatoonVehicle(Vehicle):
             v=kwargs.get("speed", DCT_XO_DEFAUT.get("v", 0)),
             a=kwargs.get("acceleration", DCT_XO_DEFAUT.get("a", 0)),
         )
-        kwargs["driven"] = True
+
         Vehicle.__init__(self, request=request, dynamics=dynamics, **kwargs)
 
     def __hash__(self):
