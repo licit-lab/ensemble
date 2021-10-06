@@ -179,31 +179,31 @@ LAUNCH_MODE = "lite"
 TOTAL_SIMULATION_STEPS = 0
 
 FIELD_DATA = {
-    "@abs": "abscissa",
-    "@acc": "acceleration",
-    "@dst": "distance",
-    "@id": "vehid",
-    "@ord": "ordinate",
-    "@tron": "link",
-    "@type": "vehtype",
-    "@vit": "speed",
-    "@voie": "lane",
-    "@z": "elevation",
-    "@etat_pilotage": "driven",
+    "abs": "abscissa",
+    "acc": "acceleration",
+    "dst": "distance",
+    "etat_pilotage": "driven",
+    "id": "vehid",
+    "ord": "ordinate",
+    "tron": "link",
+    "type": "vehtype",
+    "vit": "speed",
+    "voie": "lane",
+    "z": "elevation",
 }
 
 FIELD_FORMAT = {
-    "@abs": float,
-    "@acc": float,
-    "@dst": float,
-    "@id": int,
-    "@ord": float,
-    "@tron": str,
-    "@type": str,
-    "@vit": float,
-    "@voie": int,
-    "@z": float,
-    "@etat_pilotage": bool,
+    "abs": float,
+    "acc": float,
+    "dst": float,
+    "etat_pilotage": bool,
+    "id": int,
+    "ord": float,
+    "tron": str,
+    "type": str,
+    "vit": float,
+    "voie": int,
+    "z": float,
 }
 
 FLOATFORMAT = float64

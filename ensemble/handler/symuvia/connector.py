@@ -176,7 +176,7 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
         self._bContinue = self.__library.SymRunNextStepEx(
             self.buffer_string, self.write_xml, byref(self.b_end)
         )
-        self.request.query = self.buffer_string
+        self.request.query = self.buffer_string.value
 
     def query_data(self) -> int:
         """Run simulation step by step

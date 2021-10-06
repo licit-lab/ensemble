@@ -20,6 +20,7 @@ from collections import defaultdict
 
 from ensemble.metaclass.stream import DataQuery
 import ensemble.tools.constants as ct
+from ensemble.handler.symuvia.xmlparser import XMLTrajectory
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -35,7 +36,7 @@ response = defaultdict(lambda: False)
 class SimulatorRequest(DataQuery):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._str_response = create_string_buffer(ct.BUFFER_STRING)
+        self.datatraj = XMLTrajectory(b"")
 
     # =========================================================================
     # MEMORY HANDLING
@@ -44,21 +45,21 @@ class SimulatorRequest(DataQuery):
     @property
     def query(self):
         """String response from the simulator"""
-        return self._str_response
+        return self.datatraj._xml
 
     @query.setter
-    def query(self, response: str):
-        self._str_response = response
+    def query(self, response: bytes):
+        self.datatraj = XMLTrajectory(response)
         for c in self._channels:
             self.dispatch(c)
 
     @property
     def current_time(self) -> float:
-        return float(self.data_query.get("INST").get("@val"))
+        return self.datatraj.inst
 
     @property
     def current_nbveh(self) -> int:
-        return int(self.data_query.get("INST").get("@nbVeh"))
+        return self.datatraj.nbveh
 
     @property
     def data_query(self):
@@ -67,71 +68,20 @@ class SimulatorRequest(DataQuery):
         Returns:
             simdata (OrderedDict): Simulator data parsed from XML
         """
-        try:
-            dataveh = parse(self._str_response.value)
-            # Transform ordered dictionary into new keys
-            return dataveh
-        except ExpatError:
-            return {}
-        except AttributeError:
-            return {}
+
+        return self.datatraj.todict
 
     # =========================================================================
     # METHODS
     # =========================================================================
-
-    def get_vehicle_data(self) -> vlists:
+    def get_vehicle_data(self) -> tuple:
         """Extracts vehicles information from simulators response
 
         Returns:
             t_veh_data (list): list of dictionaries containing vehicle data with correct formatting
 
         """
-        if self.data_query.get("INST", {}).get("TRAJS") is not None:
-            veh_data = self.data_query.get("INST").get("TRAJS")
-            if isinstance(veh_data["TRAJ"], list):
-                return [SimulatorRequest.transform(d) for d in veh_data["TRAJ"]]
-            return [SimulatorRequest.transform(veh_data["TRAJ"])]
-        return []
-
-    @staticmethod
-    def transform(veh_data: dict) -> dict:
-        """Transform vehicle data from string format to coherent format
-
-        Args:
-            veh_data (dict): vehicle data as received from simulator
-
-        Returns:
-            t_veh_data (dict): vehicle data with correct formatting
-
-
-        Example:
-            As an example, for an input of the following style ::
-
-            >>> v = OrderedDict([('@abs', '25.00'), ('@acc', '0.00'), ('@dst', '25.00'), ('@id', '0'), ('@ord', '0.00'), ('@tron', 'Zone_001'), ('@type', 'VL'), ('@vit', '25.00'), ('@voie', '1'),('@z', '0')])
-            >>> tv = SimulatorRequest.transform(v)
-            >>> # Transforms into
-            >>> tv == {
-            >>>     "abscissa": 25.0,
-            >>>     "acceleration": 0.0,
-            >>>     "distance": 25.0,
-            >>>     "elevation": 0.0,
-            >>>     "lane": 1,
-            >>>     "link": "Zone_001",
-            >>>     "ordinate": 0.0,
-            >>>     "speed": 25.0,
-            >>>     "vehid": 0,
-            >>>     "vehtype": "VL",
-            >>> },
-
-        """
-        for key, val in veh_data.items():
-            response[ct.FIELD_DATA[key]] = ct.FIELD_FORMAT[key](val)
-        lkey = "@etat_pilotage"
-        response[ct.FIELD_DATA[lkey]] = ct.FIELD_FORMAT[lkey](
-            veh_data.get(lkey)
-        )
-        return dict(response)
+        return self.data_query
 
     def is_vehicle_driven(self, vehid: int) -> bool:
         """Returns true if the vehicle state is exposed to a driven state
