@@ -24,7 +24,7 @@ from ensemble.tools import constants as ct
 from ensemble.metaclass.stream import DataQuery
 from ensemble.metaclass.dynamics import AbsDynamics
 
-from ensemble.handler.symuvia.stream import SimulatorRequest
+
 from ensemble.component.dynamics import SampleDynamics
 
 # ============================================================================
@@ -185,15 +185,3 @@ class Vehicle(Subscriber):
         self._ttddist = self._ttdpivot + self.x
         self._ttdprev = self.x
         return self._ttddist
-
-
-if __name__ == "__main__":
-    # Run from base folder
-    import os
-
-    truck_path = os.path.join(
-        os.getcwd(), "ensemble", "libs", "darwin", "truckDynamics.dylib"
-    )
-
-    sim = SimulatorRequest()
-    veh = Vehicle(sim)
