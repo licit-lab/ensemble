@@ -259,3 +259,8 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     def time(self):
         """Current simulation time"""
         return self.simulation_step * TIME_STEP
+
+    @property
+    def do_next(self) -> bool:
+        """Returns true if the simulation shold continue"""
+        return self._bContinue

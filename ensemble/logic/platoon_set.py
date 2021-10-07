@@ -139,15 +139,15 @@ class PlatoonSet(SortedFrozenSet):
         return self - PlatoonSet(iterable)
 
     def joinable(self):
-        """ Exams last vehicle in the Platoon """
+        """Exams last vehicle in the Platoon"""
         return self[-1].joinable
 
     def updatePids(self):
-        """ Exams and updates the Platoon Index Position"""
+        """Exams and updates the Platoon Index Position"""
         for _, item in enumerate(self._items):
             item.platoonid = self.platoonid
 
     @classmethod
     def setPid(cls, value):
-        """ Set counter for the platoons """
+        """Set counter for the platoons"""
         cls.pid = count(value)

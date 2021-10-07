@@ -181,9 +181,11 @@ class PostRoutine(AbsState):
     """
 
     def next_state(self, event: str, configurator) -> AbsState:
-        if event == "preroutine":
+        if event == "preroutine" and configurator.connector.do_next:
             return PreRoutine()
         elif event == "terminate":
+            return Terminate()
+        elif not configurator.connector.do_next:
             return Terminate()
 
         return self

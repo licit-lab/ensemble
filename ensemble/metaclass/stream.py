@@ -66,32 +66,42 @@ class DataQuery(Publisher, metaclass=abc.ABCMeta):
     # =========================================================================
     @abc.abstractproperty
     def query(self):
-        """ A method to store data as received from the simulator"""
+        """A method to store data as received from the simulator"""
         pass
 
     @abc.abstractproperty
     def current_time(self) -> float:
-        """ Provides current time step"""
+        """Provides current time step"""
         pass
 
     @abc.abstractproperty
     def current_nbveh(self) -> int:
-        """ Provides current number of vehicles"""
+        """Provides current number of vehicles"""
         pass
 
     @abc.abstractmethod
     def get_vehicle_data(self) -> vlists:
-        """ Provides current vehicle data """
+        """Provides current vehicle data"""
         pass
 
     @abc.abstractmethod
     def is_vehicle_driven(self) -> bool:
-        """ Rrue if the vehicle state is exposed to a driven state"""
+        """True if the vehicle state is exposed to a driven state"""
+        pass
+
+    @abc.abstractmethod
+    def update_vehicle_registry(self, configurator):
+        """Updates the vehicle registry within the stream"""
         pass
 
     # =========================================================================
     # METHODS
     # =========================================================================
+
+    def dispatch_observers(self):
+        """Publishes/dispatch information two all registered elements"""
+        for c in self._channels:
+            self.dispatch(c)
 
     def get_vehicles_property(self, property: str) -> vdata:
         """Extracts a specific property and returns a tuple containing this

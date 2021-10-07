@@ -11,9 +11,9 @@
 # INTERNAL IMPORTS
 # ============================================================================
 
-from .stream import SimulatorRequest
-from .configurator import VissimConfigurator
-from .scenario import VissimScenario
+from ensemble.handler.vissim.stream import SimulatorRequest
+from ensemble.handler.vissim.configurator import VissimConfigurator
+from ensemble.handler.vissim.scenario import VissimScenario
 
 from ensemble.metaclass.connector import AbsConnector
 
@@ -230,3 +230,8 @@ class VissimConnector(AbsConnector, VissimConfigurator):
     def simulation_step(self):
         """Current simulation iteration"""
         return self._c_iter
+
+    @property
+    def do_next(self) -> bool:
+        """Returns true if the simulation shold continue"""
+        return self._bContinue

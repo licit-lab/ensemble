@@ -32,7 +32,7 @@ class SortedFrozenSet(Sequence, Set):
     """
 
     def __init__(self, items=None, key="vehid"):
-        self._items = tuple(
+        self._items = list(
             sorted(
                 set(items) if (items is not None) else set(),
                 key=lambda x: x.__dict__.get(key),
@@ -60,7 +60,9 @@ class SortedFrozenSet(Sequence, Set):
         return "{type}({arg})".format(
             type=type(self).__name__,
             arg=(
-                "[{}]".format(", ".join(map(repr, self._items))) if self._items else ""
+                "[{}]".format(", ".join(map(repr, self._items)))
+                if self._items
+                else ""
             ),
         )
 

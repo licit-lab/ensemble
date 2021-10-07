@@ -11,6 +11,7 @@ Vehicle list is a collection implementation that acts as an instance to trace in
 # ============================================================================
 
 from dataclasses import asdict
+from typing import Union
 import pandas as pd
 import numpy as np
 
@@ -30,6 +31,8 @@ from ensemble.logic.publisher import Publisher
 # ============================================================================
 
 PLT_TYPE = DCT_PLT_CONST["platoon_types"]
+
+VehType = Union[Vehicle, PlatoonVehicle]
 
 
 class VehicleList(SortedFrozenSet, Publisher):
@@ -57,21 +60,58 @@ class VehicleList(SortedFrozenSet, Publisher):
     The list could be eventually updated as an observer but for simplicity reasons it is kept like this.
     """
 
+    _cumul = set()
+
     def __init__(self, request):
         self._request = request
-        data = [
+        data = (
             PlatoonVehicle(request, **v)
             if v.get("vehtype") in PLT_TYPE
             else Vehicle(request, **v)
             for v in request.get_vehicle_data()
-        ]
-        SortedFrozenSet.__init__(self, data)
+        )
+        self._free = []
+        self.__class__._cumul = self.__class__._cumul.union(request.datatraj.id)
+        SortedFrozenSet.__init__(self, tuple(data))
         Publisher.__init__(self)
 
     def update_list(self, extra=[]):
         """Update vehicle data according to an update in the request."""
-        data = self + VehicleList(self._request) + SortedFrozenSet(extra)
+        newveh = []
+        # Create only new vehicles
+        for v in self._request.get_vehicle_data():
+            if (v.get("vehtype") in PLT_TYPE) and (
+                v.get("vehid") not in self.__class__._cumul
+            ):
+                newveh.append(PlatoonVehicle(self._request, **v))
+                self.__class__._cumul.add(v.get("vehid"))
+        data = SortedFrozenSet(self._items).union(newveh)
+        data = data.union(extra)
+
+        # Put vehicles on list
         self._items = data._items
+
+        # Take out exciting vehicles
+        for veh in self._items:
+            if veh.vehid not in self._request.datatraj.vehid:
+                self.release(veh)
+
+    def check_and_release(self, veh: VehType):
+        """Checks wether a vehicle is inside the file and then releases the vehicle
+
+        Args:
+            veh (VehType): Vehicle object
+        """
+
+    def release(self, veh: VehType):
+        """Moves a vehicle to a free list so that it is not considered in the
+
+        Args:
+            r (VehType): Vehicle object
+        """
+        self._items.remove(veh)
+        self.__class__._cumul.remove(veh.vehid)
+        self._free.append(veh)
 
     def _get_vehicles_attribute(self, attribute: str) -> pd.Series:
         """Retrieve list of parameters

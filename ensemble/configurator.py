@@ -182,18 +182,8 @@ class Configurator:
         self.connector.load_scenario(scenario)
 
     def query_data(self):
+        """Queries data from the simulator and updates vehicle list"""
         self.connector.query_data()
-
-    def create_vehicle_registry(self):
-        """Creates a vehicle registry for all vehicles in simulation"""
-        self.vehicle_registry = VehicleList(self.connector.request)
-
-    def update_vehicle_registry(self):
-        """Updates vehicle registry in case it exists"""
-        if hasattr(self, "vehicle_registry"):
-            self.vehicle_registry.update_list()
-            return
-        self.create_vehicle_registry()
 
     def create_platoon_registry(self):
         """Creates a platoon registry for all coordinators (FGC-RGC)"""
@@ -213,7 +203,6 @@ class Configurator:
 
     def update_traffic_state(self):
         """Update the vehicle list and the platoon corresponding vehicle state"""
-        self.update_vehicle_registry()
         self.update_platoon_registry()
 
     def push_data(self):
@@ -228,6 +217,9 @@ class Configurator:
             else self.simulation_parameters.get("total_steps")
         )
 
+    @property
+    def vehicle_registry(self):
+        return self.connector.request.vehicle_registry
 
 if __name__ == "__main__":
     Configurator()

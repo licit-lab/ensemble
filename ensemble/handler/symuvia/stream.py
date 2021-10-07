@@ -21,6 +21,7 @@ from collections import defaultdict
 from ensemble.metaclass.stream import DataQuery
 import ensemble.tools.constants as ct
 from ensemble.handler.symuvia.xmlparser import XMLTrajectory
+from ensemble.component.vehiclelist import VehicleList
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -50,8 +51,8 @@ class SimulatorRequest(DataQuery):
     @query.setter
     def query(self, response: bytes):
         self.datatraj = XMLTrajectory(response)
-        for c in self._channels:
-            self.dispatch(c)
+        self.update_vehicle_registry()
+        self.dispatch_observers()
 
     @property
     def current_time(self) -> float:
@@ -74,6 +75,18 @@ class SimulatorRequest(DataQuery):
     # =========================================================================
     # METHODS
     # =========================================================================
+
+    def create_vehicle_registry(self):
+        """Creates a vehicle registry for all vehicles in simulation"""
+        self.vehicle_registry = VehicleList(self)
+
+    def update_vehicle_registry(self):
+        """Updates vehicle registry in case it exists"""
+        if hasattr(self, "vehicle_registry"):
+            self.vehicle_registry.update_list()
+            return
+        self.create_vehicle_registry()
+
     def get_vehicle_data(self) -> tuple:
         """Extracts vehicles information from simulators response
 
