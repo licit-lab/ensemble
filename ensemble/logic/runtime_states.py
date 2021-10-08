@@ -30,7 +30,12 @@ from ensemble.tools.exceptions import (
     EnsembleAPILoadLibraryError,
     EnsembleAPILoadFileError,
 )
-from ensemble.tools.screen import log_in_terminal, log_warning, log_error
+from ensemble.tools.screen import (
+    log_in_terminal,
+    log_warning,
+    log_error,
+    log_verify,
+)
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -137,8 +142,8 @@ class Query(AbsState):
             configurator.update_platoon_registry()
 
             if configurator.verbose:
+                log_verify("Vehicle registry:")
                 log_in_terminal(
-                    "Vehicle registry:",
                     configurator.vehicle_registry.pretty_print(
                         [
                             "abscissa",
@@ -148,8 +153,8 @@ class Query(AbsState):
                         ]
                     ),
                 )
+                log_verify("Platoon Registry:")
                 log_in_terminal(
-                    "Platoon Registry:",
                     configurator.platoon_registry.pretty_print(
                         [
                             "abscissa",
