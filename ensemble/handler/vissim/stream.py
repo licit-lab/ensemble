@@ -49,7 +49,7 @@ class SimulatorRequest(DataQuery):
     def query(self, response):
         self._str_response = response
         self.update_vehicle_registry()
-        self.dispatch_observers()
+        self.dispatch()
 
     @property
     def current_time(self) -> float:

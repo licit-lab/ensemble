@@ -57,6 +57,11 @@ class VehGapCoordinator(AbsSingleGapCoord):
     dx_ref: float = 30
     platoonid: int = 0
 
+    # def __new__(cls, **kwargs):
+    #     if kwargs.get("create"):
+    #         return super(VehGapCoordinator, cls).__new__(cls)
+    #     return None
+
     def __init__(self, vehicle: PlatoonVehicle):
         self.ego = vehicle
         self._fgc = None

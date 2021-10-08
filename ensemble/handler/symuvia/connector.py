@@ -264,3 +264,8 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     def do_next(self) -> bool:
         """Returns true if the simulation shold continue"""
         return self._bContinue
+
+    @property
+    def simulationstep(self) -> float:
+        """Current simulation step"""
+        return self._c_iter

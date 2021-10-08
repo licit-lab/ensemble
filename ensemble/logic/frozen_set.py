@@ -72,7 +72,8 @@ class SortedFrozenSet(Sequence, Set):
         return self._items == rhs._items
 
     def __hash__(self):
-        return hash((type(self), self._items))
+        # This fix is temporary to allow hashing. Be aware that this my impact if you put the vehicle list in a dictionary etc.
+        return hash((type(self), tuple(self._items)))
 
     def __add__(self, rhs):
         if not isinstance(rhs, type(self)):

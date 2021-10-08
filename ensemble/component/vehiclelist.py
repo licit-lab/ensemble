@@ -11,9 +11,10 @@ Vehicle list is a collection implementation that acts as an instance to trace in
 # ============================================================================
 
 from dataclasses import asdict
-from typing import Union
+from typing import Iterable, Union
 import pandas as pd
 import numpy as np
+from itertools import groupby
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -31,7 +32,7 @@ from ensemble.logic.publisher import Publisher
 # ============================================================================
 
 PLT_TYPE = DCT_PLT_CONST["platoon_types"]
-
+EMPTY_MESSAGE = "\tNo vehicles have been registered"
 VehType = Union[Vehicle, PlatoonVehicle]
 
 
@@ -95,6 +96,9 @@ class VehicleList(SortedFrozenSet, Publisher):
         for veh in self._items:
             if veh.vehid not in self._request.datatraj.vehid:
                 self.release(veh)
+
+        # Publish for followers
+        self.dispatch()
 
     def check_and_release(self, veh: VehType):
         """Checks wether a vehicle is inside the file and then releases the vehicle
@@ -162,9 +166,7 @@ class VehicleList(SortedFrozenSet, Publisher):
         return case.get(type)
 
     def get_leader(self, ego: Vehicle, distance: float = 100) -> Vehicle:
-        """
-        Returns ego vehicle immediate leader
-        """
+        """Returns ego vehicle immediate leader"""
         array = np.asarray(self.distance_filter(ego, "downstream", distance))
         if array.size > 0:
             idx = (np.abs(array - ego.distance)).argmin()
@@ -183,24 +185,32 @@ class VehicleList(SortedFrozenSet, Publisher):
             veh = [v for v in self._items if v.distance == closest]
             return veh[0]
 
-    def _to_pandas(self) -> pd.DataFrame:
+    def pandas_print(self, columns: Iterable = []) -> pd.DataFrame:
         """Transforms vehicle list into a pandas for rendering purposes
 
         Returns:
             df (DataFrame): Returns a table with pandas data.
 
         """
-        return pd.DataFrame([asdict(v) for v in self._items])
+        df = pd.DataFrame([asdict(v) for v in self._items])
+        return df[columns] if (columns and not df.empty) else df
+
+    def pretty_print(self, columns: list = []) -> str:
+        """Summary of info"""
+        df = self.pandas_print(["vehid"] + columns)
+        return EMPTY_MESSAGE if df.empty else str(df)
 
     def __str__(self):
         if not self._items:
-            return "No vehicles have been registered"
-        return str(self._to_pandas())
+            return EMPTY_MESSAGE
+        df = self.pandas_print()
+        return EMPTY_MESSAGE if df.empty else str(df)
 
     def __repr__(self):
         if not self._items:
-            return "No vehicles have been registered"
-        return repr(self._to_pandas())
+            return EMPTY_MESSAGE
+        df = self.pandas_print()
+        return EMPTY_MESSAGE if df.empty else str(df)
 
     def __iter__(self):
         """Protocol sorting data by largest distance on link"""
@@ -211,3 +221,14 @@ class VehicleList(SortedFrozenSet, Publisher):
 
     def __next__(self):
         return next(self.__tmpit)
+
+    def iterate_links_distances(self):
+        """Special iterator for vehicle list by considering link ordering"""
+
+        f = lambda x: x.link
+
+        lttd = sorted(self._items, key=lambda x: x.ttd, reverse=True)
+
+        for link, group_veh in groupby(lttd, f):
+            for gc in group_veh:
+                yield gc, link

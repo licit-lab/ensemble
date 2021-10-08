@@ -131,17 +131,33 @@ class Query(AbsState):
         if event == "control":
 
             # Retrieves data
-            configurator.query_data()  # Retreives + notifies
+            configurator.query_data()  # Retreives data + update_registry
 
-            # Updates vehicle + platoon registry
-            configurator.update_traffic_state()
+            # Updates platoon registry
+            configurator.update_platoon_registry()
 
             if configurator.verbose:
                 log_in_terminal(
-                    "Vehicle registry:", str(configurator.vehicle_registry)
+                    "Vehicle registry:",
+                    configurator.vehicle_registry.pretty_print(
+                        [
+                            "abscissa",
+                            "acceleration",
+                            "distance",
+                            "driven",
+                        ]
+                    ),
                 )
                 log_in_terminal(
-                    "Platoon Registry:", str(configurator.platoon_registry)
+                    "Platoon Registry:",
+                    configurator.platoon_registry.pretty_print(
+                        [
+                            "abscissa",
+                            "acceleration",
+                            "distance",
+                            "driven",
+                        ]
+                    ),
                 )
             return Control()
 
@@ -155,9 +171,9 @@ class Control(AbsState):
 
     def next_state(self, event: str, configurator) -> AbsState:
         if event == "push":
-            configurator.platoon_registry.apply_cacc(
-                configurator.connector.time
-            )
+            # configurator.platoon_registry.apply_cacc(
+            #     configurator.connector.time
+            # )
             return Push()
         return self
 

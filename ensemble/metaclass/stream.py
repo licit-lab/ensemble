@@ -98,11 +98,6 @@ class DataQuery(Publisher, metaclass=abc.ABCMeta):
     # METHODS
     # =========================================================================
 
-    def dispatch_observers(self):
-        """Publishes/dispatch information two all registered elements"""
-        for c in self._channels:
-            self.dispatch(c)
-
     def get_vehicles_property(self, property: str) -> vdata:
         """Extracts a specific property and returns a tuple containing this
         property for all vehicles in the buffer string

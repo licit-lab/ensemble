@@ -42,15 +42,15 @@ class PlatoonSet(SortedFrozenSet):
 
     pid = count(0)
 
-    def __init__(self, items=None, key="x", id: int = -1):
+    def __init__(self, items=None, key="x", id: int = 0):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
                 key=lambda x: getattr(x, key),
             )
         )
-        self.platoonid = id if id >= 0 else next(self.__class__.pid)
-        self.updatePids()
+        self.platoonid = id
+        self.update_pid()
 
     def __contains__(self, item):
         try:
@@ -94,11 +94,11 @@ class PlatoonSet(SortedFrozenSet):
             return NotImplemented
 
         if len(self._items) + len(rhs._items) < MAXTRKS:
-            # Join from the front
+            # Join from the back (rhs: tail, self:head)
             if rhs.joinable():
-                PlatoonSet.setPid(rhs.platoonid)
+                PlatoonSet.setPid(self.platoonid)
                 return PlatoonSet(
-                    tuple(chain(self._items, rhs._items)), id=self[-1].platoonid
+                    chain(self._items, rhs._items), id=self[-1].platoonid
                 )
 
         return self, rhs
@@ -130,7 +130,7 @@ class PlatoonSet(SortedFrozenSet):
         return self & PlatoonSet(iterable)
 
     def union(self, iterable):
-        return self | PlatoonSet(iterable)
+        return self | PlatoonSet(iterable, id=self.platoonid)
 
     def symmetric_difference(self, iterable):
         return self ^ PlatoonSet(iterable)
@@ -142,12 +142,16 @@ class PlatoonSet(SortedFrozenSet):
         """Exams last vehicle in the Platoon"""
         return self[-1].joinable
 
-    def updatePids(self):
+    def increase_pid(self):
+        """Increases platoon id"""
+        return next(self.__class__.pid)
+
+    def update_pid(self):
         """Exams and updates the Platoon Index Position"""
         for _, item in enumerate(self._items):
             item.platoonid = self.platoonid
 
     @classmethod
-    def setPid(cls, value):
+    def set_pid(cls, value):
         """Set counter for the platoons"""
         cls.pid = count(value)
