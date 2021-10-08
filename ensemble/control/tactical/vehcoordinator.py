@@ -122,6 +122,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
     def solve_state(self) -> PLState:
         """Logic solver for the platoon state machine."""
         new_state = self.status.next_state(self)
+        self.ego.state = new_state
         self.reference.create_time_gap_hwy(new_state)
         return new_state
 

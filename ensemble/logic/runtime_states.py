@@ -153,7 +153,7 @@ class Query(AbsState):
                 log_in_terminal(
                     configurator.platoon_registry.pretty_print(
                         [
-                            "status",
+                            "state",
                             "platoon",
                             "comv2x",
                             "abscissa",
