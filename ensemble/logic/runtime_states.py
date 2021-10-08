@@ -149,7 +149,6 @@ class Query(AbsState):
                     ),
                 )
                 log_verify("Platoon Registry:")
-                log_in_terminal(configurator.platoon_registry)
                 log_in_terminal(
                     configurator.platoon_registry.pretty_print(
                         [
