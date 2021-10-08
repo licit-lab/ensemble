@@ -96,7 +96,7 @@ class VehicleList(SortedFrozenSet, Publisher):
 
         # Take out exciting vehicles
         for veh in self._items:
-            if veh.vehid not in self._request.datatraj.vehid:
+            if veh.vehid not in self._request.get_vehicles_property("vehid"):
                 self.release(veh)
 
         # Publish for followers

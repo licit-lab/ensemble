@@ -116,7 +116,10 @@ class GlobalGapCoordinator(Subscriber):
     def release_vehicle_gcs(self):
         """Releases all gap coordinators w.r.t publihser"""
         for vgc in self.iter_group_link(downtoup=True, vgc=True):
-            if vgc.ego.vehid not in self._publisher._request.datatraj.vehid:
+            if (
+                vgc.ego.vehid
+                not in self._publisher._request.get_vehicles_property("vehid")
+            ):
                 self.release_gapcoordinator(vgc)
 
     def vgcs(self):
