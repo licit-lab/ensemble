@@ -145,12 +145,7 @@ class Query(AbsState):
                 log_verify("Vehicle registry:")
                 log_in_terminal(
                     configurator.vehicle_registry.pretty_print(
-                        [
-                            "abscissa",
-                            "acceleration",
-                            "distance",
-                            "driven",
-                        ]
+                        ["abscissa", "ordinate", "acceleration", "speed"]
                     ),
                 )
                 log_verify("Platoon Registry:")
@@ -158,7 +153,9 @@ class Query(AbsState):
                     configurator.platoon_registry.pretty_print(
                         [
                             "abscissa",
+                            "ordinate",
                             "acceleration",
+                            "speed",
                             "distance",
                             "driven",
                         ]

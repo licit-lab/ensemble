@@ -72,7 +72,9 @@ class VehicleList(SortedFrozenSet, Publisher):
             for v in request.get_vehicle_data()
         )
         self._free = []
-        self.__class__._cumul = self.__class__._cumul.union(request.datatraj.id)
+        self.__class__._cumul = self.__class__._cumul.union(
+            request.get_vehicles_property("vehid")
+        )
         SortedFrozenSet.__init__(self, tuple(data))
         Publisher.__init__(self)
 
