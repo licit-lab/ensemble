@@ -74,7 +74,12 @@ class Point:
 
     def isinfrontof(self, m):
         """Returns true if point behind of this one"""
-        return not self.isbehindof(m)
+        n = self.findperpendicular()
+        a = n + self
+        b = self
+        return (
+            np.sign((b.x - a.x) * (m.y - a.y) - (b.y - a.y) * (m.x - a.x)) < 0
+        )
 
     def __add__(self, point):
         return Point(self.x + point.x, self.y + point.y)

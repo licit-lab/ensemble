@@ -93,6 +93,8 @@ class VehicleList(SortedFrozenSet, Publisher):
                     self.__class__._cumul.add(v.get("vehid"))
                 lead = self.get_leader(newveh[-1])
                 newveh[-1].leadid = lead.vehid
+                follow = self.get_follower(newveh[-1])
+                newveh[-1].followid = follow.vehid
         data = SortedFrozenSet(self._items).union(newveh)
         data = data.union(extra)
 
@@ -107,6 +109,7 @@ class VehicleList(SortedFrozenSet, Publisher):
         # Publish for followers
         self.dispatch()
         self.update_leaders()
+        self.update_followers()
 
     def check_and_release(self, veh: VehType):
         """Checks wether a vehicle is inside the file and then releases the vehicle
@@ -276,7 +279,7 @@ class VehicleList(SortedFrozenSet, Publisher):
         Returns ego vehicle immediate follower
         """
         upstreamdistance = self.distance_filter(
-            ego, "downstream", property="distance", radius=distance
+            ego, "upstream", property="distance", radius=distance
         )
 
         # Former case, if we detect vehicles upstream
@@ -285,6 +288,7 @@ class VehicleList(SortedFrozenSet, Publisher):
             idx = (np.abs(array - ego.distance)).argmin()
             closest = array[idx]
             veh = [v for v in self._items if v.distance == closest]
+            ego.followid = veh[0].vehid
             return veh[0]
 
         radiusids = self.distance_filter(
@@ -321,6 +325,11 @@ class VehicleList(SortedFrozenSet, Publisher):
 
         ego.followid = follower.vehid
         return follower
+
+    def update_followers(self):
+        """Updates all vehicles followers"""
+        for veh in self:
+            self.get_follower(veh)
 
     def pandas_print(self, columns: Iterable = []) -> pd.DataFrame:
         """Transforms vehicle list into a pandas for rendering purposes

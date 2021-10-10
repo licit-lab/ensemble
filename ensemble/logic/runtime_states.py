@@ -143,12 +143,13 @@ class Query(AbsState):
                 log_in_terminal(
                     configurator.vehicle_registry.pretty_print(
                         [
+                            "leadid",
+                            "followid",
                             "abscissa",
                             "ordinate",
                             "acceleration",
                             "speed",
                             "link",
-                            "leadid",
                             "ttd",
                         ]
                     ),
