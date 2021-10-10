@@ -42,14 +42,14 @@ class PlatoonSet(SortedFrozenSet):
 
     pid = count(0)
 
-    def __init__(self, items=None, key="x", id: int = 0):
+    def __init__(self, items=None, key="x", id: int = -1):
         self._items = tuple(
             sorted(
                 set(items) if (items is not None) else set(),
                 key=lambda x: getattr(x, key),
             )
         )
-        self.platoonid = id
+        self.platoonid = id if id >= 0 else self.increase_pid()
         self.update_pid()
 
     def __contains__(self, item):
@@ -96,7 +96,6 @@ class PlatoonSet(SortedFrozenSet):
         if len(self._items) + len(rhs._items) < MAXTRKS:
             # Join from the back (rhs: tail, self:head)
             if rhs.joinable():
-                PlatoonSet.setPid(self.platoonid)
                 return PlatoonSet(
                     chain(self._items, rhs._items), id=self[-1].platoonid
                 )

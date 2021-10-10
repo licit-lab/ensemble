@@ -44,7 +44,7 @@ class GlobalGapCoordinator(Subscriber):
     def __init__(self, vehicle_registry: VehicleList):
         self._gcnet = nx.DiGraph()
         super().__init__(vehicle_registry)
-        self.platoon_sets = []
+        self.platoon_sets = {}
         self.free_gcs = []
         self.update_platoons()
 
@@ -71,6 +71,7 @@ class GlobalGapCoordinator(Subscriber):
             d = asdict(data)
             d = dict(d, **asdict(data.ego))
             d["platoonid"] = data.platoonid
+            d["distance"] = data.ego.distance
             veh_data.append(d)
         df = pd.DataFrame(veh_data)
         if columns and not df.empty:
@@ -107,7 +108,6 @@ class GlobalGapCoordinator(Subscriber):
         self.add_vehicle_gcs()
         self.release_vehicle_gcs()
         self.update_leaders()
-        self.platoons_sets = []
 
     def add_vehicle_gcs(self):
         """Add all gap coordinators w.r.t publisher"""
@@ -144,7 +144,6 @@ class GlobalGapCoordinator(Subscriber):
 
     def update_leader(self, vgc: VehGapCoordinator):
         """Add or creates leader for a specific gap coordinator"""
-
         leader = self._publisher.get_leader(vgc.ego, distance=MAXNDST)
         if (
             leader is not None
@@ -180,34 +179,32 @@ class GlobalGapCoordinator(Subscriber):
             else:
                 yield group_gc
 
-    def platoon_sets_flattenned(self):
-        """Returns an iterable for all platoons"""
-        return chain(self.platoon_sets)
-
     def create_platoon_sets(self):
         """Create all platoons subsets"""
-        PlatoonSet.set_pid(0)
         converter = lambda x: x[1].get("vgc")
-        for group_gc in self.iter_group_link(downtoup=True):
-            self.platoon_sets.append(PlatoonSet(map(converter, group_gc)))
+        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+            if not vgc.platoon:
+                if vgc.leader.ego == vgc.ego or vgc.ego in PLT_TYP:
+                    # Head
+                    ps = PlatoonSet((vgc,))
+                    ps.update_pid()
+                    self.platoon_sets[ps.platoonid] = ps
+                else:
+                    # Try join from behind
 
-    def fuse_platoons_sets(self, vgc: VehGapCoordinator):
-        """Recursively update platoons"""
+                    # Retrieve id of leader
+                    lps = self.platoon_sets[vgc.leader.platoonid]
+                    jps = lps + PlatoonSet((vgc,))
 
-        for ps in self.platoon_sets_flattenned():
-            self.join_platoon_from_behind(ps)
-
-        ps = PlatoonSet((vgc,))
-        tmp = self.create_platoons(vgc.leader) + ps
-        if isinstance(tmp, tuple):
-            return tmp[1]
-        self._platoons.remove(tmp[1:])
-        self._platoons.append(tmp)
-        return tmp
-
-    def join_platoon_from_behind(self, ps: PlatoonSet):
-        if len(ps) == 1 and ps[0].leader.ego.vehid == ps[1].ego.vehid:
-            return
+                    if isinstance(jps, tuple):
+                        # This means back was refused
+                        self.platoon_sets[jps[1].platoonid] = jps[1]
+                        jps[1].update_pid()
+                    else:
+                        self.platoon_sets[vgc.leader.platoonid] = jps
+                        jps.update_pid()
+                        PlatoonSet.set_pid(jps[1].platoonid)
+                vgc.platoon = True
 
     def update_platoons(self):
         """First iteration to fill the platoon registry based on the current
@@ -215,18 +212,10 @@ class GlobalGapCoordinator(Subscriber):
         """
 
         # The main idea to update the  platoon_registry is the following:
-        # 1. Add gap coordinators:
-        #     1a. Iterate over the whole vehicle_registry
-        #     1b. Group vehicles per link.
-        #     1c. Iterate from largest ttd towards smaller ttd
-        #         1c1. For current link, iterate from head to tail.
-        #         1c2. Create the current gap coordinator (gc).
-        #         1c3. Add the vehicle gap coordinator to the list of gc
-        #         1c4. For each vehicle find its leader number
-        #              1c4a. is the leader in the gc?
-        #                     yes -> add an edge from current gc to leader gc.
-        #                     no -> do 1c2/1c3.
-        #                           add an edge from current gc to leader gc.
+        # 1. Once the vehicle registry is updated, via a dispatch may update
+        #    the list of gap coordinators.
+        # 2. When entering here gap coordinators should be available.
+        # 3. W
         # 2. Merge gap coordinators:
         #    2a. Iterate over gc per link
         #    2b. Iterate from upstream towards downstream on gc (small with largest ttd)
@@ -242,8 +231,7 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         self.create_platoon_sets()
 
-        # self.fuse_platoons_sets()
-        log_in_terminal(f"Len platoonsets {len(self.platoon_sets)}")
+        log_in_terminal(f"Len platoonsets {len(self.platoon_sets.keys())}")
         self.update_states()
 
     @property

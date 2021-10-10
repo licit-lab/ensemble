@@ -145,6 +145,7 @@ class Query(AbsState):
                         [
                             "leadid",
                             "followid",
+                            "vehtype",
                             "abscissa",
                             "ordinate",
                             "acceleration",
