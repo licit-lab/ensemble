@@ -51,8 +51,8 @@ class SimulatorRequest(DataQuery):
     @query.setter
     def query(self, response: bytes):
         self.datatraj = XMLTrajectory(response)
-        self.update_vehicle_registry()
         self.dispatch()
+        self.update_vehicle_registry()
 
     @property
     def current_time(self) -> float:

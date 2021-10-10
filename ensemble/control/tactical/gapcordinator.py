@@ -106,6 +106,8 @@ class GlobalGapCoordinator(Subscriber):
 
         self.add_vehicle_gcs()
         self.release_vehicle_gcs()
+        self.update_leaders()
+        self.platoons_sets = []
 
     def add_vehicle_gcs(self):
         """Add all gap coordinators w.r.t publisher"""
@@ -152,6 +154,11 @@ class GlobalGapCoordinator(Subscriber):
             self._gcnet.add_edge(vgc.ego.vehid, leader.vehid)
             self[vgc.ego.vehid].leader = self[leader.vehid]
             self[vgc.ego.vehid].leader_data = {"id": leader.vehid}
+
+    def update_leaders(self):
+        """Updates leaders for all gap coordinators"""
+        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+            self.update_leader(vgc)
 
     def update_states(self):
         """Update platoon state according to current information"""

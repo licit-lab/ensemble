@@ -85,6 +85,7 @@ class Vehicle(Subscriber):
     abscissa: float = 0.0
     acceleration: float = 0.0
     distance: float = 0.0
+    _distance: float = field(init=False, repr=False, default=0.0)
     driven: bool = False
     elevation: float = 0.0
     lane: int = 1
@@ -93,6 +94,9 @@ class Vehicle(Subscriber):
     speed: float = 25.0
     vehid: int = 0
     vehtype: str = ""
+    leadid: int = 0
+    followid: int = 0
+    ttd: float = 0
 
     def __init__(
         self,
@@ -109,6 +113,7 @@ class Vehicle(Subscriber):
         # Internal
         self._ttdprev = 0
         self._ttdpivot = 0
+        self.distance = 0.0
 
         # Optional properties
         self.update_no_request(**kwargs)
@@ -127,6 +132,7 @@ class Vehicle(Subscriber):
         """Updates data from publisher"""
         dataveh = self._publisher.get_vehicle_properties(self.vehid)
         self.__dict__.update(**dataveh)
+        self.distance = dataveh["distance"]  # explicit update
 
         link = getattr(self, "link")
         if link not in getattr(self, "itinerary"):
@@ -145,6 +151,18 @@ class Vehicle(Subscriber):
             np.ndarray: [3d-array] @ k+1 [distance;speed;acceleration]
         """
         return np.array((self.distance, self.speed, self.acceleration))
+
+    @property
+    def distance(self):
+        return self._distance
+
+    @distance.setter
+    def distance(self, value):
+        self._distance = value
+        if self._distance < self._ttdprev:
+            self._ttdpivot += self._ttdprev
+        self._ttddist = self._ttdpivot + self._distance
+        self._ttdprev = self._distance
 
     @property
     def x(self):
@@ -180,8 +198,4 @@ class Vehicle(Subscriber):
         #     lst.append(dist)
         # return lst
 
-        if self.x < self._ttdprev:
-            self._ttdpivot += self._ttdprev
-        self._ttddist = self._ttdpivot + self.x
-        self._ttdprev = self.x
         return self._ttddist

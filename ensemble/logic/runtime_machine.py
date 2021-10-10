@@ -25,6 +25,7 @@ from .runtime_states import (
     PostRoutine,
     Terminate,
 )
+from ensemble.tools.screen import log_success
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -59,7 +60,7 @@ class RuntimeDevice:
             # Step counted on PreRoutine
             if isinstance(self.state, PostRoutine):
                 ccycle = ccycle + 1
-                click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
+                log_success(f"Step: {ccycle}")
             if isinstance(self.state, Terminate):
                 break
 

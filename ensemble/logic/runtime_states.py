@@ -138,21 +138,32 @@ class Query(AbsState):
             # Retrieves data
             configurator.query_data()  # Retreives data + update_registry
 
-            # Updates platoon registry
-            configurator.update_platoon_registry()
-
             if configurator.verbose:
                 log_verify("Vehicle registry:")
                 log_in_terminal(
                     configurator.vehicle_registry.pretty_print(
-                        ["abscissa", "ordinate", "acceleration", "speed"]
+                        [
+                            "abscissa",
+                            "ordinate",
+                            "acceleration",
+                            "speed",
+                            "link",
+                            "leadid",
+                            "ttd",
+                        ]
                     ),
                 )
+
+            # Updates platoon registry
+            configurator.update_platoon_registry()
+
+            if configurator.verbose:
                 log_verify("Platoon Registry:")
                 log_in_terminal(
                     configurator.platoon_registry.pretty_print(
                         [
                             "state",
+                            "link",
                             "platoon",
                             "comv2x",
                             "abscissa",
@@ -161,6 +172,7 @@ class Query(AbsState):
                             "speed",
                             "distance",
                             "driven",
+                            "ttd",
                         ]
                     ),
                 )

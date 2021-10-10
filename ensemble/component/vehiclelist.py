@@ -26,6 +26,7 @@ from ensemble.tools.constants import DCT_PLT_CONST
 
 from ensemble.logic.frozen_set import SortedFrozenSet
 from ensemble.logic.publisher import Publisher
+from ensemble.tools.geometry import Point
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -83,11 +84,15 @@ class VehicleList(SortedFrozenSet, Publisher):
         newveh = []
         # Create only new vehicles
         for v in self._request.get_vehicle_data():
-            if (v.get("vehtype") in PLT_TYPE) and (
-                v.get("vehid") not in self.__class__._cumul
-            ):
-                newveh.append(PlatoonVehicle(self._request, **v))
-                self.__class__._cumul.add(v.get("vehid"))
+            if v.get("vehid") not in self.__class__._cumul:
+                if v.get("vehtype") in PLT_TYPE:
+                    newveh.append(PlatoonVehicle(self._request, **v))
+                    self.__class__._cumul.add(v.get("vehid"))
+                else:
+                    newveh.append(Vehicle(self._request, **v))
+                    self.__class__._cumul.add(v.get("vehid"))
+                lead = self.get_leader(newveh[-1])
+                newveh[-1].leadid = lead.vehid
         data = SortedFrozenSet(self._items).union(newveh)
         data = data.union(extra)
 
@@ -101,6 +106,7 @@ class VehicleList(SortedFrozenSet, Publisher):
 
         # Publish for followers
         self.dispatch()
+        self.update_leaders()
 
     def check_and_release(self, veh: VehType):
         """Checks wether a vehicle is inside the file and then releases the vehicle
@@ -128,7 +134,7 @@ class VehicleList(SortedFrozenSet, Publisher):
         Returns
             dataframe (series): Returns values for a set of vehicles
         """
-        return self._to_pandas()[attribute]
+        return self.pandas_print()[attribute]
 
     @property
     def acceleration(self) -> pd.Series:
@@ -145,47 +151,176 @@ class VehicleList(SortedFrozenSet, Publisher):
         """Returns all vehicle's accelerations"""
         return self._get_vehicles_attribute("distance")
 
+    @property
+    def link(self) -> pd.Series:
+        """Returns all vehicle's link"""
+        return self._get_vehicles_attribute("link")
+
+    @property
+    def lane(self) -> pd.Series:
+        """Returns all vehicle's lane"""
+        return self._get_vehicles_attribute("lane")
+
+    @property
+    def abscissa(self) -> pd.Series:
+        """Returns all vehicle's abscissa"""
+        return self._get_vehicles_attribute("abscissa")
+
+    @property
+    def ordinate(self) -> pd.Series:
+        """Returns all vehicle's ordinate"""
+        return self._get_vehicles_attribute("ordinate")
+
+    @property
+    def vehid(self) -> pd.Series:
+        """Returns all vehicle's vehid"""
+        return self._get_vehicles_attribute("vehid")
+
+    @property
+    def leadid(self) -> pd.Series:
+        """Returns all leader vehicle's vehid"""
+        return self._get_vehicles_attribute("leadid")
+
     def distance_filter(
-        self, ego: Vehicle, type: str = "downstream", radius: float = 100
+        self,
+        ego: Vehicle,
+        type: str = "downstream",
+        property="distance",
+        radius: float = 100,
     ):
         """
         Returns all vehicles' downstream or
         """
         case = {
-            "downstream": [
-                v.distance
+            "downstream": {
+                getattr(v, "vehid"): getattr(v, property)
                 for v in self._items
                 if v.distance > ego.distance
                 and v.distance < ego.distance + radius
-            ],
-            "upstream": [
-                v.distance
+            },
+            "upstream": {
+                getattr(v, "vehid"): getattr(v, property)
                 for v in self._items
                 if v.distance < ego.distance
                 and v.distance > ego.distance - radius
-            ],
+            },
+            "all": {
+                getattr(v, "vehid"): getattr(v, property)
+                for v in self._items
+                if np.linalg.norm(
+                    [v.abscissa - ego.abscissa, v.ordinate - ego.ordinate]
+                )
+                < radius
+            },
         }
         return case.get(type)
 
     def get_leader(self, ego: Vehicle, distance: float = 100) -> Vehicle:
         """Returns ego vehicle immediate leader"""
-        array = np.asarray(self.distance_filter(ego, "downstream", distance))
-        if array.size > 0:
+
+        downstreamdistance = self.distance_filter(
+            ego, "downstream", property="_distance", radius=distance
+        )
+
+        # Former case, if we detect vehicles downstream
+        if downstreamdistance:
+            array = np.array(tuple(downstreamdistance.values()))
+            idx = (np.abs(array - ego.distance)).argmin()
+            closest = array[idx]
+            veh = [v for v in self._items if v.distance == closest]
+            ego.leadid = veh[0].vehid
+            return veh[0]
+
+        radiusids = self.distance_filter(
+            ego, "all", property="lane", radius=distance
+        )
+
+        # Get the average points beyond
+        ego_pos = Point(ego.abscissa, ego.ordinate)
+        points_in_radious = {
+            x.vehid: Point(x.abscissa, x.ordinate).isinfrontof(ego_pos)
+            for x in self
+            if x.vehid != ego.vehid and x.vehid in radiusids.keys()
+        }
+
+        if points_in_radious == {}:
+            # No vehicles in radious or I am traveling alone
+            ego.leadid = ego.vehid
+            return ego
+
+        candidates = {
+            x.vehid: ego_pos.distanceto(Point(x.abscissa, x.ordinate))
+            for x in self._items
+            if ego_pos.isbehindof(Point(x.abscissa, x.ordinate))
+        }
+
+        if candidates == {}:
+            # No points beyond so I am my leader with followers
+            ego.leadid = ego.vehid
+            return ego
+
+        distances = np.asarray(list(candidates.values()))
+        idx = distances.argmin()
+        leader = self[list(candidates.keys())[idx]]
+
+        ego.leadid = leader.vehid
+        return leader
+
+    def update_leaders(self):
+        """Updates all vehicles leaders"""
+        for veh in self:
+            self.get_leader(veh)
+
+    def get_follower(self, ego: Vehicle, distance: float = 100) -> Vehicle:
+        """
+        Returns ego vehicle immediate follower
+        """
+        upstreamdistance = self.distance_filter(
+            ego, "downstream", property="distance", radius=distance
+        )
+
+        # Former case, if we detect vehicles upstream
+        if upstreamdistance:
+            array = np.array(tuple(upstreamdistance.values()))
             idx = (np.abs(array - ego.distance)).argmin()
             closest = array[idx]
             veh = [v for v in self._items if v.distance == closest]
             return veh[0]
 
-    def get_follower(self, ego: Vehicle) -> Vehicle:
-        """
-        Returns ego vehicle immediate leader
-        """
-        array = np.asarray(self.distance_filter(ego, "upstream"))
-        if array.size > 0:
-            idx = (np.abs(array - ego.distance)).argmin()
-            closest = array[idx]
-            veh = [v for v in self._items if v.distance == closest]
-            return veh[0]
+        radiusids = self.distance_filter(
+            ego, "all", property="lane", radius=distance
+        )
+
+        # Get the average points behind
+        ego_pos = Point(ego.abscissa, ego.ordinate)
+        points_in_radious = {
+            x.vehid: Point(x.abscissa, x.ordinate).isbehindof(ego_pos)
+            for x in self
+            if x.vehid != ego.vehid and x.vehid in radiusids.keys()
+        }
+
+        if points_in_radious == {}:
+            # No vehicles in radious or I am traveling alone
+            ego.followid = ego.vehid
+            return ego
+
+        candidates = {
+            x.vehid: ego_pos.distanceto(Point(x.abscissa, x.ordinate))
+            for x in self._items
+            if ego_pos.isinfrontof(Point(x.abscissa, x.ordinate))
+        }
+
+        if candidates == {}:
+            # No points beyond so I am my leader with followers
+            ego.followid = ego.vehid
+            return ego
+
+        distances = np.asarray(list(candidates.values()))
+        idx = distances.argmin()
+        follower = self[list(candidates.keys())[idx]]
+
+        ego.followid = follower.vehid
+        return follower
 
     def pandas_print(self, columns: Iterable = []) -> pd.DataFrame:
         """Transforms vehicle list into a pandas for rendering purposes
