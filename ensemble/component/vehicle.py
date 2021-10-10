@@ -167,7 +167,7 @@ class Vehicle(Subscriber):
     @property
     def x(self):
         """Return vehicle travelled ditance"""
-        return self.distance
+        return self.ttd
 
     @property
     def v(self):
