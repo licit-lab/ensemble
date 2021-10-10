@@ -168,13 +168,11 @@ class Query(AbsState):
                             "link",
                             "platoon",
                             "comv2x",
-                            "abscissa",
-                            "ordinate",
                             "acceleration",
                             "speed",
-                            "distance",
                             "driven",
                             "ttd",
+                            "positionid",
                         ]
                     ),
                 )

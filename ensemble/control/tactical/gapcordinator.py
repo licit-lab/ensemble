@@ -189,6 +189,7 @@ class GlobalGapCoordinator(Subscriber):
                     ps = PlatoonSet((vgc,))
                     ps.update_pid()
                     self.platoon_sets[ps.platoonid] = ps
+                    vgc.positionid = len(ps) - 1
                 else:
                     # Try join from behind
 
@@ -200,10 +201,12 @@ class GlobalGapCoordinator(Subscriber):
                         # This means back was refused
                         self.platoon_sets[jps[1].platoonid] = jps[1]
                         jps[1].update_pid()
+                        vgc.positionid = len(jps[1]) - 1
                     else:
                         self.platoon_sets[vgc.leader.platoonid] = jps
                         jps.update_pid()
                         PlatoonSet.set_pid(jps[1].platoonid)
+                        vgc.positionid = len(jps) - 1
                 vgc.platoon = True
 
     def update_platoons(self):

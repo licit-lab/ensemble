@@ -56,6 +56,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
     comv2x: bool = True
     dx_ref: float = 30
     platoonid: int = 0
+    positionid: int = 0
 
     # def __new__(cls, **kwargs):
     #     if kwargs.get("create"):
@@ -66,7 +67,6 @@ class VehGapCoordinator(AbsSingleGapCoord):
         self.ego = vehicle
         self._fgc = None
         self._rgc = None
-        self.positionid = 0
 
         create_dct = lambda: {key: 0.0 for key in KEYS}
         self._ctr_lead_data = create_dct()
