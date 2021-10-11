@@ -4,13 +4,14 @@ import os
 import sys
 
 bottleneck04 = os.path.join(
-    os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_004.xml"
+    os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_hybrid.xml"
 )
 
 file_path = ("tests", "mocks", "vissim", "TestNetwork.inpx")
 file_layx_path = ("tests", "mocks", "vissim", "TestNetwork.layx")
 
 c = Configurator()
+c.verbose = True
 c.set_simulation_platform("")  # Automatic detection
 if c.platform == "Darwin":
     c.update_values(scenario_files=(bottleneck04,))  # Set scenario
