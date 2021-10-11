@@ -187,7 +187,6 @@ class GlobalGapCoordinator(Subscriber):
                 if vgc.leader.ego == vgc.ego or vgc.ego in PLT_TYP:
                     # Head
                     ps = PlatoonSet((vgc,))
-                    ps.update_pid()
                     self.platoon_sets[ps.platoonid] = ps
                     vgc.positionid = len(ps) - 1
                 else:
@@ -195,17 +194,18 @@ class GlobalGapCoordinator(Subscriber):
 
                     # Retrieve id of leader
                     lps = self.platoon_sets[vgc.leader.platoonid]
-                    jps = lps + PlatoonSet((vgc,))
+                    nwps = PlatoonSet((vgc,))
+                    jps = lps + nwps
 
                     if isinstance(jps, tuple):
                         # This means back was refused
                         self.platoon_sets[jps[1].platoonid] = jps[1]
-                        jps[1].update_pid()
                         vgc.positionid = len(jps[1]) - 1
                     else:
                         self.platoon_sets[vgc.leader.platoonid] = jps
-                        jps.update_pid()
-                        PlatoonSet.set_pid(jps[1].platoonid)
+                        PlatoonSet.set_pid(
+                            nwps.platoonid
+                        )  # Retrieves former id
                         vgc.positionid = len(jps) - 1
                 vgc.platoon = True
 
@@ -234,8 +234,13 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         self.create_platoon_sets()
 
-        log_in_terminal(f"Len platoonsets {len(self.platoon_sets.keys())}")
+        
         self.update_states()
+
+    @property
+    def nplatoons(self)->int:
+        """Return the number of created platoons"""
+        return len(self.platoon_sets.keys())
 
     @property
     def cacc(self):

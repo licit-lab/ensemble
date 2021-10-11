@@ -49,7 +49,7 @@ class PlatoonSet(SortedFrozenSet):
                 key=lambda x: getattr(x, key),
             )
         )
-        self.platoonid = id if id >= 0 else self.increase_pid()
+        self.platoonid = id if id >= 0 else next(self.__class__.pid)
         self.update_pid()
 
     def __contains__(self, item):

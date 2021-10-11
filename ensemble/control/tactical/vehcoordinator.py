@@ -67,6 +67,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
         self.ego = vehicle
         self._fgc = None
         self._rgc = None
+        self._posid = 0
 
         create_dct = lambda: {key: 0.0 for key in KEYS}
         self._ctr_lead_data = create_dct()
@@ -198,12 +199,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def positionid(self):
         """Platoon id 0-index notation to denote position on the platoon"""
-        return self._platoonid
+        return self._posid
 
     @positionid.setter
     def positionid(self, value):
         """Platoon id 0-index notation to denote position on the platoon"""
-        self._platoonid = np.clip(value, 0, MAXTRKS)
+        self._posid = np.clip(value, 0, MAXTRKS)
 
     @property
     def history_control(self):

@@ -176,6 +176,9 @@ class Query(AbsState):
                         ]
                     ),
                 )
+                log_in_terminal(
+                    f"Number of platoons: {configurator.platoon_registry.nplatoons}"
+                )
             return Control()
 
         return self
