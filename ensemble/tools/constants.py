@@ -134,8 +134,8 @@ DCT_PLT_DATA = {
 }
 
 DCT_LIB_CACC = {
-    "Windows": "OperationalDLL.dll",
-    "Darwin": "OperationalDLL.dylib",
+    "Windows": "accAndCacc.dll",
+    "Darwin": "accAndCacc.dylib",
     "Linux": "OperationalDLL.so",
 }
 
