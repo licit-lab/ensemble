@@ -132,7 +132,10 @@ class Vehicle(Subscriber):
         """Updates data from publisher"""
         dataveh = self._publisher.get_vehicle_properties(self.vehid)
         self.__dict__.update(**dataveh)
-        self.distance = dataveh["distance"]  # explicit update
+        try:
+            self.distance = dataveh["distance"]  # explicit update
+        except KeyError:
+            pass
 
         link = getattr(self, "link")
         if link not in getattr(self, "itinerary"):
