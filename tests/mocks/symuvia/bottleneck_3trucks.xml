@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT_SYMUBRUIT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../reseau.xsd" version="2.05">
     <SIMULATIONS>
-        <SIMULATION id="simID" pasdetemps="1" debut="00:00:00" fin="00:00:30" loipoursuite="exacte" comportementflux="iti" date="1985-01-17" titre="" proc_deceleration="false" seed="1">
+        <SIMULATION id="simID" pasdetemps="1" debut="00:00:00" fin="00:00:40" loipoursuite="exacte" comportementflux="iti" date="1985-01-17" titre="" proc_deceleration="false" seed="1">
             <RESTITUTION trace_route="false" trajectoires="true" debug="false" debug_matrice_OD="false" debug_SAS="false"/>
         </SIMULATION>
     </SIMULATIONS>
