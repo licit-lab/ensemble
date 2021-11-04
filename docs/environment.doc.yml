@@ -1,4 +1,4 @@
-name: ensemble_doc
+name: ensemble-doc
 channels:
   - licit-lab
   - conda-forge
@@ -17,13 +17,17 @@ dependencies:
   - pytest
   - coverage
   - ipython
-  - symuvia=1.0.0
+  - symuflow=1.0.0
+  - pyqt
+  - pyqtgraph
+  - pytest
+  - coverage
+  - ipython
   - pandoc
   - sphinx
   - recommonmark
   - nbsphinx
   - sphinx-book-theme
   - ipykernel
-  - pip 
-  - pip:
-    - --editable ..
+  - myst-parser
+  - pip

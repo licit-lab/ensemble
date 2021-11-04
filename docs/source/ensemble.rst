@@ -5,12 +5,14 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    ensemble.component
    ensemble.control
    ensemble.handler
    ensemble.input
-   ensemble.state
+   ensemble.logic
+   ensemble.metaclass
    ensemble.tools
 
 Submodules
@@ -39,7 +41,6 @@ ensemble.ensemble module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

@@ -40,22 +40,19 @@ for item in sys.path:
 
 # -- Project information -----------------------------------------------------
 
-import ensemble
-
-
-# -- Project information -----------------------------------------------------
-
 project = "Ensemble Truck Platooning API"
 copyright = "2020, Ensemble WP 4.5"
 author = "Ensemble WP 4.5"
 
-# The version info for the project you're documenting, acts as replacement
-# for |version| and |release|, also used in various other places throughout
-# the built documents.
-#
-# The short X.Y version.
-version = ensemble.__version__
-# The full version, including alpha/beta/rc tags.
+from symupy.utils.constants import DEFAULT_PATH_SYMUFLOW
+
+print("LIB: Library Check")
+print("===============================")
+print(DEFAULT_PATH_SYMUFLOW)
+
+import ensemble
+
+# The full version, including alpha/beta/rc tags
 release = ensemble.__version__
 
 
@@ -64,7 +61,13 @@ release = ensemble.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon", "recommonmark"]
+extensions = [
+    "nbsphinx",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "myst_parser",
+]
 
 # Napoleon settings
 napoleon_google_docstring = True
@@ -78,6 +81,9 @@ napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
+
+# Skipping errors
+nbsphinx_allow_errors = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -114,13 +120,22 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "bizstyle"
-
-# Theme options are theme-specific and customize the look and feel of a
-# theme further.  For a list of options available for each theme, see the
-# documentation.
 #
-# html_theme_options = {}
+html_theme = "sphinx_book_theme"
+html_logo = "_static/logo.png"
+html_title = f"v{ensemble.__version__}"
+html_copy_source = True
+html_sourcelink_suffix = ""
+html_favicon = "_static/logo.png"
+html_last_updated_fmt = ""
+
+# Options theme
+html_theme_options = {
+    "repository_url": "https://github.com/licit-lab/ensemble",
+    "use_issues_button": False,
+    "use_edit_page_button": False,
+}
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -154,14 +169,30 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
-latex_documents = [(master_doc, "ensemble.tex", "Ensemble Truck Platooning Documentation", "Andres Ladino", "manual",)]
+latex_documents = [
+    (
+        master_doc,
+        "ensemble.tex",
+        "Ensemble Truck Platooning Documentation",
+        "Andres Ladino",
+        "manual",
+    )
+]
 
 
 # -- Options for manual page output ------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "ensemble", "Ensemble Truck Platooning Documentation", [author], 1,)]
+man_pages = [
+    (
+        master_doc,
+        "ensemble",
+        "Ensemble Truck Platooning Documentation",
+        [author],
+        1,
+    )
+]
 
 
 # -- Options for Texinfo output ----------------------------------------
