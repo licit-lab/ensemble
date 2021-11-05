@@ -1,4 +1,4 @@
-""" 
+"""
 Vehicle List
 =============
 This module implements a vehicle list model.
@@ -79,7 +79,7 @@ class VehicleList(SortedFrozenSet, Publisher):
         SortedFrozenSet.__init__(self, tuple(data))
         Publisher.__init__(self)
 
-    def update_list(self, extra=[]):
+    def update_list(self, extra: Iterable[Vehicle] = []):
         """Update vehicle data according to an update in the request."""
         newveh = []
         # Create only new vehicles
@@ -110,13 +110,6 @@ class VehicleList(SortedFrozenSet, Publisher):
         self.dispatch()
         self.update_leaders()
         self.update_followers()
-
-    def check_and_release(self, veh: VehType):
-        """Checks wether a vehicle is inside the file and then releases the vehicle
-
-        Args:
-            veh (VehType): Vehicle object
-        """
 
     def release(self, veh: VehType):
         """Moves a vehicle to a free list so that it is not considered in the

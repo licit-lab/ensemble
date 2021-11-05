@@ -20,12 +20,14 @@ with open("HISTORY.md", "r", encoding="UTF8") as history_file:
     HISTORY = history_file.read()
 
 requirements = [
-    "click>=7.0",
-    "xmltodict>=0.12",
-    "lxml>=4.5.0",
-    "pandas>=1.0.0",
-    "symupy>=0.5.0",
+    "numpy>=1.16",
+    "lxml>=4.3.3",
     "networkx>=2.5",
+    "matplotlib>=3.0.0",
+    "sqlalchemy>=1.3.5",
+    "pandas>=1.0.0",
+    "scipy>=1.4.1",
+    "click>=7.0",
     "python-decouple>=3.3",
 ]
 

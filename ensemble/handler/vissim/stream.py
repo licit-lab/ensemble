@@ -1,7 +1,7 @@
 """
 Vissim Stream
 ================
-This module is able to receive the stream of data comming from the Vissim platform and define a parser for a specific vehicle data suitable to perform platooning activities. 
+This module is able to receive the stream of data comming from the Vissim platform and define a parser for a specific vehicle data suitable to perform platooning activities.
 """
 
 # ============================================================================
@@ -118,7 +118,7 @@ class SimulatorRequest(DataQuery):
 
 
         Example:
-            As an example, for an input of the following style ::
+            As an example, for an input of the following style::
 
             >>> v = {"CoordFrontX":421.31564190349957
                         "Acceleration":-0.0
