@@ -1043,7 +1043,7 @@ env = Environment(
 def transform_data(TEST):
     VEHICLES = [dict(zip(KEYS, v)) for v in TEST]
     template = env.get_template("instant.xml")
-    return create_string_buffer(str.encode(template.render(vehicles=VEHICLES)))
+    return bytes(template.render(vehicles=VEHICLES), encoding="UTF8")
 
 
 # ============================================================================
@@ -1051,7 +1051,9 @@ def transform_data(TEST):
 # ============================================================================
 
 
-def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
+def test_01_standalone_to_join_no_PCM_available(
+    symuviarequest: SymuviaRequest, TEST01: list
+):
     symuviarequest.query = transform_data(TEST01)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1060,7 +1062,9 @@ def test_01_standalone_to_join_no_PCM_available(symuviarequest, TEST01):
     assert isinstance(ggc[2].status, StandAlone)
 
 
-def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
+def test_02_standalone_to_join_far_away(
+    symuviarequest: SymuviaRequest, TEST02: list
+):
     symuviarequest.query = transform_data(TEST02)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1069,7 +1073,7 @@ def test_02_standalone_to_join_far_away(symuviarequest, TEST02):
     assert isinstance(ggc[2].status, StandAlone)
 
 
-def test_03_standalone_to_join(symuviarequest, TEST03):
+def test_03_standalone_to_join(symuviarequest: SymuviaRequest, TEST03: list):
     symuviarequest.query = transform_data(TEST03)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1077,7 +1081,7 @@ def test_03_standalone_to_join(symuviarequest, TEST03):
     assert True
 
 
-def test_04_(symuviarequest, TEST04):
+def test_04_(symuviarequest: SymuviaRequest, TEST04: list):
     symuviarequest.query = transform_data(TEST04)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1085,7 +1089,7 @@ def test_04_(symuviarequest, TEST04):
     assert True
 
 
-def test_05_(symuviarequest, TEST05):
+def test_05_(symuviarequest: SymuviaRequest, TEST05: list):
     symuviarequest.query = transform_data(TEST05)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1093,7 +1097,7 @@ def test_05_(symuviarequest, TEST05):
     assert True
 
 
-def test_06_(symuviarequest, TEST06):
+def test_06_(symuviarequest: SymuviaRequest, TEST06: list):
     symuviarequest.query = transform_data(TEST06)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1101,7 +1105,7 @@ def test_06_(symuviarequest, TEST06):
     assert True
 
 
-def test_07_(symuviarequest, TEST07):
+def test_07_(symuviarequest: SymuviaRequest, TEST07: list):
     symuviarequest.query = transform_data(TEST07)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1109,7 +1113,7 @@ def test_07_(symuviarequest, TEST07):
     assert True
 
 
-def test_08_(symuviarequest, TEST08):
+def test_08_(symuviarequest: SymuviaRequest, TEST08: list):
     symuviarequest.query = transform_data(TEST08)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1117,7 +1121,7 @@ def test_08_(symuviarequest, TEST08):
     assert True
 
 
-def test_09_(symuviarequest, TEST09):
+def test_09_(symuviarequest: SymuviaRequest, TEST09: list):
     symuviarequest.query = transform_data(TEST09)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1125,7 +1129,7 @@ def test_09_(symuviarequest, TEST09):
     assert True
 
 
-def test_10_(symuviarequest, TEST10):
+def test_10_(symuviarequest: SymuviaRequest, TEST10: list):
     symuviarequest.query = transform_data(TEST10)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1133,7 +1137,7 @@ def test_10_(symuviarequest, TEST10):
     assert True
 
 
-def test_11_(symuviarequest, TEST11):
+def test_11_(symuviarequest: SymuviaRequest, TEST11: list):
     symuviarequest.query = transform_data(TEST11)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1141,7 +1145,7 @@ def test_11_(symuviarequest, TEST11):
     assert True
 
 
-def test_12_(symuviarequest, TEST12):
+def test_12_(symuviarequest: SymuviaRequest, TEST12: list):
     symuviarequest.query = transform_data(TEST12)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1149,7 +1153,7 @@ def test_12_(symuviarequest, TEST12):
     assert True
 
 
-def test_13_(symuviarequest, TEST13):
+def test_13_(symuviarequest: SymuviaRequest, TEST13: list):
     symuviarequest.query = transform_data(TEST13)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1157,7 +1161,7 @@ def test_13_(symuviarequest, TEST13):
     assert True
 
 
-def test_14_(symuviarequest, TEST14):
+def test_14_(symuviarequest: SymuviaRequest, TEST14: list):
     symuviarequest.query = transform_data(TEST14)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1165,7 +1169,7 @@ def test_14_(symuviarequest, TEST14):
     assert True
 
 
-def test_15_(symuviarequest, TEST15):
+def test_15_(symuviarequest: SymuviaRequest, TEST15: list):
     symuviarequest.query = transform_data(TEST15)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1173,7 +1177,7 @@ def test_15_(symuviarequest, TEST15):
     assert True
 
 
-def test_16_(symuviarequest, TEST16):
+def test_16_(symuviarequest: SymuviaRequest, TEST16: list):
     symuviarequest.query = transform_data(TEST16)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1181,7 +1185,7 @@ def test_16_(symuviarequest, TEST16):
     assert True
 
 
-def test_17_(symuviarequest, TEST17):
+def test_17_(symuviarequest: SymuviaRequest, TEST17: list):
     symuviarequest.query = transform_data(TEST17)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1189,7 +1193,7 @@ def test_17_(symuviarequest, TEST17):
     assert True
 
 
-def test_18_(symuviarequest, TEST18):
+def test_18_(symuviarequest: SymuviaRequest, TEST18: list):
     symuviarequest.query = transform_data(TEST18)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1197,7 +1201,7 @@ def test_18_(symuviarequest, TEST18):
     assert True
 
 
-def test_19_(symuviarequest, TEST19):
+def test_19_(symuviarequest: SymuviaRequest, TEST19: list):
     symuviarequest.query = transform_data(TEST19)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1205,7 +1209,7 @@ def test_19_(symuviarequest, TEST19):
     assert True
 
 
-def test_20_(symuviarequest, TEST20):
+def test_20_(symuviarequest: SymuviaRequest, TEST20: list):
     symuviarequest.query = transform_data(TEST20)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1213,7 +1217,7 @@ def test_20_(symuviarequest, TEST20):
     assert True
 
 
-def test_21_(symuviarequest, TEST21):
+def test_21_(symuviarequest: SymuviaRequest, TEST21: list):
     symuviarequest.query = transform_data(TEST21)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)
@@ -1221,7 +1225,7 @@ def test_21_(symuviarequest, TEST21):
     assert True
 
 
-def test_22_(symuviarequest, TEST22):
+def test_22_(symuviarequest: SymuviaRequest, TEST22: list):
     symuviarequest.query = transform_data(TEST22)
     vehlist = VehicleList(symuviarequest)
     ggc = GlobalGapCoordinator(vehlist)

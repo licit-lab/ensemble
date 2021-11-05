@@ -5,7 +5,6 @@
 # ============================================================================
 import pytest
 from collections.abc import Container, Sized, Iterable, Sequence, Hashable, Set
-from ctypes import create_string_buffer
 
 # ============================================================================
 # INTERNAL IMPORTS
@@ -20,23 +19,17 @@ from ensemble.handler.symuvia.stream import SimulatorRequest
 
 @pytest.fixture
 def six_vehicles():
-    return create_string_buffer(
-        b'<INST nbVeh="6" val="12.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="275.00" acc="0.00" dst="275.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="244.12" acc="0.00" dst="244.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="50.00" acc="0.00" dst="50.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
-    )
+    return b'<INST nbVeh="6" val="12.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="275.00" acc="0.00" dst="275.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="244.12" acc="0.00" dst="244.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="50.00" acc="0.00" dst="50.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="1"/></ENTREES><REGULATIONS/></INST>'
 
 
 @pytest.fixture
 def seven_vehicles():
-    return create_string_buffer(
-        b'<INST nbVeh="7" val="16.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="375.00" acc="0.00" dst="375.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="344.12" acc="0.00" dst="344.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="300.00" acc="0.00" dst="300.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="250.00" acc="0.00" dst="250.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="6" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
-    )
+    return b'<INST nbVeh="7" val="16.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="375.00" acc="0.00" dst="375.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="344.12" acc="0.00" dst="344.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="300.00" acc="0.00" dst="300.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="250.00" acc="0.00" dst="250.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="6" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
 
 
 @pytest.fixture
 def eight_vehicles():
-    return create_string_buffer(
-        b'<INST nbVeh="8" val="16.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="375.00" acc="0.00" dst="375.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="344.12" acc="0.00" dst="344.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="300.00" acc="0.00" dst="300.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="250.00" acc="0.00" dst="250.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="6" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="50.00" acc="0.00" dst="50.00" id="7" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
-    )
+    return b'<INST nbVeh="8" val="16.00"><CREATIONS/><SORTIES/><TRAJS><TRAJ abs="375.00" acc="0.00" dst="375.00" id="0" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="344.12" acc="0.00" dst="344.12" id="1" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="300.00" acc="0.00" dst="300.00" id="2" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="250.00" acc="0.00" dst="250.00" id="3" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="200.00" acc="0.00" dst="200.00" id="4" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="150.00" acc="0.00" dst="150.00" id="5" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="100.00" acc="0.00" dst="100.00" id="6" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/><TRAJ abs="50.00" acc="0.00" dst="50.00" id="7" ord="0.00" tron="Zone_001" type="PL" vit="25.00" voie="1" z="0.00"/></TRAJS><STREAMS/><LINKS/><SGTS/><FEUX/><ENTREES><ENTREE id="Ext_In" nb_veh_en_attente="0"/></ENTREES><REGULATIONS/></INST>'
 
 
 @pytest.fixture

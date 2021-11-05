@@ -15,16 +15,16 @@ def runner():
 
 
 @pytest.fixture
-def bottleneck01():
+def bottleneck_1truck():
     return os.path.join(
-        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_001.xml"
+        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_1truck.xml"
     )
 
 
 @pytest.fixture
-def bottleneck04():
+def bottleneck_2trucks2links():
     return os.path.join(
-        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_004.xml"
+        os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_2trucks2links.xml"
     )
 
 
@@ -48,10 +48,10 @@ def test_cli_03_check(runner):
     "Error: \tScenario file(s) is an empty list" == result.output
 
 
-def test_cli_04_check(runner, bottleneck01):
+def test_cli_04_check(runner, bottleneck_1truck):
     """Run: ensemble check"""
-    result = runner.invoke(cli.main, ["check", "-s", bottleneck01])
-    f"Input File: {bottleneck01} Found\n" in result.output
+    result = runner.invoke(cli.main, ["check", "-s", bottleneck_1truck])
+    f"Input File: {bottleneck_1truck} Found\n" in result.output
 
 
 def test_cli_04_check_help(runner):
@@ -80,6 +80,7 @@ def test_cli_07_check_files_not_found(runner):
     "Input File: fileB.xml. Not Found " in result.output
 
 
+@pytest.mark.filterwarnings()
 def test_cli_08_launch_files_check_files_not_found(runner):
     """Run: ensemble lauch -s fileA.csv -s fileB.xml --check"""
     result = runner.invoke(
@@ -89,13 +90,15 @@ def test_cli_08_launch_files_check_files_not_found(runner):
     "Input File: fileB.xml. Not Found " == result.output
 
 
-def test_cli_09_launch_bottleneck01(runner, bottleneck01):
-    """Run: ensemble launch -s path/bottleneck01.xml"""
-    result = runner.invoke(cli.main, ["launch", "-s", bottleneck01])
-    f"Input File: {bottleneck01} Found\n" in result.output
+def test_cli_09_launch_bottleneck_1truck(runner, bottleneck_1truck):
+    """Run: ensemble launch -s path/bottleneck_1truck.xml"""
+    result = runner.invoke(cli.main, ["launch", "-s", bottleneck_1truck])
+    f"Input File: {bottleneck_1truck} Found\n" in result.output
 
 
-def test_cli_09_launch_bottleneck04(runner, bottleneck04):
-    """Run: ensemble launch -s path/bottleneck01.xml"""
-    result = runner.invoke(cli.main, ["launch", "-s", bottleneck04])
-    f"Input File: {bottleneck01} Found\n" in result.output
+def test_cli_09_launch_bottleneck_2trucks2links(
+    runner, bottleneck_2trucks2links
+):
+    """Run: ensemble launch -s path/bottleneck_1truck.xml"""
+    result = runner.invoke(cli.main, ["launch", "-s", bottleneck_2trucks2links])
+    f"Input File: {bottleneck_1truck} Found\n" in result.output

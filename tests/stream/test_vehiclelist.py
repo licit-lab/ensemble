@@ -1,5 +1,5 @@
 """
-    Unit testing for vehicle list 
+    Unit testing for vehicle list
 """
 
 # ============================================================================
@@ -57,7 +57,7 @@ env = Environment(
 def transform_data(TEST):
     VEHICLES = [dict(zip(KEYS, v)) for v in TEST]
     template = env.get_template("instant.xml")
-    return str.encode(template.render(vehicles=VEHICLES))
+    return str.encode(template.render(vehicles=VEHICLES), encoding="UTF8")
 
 
 # ============================================================================
@@ -96,12 +96,26 @@ def TEST01():
 def test_get_leader(symuviarequest, TEST01):
     symuviarequest.query = transform_data(TEST01)
     vehlist = VehicleList(symuviarequest)
-    assert vehlist.get_leader(vehlist[0]) is None
-    assert vehlist.get_leader(vehlist[1]) is vehlist[0]
+    assert vehlist.get_leader(vehlist[0]) is vehlist[0]
+    assert vehlist.get_leader(vehlist[1]) is vehlist[1]
+
+
+def test_get_leader_inrange(symuviarequest, TEST01):
+    symuviarequest.query = transform_data(TEST01)
+    vehlist = VehicleList(symuviarequest)
+    assert vehlist.get_leader(vehlist[0], 200) is vehlist[0]
+    assert vehlist.get_leader(vehlist[1], 200) is vehlist[0]
 
 
 def test_get_follower(symuviarequest, TEST01):
     symuviarequest.query = transform_data(TEST01)
     vehlist = VehicleList(symuviarequest)
-    assert vehlist.get_follower(vehlist[0]) is vehlist[1]
-    assert vehlist.get_follower(vehlist[1]) is None
+    assert vehlist.get_follower(vehlist[0]) is vehlist[0]
+    assert vehlist.get_follower(vehlist[1]) is vehlist[1]
+
+
+def test_get_follower_inrange(symuviarequest, TEST01):
+    symuviarequest.query = transform_data(TEST01)
+    vehlist = VehicleList(symuviarequest)
+    assert vehlist.get_follower(vehlist[0], 200) is vehlist[1]
+    assert vehlist.get_follower(vehlist[1], 200) is vehlist[1]

@@ -4,7 +4,7 @@ import os
 import sys
 
 bottleneck04 = os.path.join(
-    os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_004.xml"
+    os.getcwd(), "tests", "mocks", "symuvia", "bottleneck_2trucks2links.xml"
 )
 
 file_path = ("tests", "mocks", "vissim", "TestNetwork.inpx")

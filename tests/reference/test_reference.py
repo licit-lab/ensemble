@@ -35,10 +35,10 @@ from ensemble.logic.platoon_states import (
 def test_splitting():
     r = ReferenceHeadway()
     r.create_time_gap_hwy(Splitting())
-    assert pytest.approx(r.reference[-1], 3 * 1.4)
+    assert pytest.approx(r.reference_headway[-1], 3 * 1.4)
 
 
 def test_joining():
     r = ReferenceHeadway(gap0=2)
     r.create_time_gap_hwy(Joining())
-    assert r.reference[-1] == 1.4
+    assert r.reference_headway[-1] == 1.4
