@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    ensemble.control.operational
    ensemble.control.tactical
@@ -19,7 +20,6 @@ ensemble.control.governor module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

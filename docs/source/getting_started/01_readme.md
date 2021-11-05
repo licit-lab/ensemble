@@ -4,7 +4,7 @@
 
 ![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green)
 
-![](img/logo.png)
+![](../_static/logo.png)
 
 ## Overview
 

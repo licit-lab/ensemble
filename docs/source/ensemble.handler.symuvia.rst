@@ -36,6 +36,13 @@ ensemble.handler.symuvia.stream module
    :undoc-members:
    :show-inheritance:
 
+ensemble.handler.symuvia.xmlparser module
+-----------------------------------------
+
+.. automodule:: ensemble.handler.symuvia.xmlparser
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

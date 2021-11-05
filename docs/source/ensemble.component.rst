@@ -12,22 +12,37 @@ ensemble.component.dynamics module
    :undoc-members:
    :show-inheritance:
 
-ensemble.component.platoonvehicle module
-----------------------------------------
+ensemble.component.platoon\_vehicle module
+------------------------------------------
 
-.. automodule:: ensemble.component.platoonvehicle
+.. automodule:: ensemble.component.platoon_vehicle
    :members:
    :undoc-members:
    :show-inheritance:
 
-ensemble.component.vehicles module
-----------------------------------
+ensemble.component.platoonvehicleinfo module
+--------------------------------------------
 
-.. automodule:: ensemble.component.vehicles
+.. automodule:: ensemble.component.platoonvehicleinfo
    :members:
    :undoc-members:
    :show-inheritance:
 
+ensemble.component.vehicle module
+---------------------------------
+
+.. automodule:: ensemble.component.vehicle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ensemble.component.vehiclelist module
+-------------------------------------
+
+.. automodule:: ensemble.component.vehiclelist
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

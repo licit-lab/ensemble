@@ -12,14 +12,6 @@ ensemble.logic.frozen\_set module
    :undoc-members:
    :show-inheritance:
 
-ensemble.logic.platoon\_machine module
---------------------------------------
-
-.. automodule:: ensemble.logic.platoon_machine
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ensemble.logic.platoon\_set module
 ----------------------------------
 
