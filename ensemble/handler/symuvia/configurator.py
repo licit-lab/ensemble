@@ -22,7 +22,7 @@ from ensemble.tools.constants import (
     LAUNCH_MODE,
 )
 
-from symupy.utils.constants import DEFAULT_PATH_SYMUVIA
+from ensemble.tools.constants import DEFAULT_PATH_SYMUVIA
 
 # ============================================================================
 # CLASS AND DEFINITIONS

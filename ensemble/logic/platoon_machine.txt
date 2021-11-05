@@ -1,10 +1,10 @@
-""" 
+"""
     This module defines the basic states required to determine the status of a vehicle in a platoon formation
 
-    The states are defined as: 
+    The states are defined as:
 
     * **StandAlone**: Vehicle not in a platoon formation
-    * **Join**: Vehicle willing to join a platoon or willing to create a platoon 
+    * **Join**: Vehicle willing to join a platoon or willing to create a platoon
     * **Platooning**: Vehicle inside a platoon formation
     * **Split**: Vehicle is willing to split from current platoon.
 

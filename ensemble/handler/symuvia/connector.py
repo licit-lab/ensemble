@@ -1,7 +1,7 @@
 """
 Symuvia Connector
 =================
-This module details the implementation of a ``Simulator`` object in charge of handling the connection between the traffic simulator and this interface. The connection with the traffic simulator is handled by an object called ``Connector`` which establishes a messaging protocol with the traffic simulator. 
+This module details the implementation of a ``Simulator`` object in charge of handling the connection between the traffic simulator and this interface. The connection with the traffic simulator is handled by an object called ``Connector`` which establishes a messaging protocol with the traffic simulator.
 
 Example:
     To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
@@ -12,11 +12,11 @@ Example:
 
 Other parameters can also be send to the simulator in order to provide other configurations:
 
-Example: 
+Example:
     To send make increase the *buffer size* to a specific size:
 
         >>> simulator = Simulator(path, bufferSize = 1000000)
-    
+
     To increase change the flag that traces the flow:
 
         >>> simulator = Simulator(path, traceFlow = True)
@@ -34,12 +34,7 @@ from pathlib import Path
 # INTERNAL IMPORTS
 # ============================================================================
 
-from .stream import SimulatorRequest
-from .configurator import SymuviaConfigurator
-from .scenario import SymuviaScenario
-
 from ensemble.metaclass.connector import AbsConnector
-
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
@@ -47,6 +42,10 @@ from ensemble.tools.exceptions import (
 )
 
 from ensemble.tools.screen import log_verify, log_success, log_error
+
+from .stream import SimulatorRequest
+from .configurator import SymuviaConfigurator
+from .scenario import SymuviaScenario
 
 import ensemble.tools.constants as CT
 
@@ -85,13 +84,13 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     :raises EnsembleAPILoadFileError:
         Error raised whenever the SymuVia library is not found
 
-    :raises SymupyFileLoadError:
+    :raises EnsembleAPILoadFileError:
         Error raised whenever the provided path for an scenario cannot be loaded into the Simulator
 
-    :raises SymupyVehicleCreationError:
+    :raises EnsembleAPILoadFileError:
         Error raised when a vehicle cannot be created
 
-    :raises SymupyDriveVehicleError:
+    :raises EnsembleAPIDriveVehicleError:
         Error rased when a vehicle state cannot be imposed
 
     :raises NotImplementedError:
