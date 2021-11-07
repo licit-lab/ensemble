@@ -1,9 +1,9 @@
 """
 Platoon Vehicle
 ===============
-This module contains information on a vehicle platoon. 
+    This module contains information on a vehicle platoon.
 
-The platoon vehicle model acts as an instance to trace individual vehicle data and modify vehicle behavior according to given dynamics. 
+    The platoon vehicle model acts as an instance to trace individual vehicle data and modify vehicle behavior according to given dynamics.
 """
 
 # ============================================================================
