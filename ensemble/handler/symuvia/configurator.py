@@ -22,7 +22,7 @@ from ensemble.tools.constants import (
     LAUNCH_MODE,
 )
 
-from ensemble.tools.constants import DEFAULT_PATH_SYMUVIA
+from ensemble.tools.constants import DEFAULT_PATH_SYMUFLOW
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -74,10 +74,9 @@ class SymuviaConfigurator(ConnectorConfigurator):
     buffer_string: c_char = create_string_buffer(BUFFER_STRING)
     write_xml: c_bool = c_bool(WRITE_XML)
     trace_flow: bool = TRACE_FLOW
-    library_path: str = DEFAULT_PATH_SYMUVIA
+    library_path: str = str(DEFAULT_PATH_SYMUFLOW)
     total_steps: int = TOTAL_SIMULATION_STEPS
     step_launch_mode: str = LAUNCH_MODE
-    library_path: str = CT.DCT_DEFAULT_PATHS[("symuvia", platform.system())]
     b_end: c_int = c_int()
 
     def __init__(self, **kwargs) -> None:

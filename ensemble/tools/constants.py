@@ -1,27 +1,30 @@
 """
-    This module contains a **constants** and **default** parameters. These parameters can be accessed    at any time by whatever of the modules. 
+Constants module
+================
 
-    Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values. 
+    This module contains a **constants** and **default** parameters. These parameters can be accessed    at any time by whatever of the modules.
+
+    Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values.
 
     Example:
         To use the ``Constants`` import the module as::
 
             >>> import ensemble.tools.constants as ct
-            >>> ct.BUFFER_STRING # access the buffer size 
+            >>> ct.BUFFER_STRING # access the buffer size
 
 
     ============================  ======================================
      **Variable**                 **Description**
     ----------------------------  --------------------------------------
     ``BUFFER_STRING``              Buffer size
-    ``DEFAULT_PATH_SYMUVIA``       Default Path Towards SymuVia    
+    ``DEFAULT_PATH_SYMUFLOW``       Default Path Towards SymuVia
     ``DEFAULT_LIB_OSX``            Default OS X library path (SymuVia)
     ``DEFAULT_LIB_LINUX``          Default Linux library path  (SymuVia)
     ``DEFAULT_LIB_WINDOWS``        Default Windows library path (Vissim)
-    ``DCT_SIMULATORS``             Simulator according to SO 
+    ``DCT_SIMULATORS``             Simulator according to SO
     ``DCT_DEFAULT_PATHS``          Available combinations SO/simulator
-    ``DCT_RUNTIME_PARAM``          Runtime default parameters 
-    ``DCT_VEH_PARAM``              Vehicle default parameters 
+    ``DCT_RUNTIME_PARAM``          Runtime default parameters
+    ``DCT_VEH_PARAM``              Vehicle default parameters
     ``DCT_VEH_DATA``               Vehicle data default parameters
     ``DCT_PLT_DATA``               Platoon parameters
     ``DCT_LIB_CACC``               Default CACC library path
@@ -35,7 +38,7 @@
     ``DCT_NETWORK_INFO``           XML Network information
     ``DCT_SCENARIO_INFO``          XML Scenario information
     ``TP_VEHTYPES``                Vehicle type information
-    ``TP_ACCEL``                   Vehicle acceleration boundaries    
+    ``TP_ACCEL``                   Vehicle acceleration boundaries
     ============================  ======================================
 
 """
@@ -76,8 +79,8 @@ PATHS_2_SEARCH = (CONDA_PREFIX,)
 
 # Default names/platform
 DCT_LIBOSNAME = {
-    "Darwin": "libSymuVia.dylib",
-    "Linux": "libSymuVia.so",
+    "Darwin": "libSymuFlow.dylib",
+    "Linux": "libSymuFlow.so",
     "Windows": "Vissim.Vissim-64.10",
 }
 
@@ -88,13 +91,13 @@ def find_path(roots):
             yield from p.glob(f"**/{DCT_LIBOSNAME[SYSTEM]}")
 
 
-DEFAULT_PATH_SYMUVIA = DCT_LIBOSNAME[SYSTEM]
+DEFAULT_PATH_SYMUFLOW = DCT_LIBOSNAME[SYSTEM]
 for path in find_path(PATHS_2_SEARCH):
-    DEFAULT_PATH_SYMUVIA = (
+    DEFAULT_PATH_SYMUFLOW = (
         path if SYSTEM != "Windows" else DCT_LIBOSNAME[SYSTEM]
     )
 
-print(f"Default path: {DEFAULT_PATH_SYMUVIA}")
+print(f"Default path: {DEFAULT_PATH_SYMUFLOW}")
 
 # *****************************************************************************
 # DEFAULT SIMULATOR/ OS ASSOCIATION
@@ -110,12 +113,12 @@ DCT_SIMULATORS = {
 
 # Fill candidates
 DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA,
-    ("symuvia", "Windows"): DEFAULT_PATH_SYMUVIA,
-    ("vissim", "Windows"): DEFAULT_PATH_SYMUVIA,
-    ("vissim", "Darwin"): DEFAULT_PATH_SYMUVIA,
-    ("symuvia", "Linux"): DEFAULT_PATH_SYMUVIA,
-    ("vissim", "Linux"): DEFAULT_PATH_SYMUVIA,
+    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUFLOW,
+    ("symuvia", "Windows"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Windows"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Darwin"): DEFAULT_PATH_SYMUFLOW,
+    ("symuvia", "Linux"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Linux"): DEFAULT_PATH_SYMUFLOW,
 }
 
 # Dynamic Platoon Data
@@ -406,4 +409,4 @@ DCT_XO_DEFAUT = {
 RADIOUS_ANT = 500
 
 if __name__ == "__main__":
-    print(DEFAULT_PATH_SYMUVIA)
+    print(DEFAULT_PATH_SYMUFLOW)

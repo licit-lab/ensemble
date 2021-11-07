@@ -1,14 +1,13 @@
 """
 SymuVia Stream
 ================
-This module is able to receive the stream of data comming from the SymuVia platform and define a parser for a specific vehicle data suitable to perform platooning activities. 
+This module is able to receive the stream of data comming from the SymuVia platform and define a parser for a specific vehicle data suitable to perform platooning activities.
 """
 
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
 
-from xmltodict import parse
 from xml.parsers.expat import ExpatError
 from ctypes import create_string_buffer
 from typing import Union, Dict, List, Tuple

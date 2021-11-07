@@ -44,7 +44,7 @@ project = "Ensemble Truck Platooning API"
 copyright = "2020, Ensemble WP 4.5"
 author = "Ensemble WP 4.5"
 
-from symupy.utils.constants import DEFAULT_PATH_SYMUFLOW
+from ensemble.tools.constants import DEFAULT_PATH_SYMUFLOW
 
 print("LIB: Library Check")
 print("===============================")
