@@ -10,7 +10,7 @@ bottleneck04 = os.path.join(
 file_path = ("tests", "mocks", "vissim", "TestNetwork.inpx")
 file_layx_path = ("tests", "mocks", "vissim", "TestNetwork.layx")
 
-c = Configurator()
+c = Configurator(verbose=True)
 c.set_simulation_platform("")  # Automatic detection
 if c.platform == "Darwin":
     c.update_values(scenario_files=(bottleneck04,))  # Set scenario
