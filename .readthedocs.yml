@@ -1,0 +1,18 @@
+version: 2
+
+sphinx:
+  builder: html
+  configuration: docs/source/conf.py
+
+conda:
+  environment: docs/environment.doc.yml
+
+python:
+  version: 3.9
+  install:
+    # install symupy itself
+    - method: pip
+      path: .
+
+build:
+  image: testing
