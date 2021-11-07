@@ -24,10 +24,8 @@ requirements = [
     "lxml>=4.3.3",
     "networkx>=2.5",
     "matplotlib>=3.0.0",
-    "sqlalchemy>=1.3.5",
     "pandas>=1.0.0",
-    "scipy>=1.4.1",
-    "click>=7.0",
+    "click>=8.0",
     "python-decouple>=3.3",
 ]
 
