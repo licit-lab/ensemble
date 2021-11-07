@@ -49,6 +49,7 @@ def runtime_op_layer(initial_condition: np.ndarray, scenario: str = "platoon"):
             vehtype="PLT",
             dyn_path=truck_path,
             distance=x0[0],
+            abscissa=x0[0],
             speed=x0[1],
         )
         vehlist.update_list(
@@ -79,5 +80,5 @@ if __name__ == "__main__":
     )
 
     # Initial condition
-    X0 = np.array([[30, 25], [0, 26]])
+    X0 = np.array([[40, 25], [10, 26]])
     runtime_op_layer(X0)
