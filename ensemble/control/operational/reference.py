@@ -2,7 +2,7 @@
 Reference Control
 =================
 
-This model is here to create the reference for the operational controller based on a specific time window.
+    This model is here to create the reference for the operational controller based on a specific time window.
 """
 
 # ============================================================================
@@ -31,7 +31,8 @@ from ensemble.logic.platoon_states import (
 from ensemble.tools.constants import DCT_RUNTIME_PARAM, DCT_PLT_CONST, TIME_STEP
 
 TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
-TIME_INTERVAL = DCT_RUNTIME_PARAM["sampling_time_tactical"]
+# Accounts for initial generation of 1h of sequences
+TIME_INTERVAL = DCT_RUNTIME_PARAM["horizon_tactical"]
 TIME_GAP = DCT_PLT_CONST["time_gap"]
 CRUISE_SPEED = DCT_PLT_CONST["cruise_speed"]
 
@@ -160,7 +161,7 @@ class ReferenceHeadway:
 
 if __name__ == "__main__":
     r = ReferenceHeadway()
-    # r.plot_case(Splitting())
+    r.plot_case(Splitting())
     c = ["r", "b"]
 
     _, a = plt.subplots(2, 1)
