@@ -340,6 +340,7 @@ DCT_RUNTIME_PARAM = {
     "total_steps": 60,  # [s]
     "sampling_time_operational": 1 / 10,  # [s] step
     "sampling_time_tactical": 60,  # [s] time interval
+    "horizon_tactical": 3600,
 }
 
 # Vehicles Parameters

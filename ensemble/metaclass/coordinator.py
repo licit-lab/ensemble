@@ -1,5 +1,5 @@
 """
-Abstract Gap Coordinator 
+Abstract Gap Coordinator
 ========================
 This module implements a general metaclass for a vehicle gap coordinator.
 """
@@ -99,6 +99,11 @@ class AbsSingleGapCoord(metaclass=abc.ABCMeta):
 
     @abc.abstractproperty
     def history_control(self):
+        """Historical control"""
+        pass
+
+    @abc.abstractproperty
+    def history_reference(self):
         """Historical control"""
         pass
 

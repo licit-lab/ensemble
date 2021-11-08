@@ -76,8 +76,9 @@ class VehGapCoordinator(AbsSingleGapCoord):
         self._ctr_ego_data["id"] = self.ego.vehid
 
         # Historical data
-        self._history_state = np.empty((3,))
-        self._history_control = np.empty((1,))
+        self._history_state = np.array([(vehicle.x, vehicle.v, vehicle.a)])
+        self._history_control = np.array([(0,)])
+        self._history_reference = np.array([0, 0, 0])
 
     def init_reference(self):
         """Initializes the reference class for the gap coordinator. In particular the initial conditions should be already computed."""
@@ -130,7 +131,7 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def x(self):
         """Ego current position in link"""
-        return self.ego.ttd
+        return self.history_state[-1][0]  # self.ego.ttd
 
     @property
     def leader(self) -> AbsSingleGapCoord:
@@ -160,12 +161,12 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @property
     def acceleration(self):
         """Acceleration"""
-        return self.ego.acceleration
+        return self.history_state[-1][2]  # self.ego.acceleration
 
     @property
     def speed(self):
         """Speed"""
-        return self.ego.speed
+        return self.history_state[-1][1]  # self.ego.speed
 
     @property
     def ttd(self):
@@ -233,6 +234,20 @@ class VehGapCoordinator(AbsSingleGapCoord):
     @history_state.setter
     def history_state(self, value: np.ndarray):
         self._history_state = np.vstack((self._history_state, value))
+
+    @property
+    def history_reference(self):
+        return self._history_reference
+
+    @history_reference.setter
+    def history_reference(self, value: np.ndarray):
+        self._history_reference = np.vstack((self._history_reference, value))
+
+    @property
+    def last_reference(self):
+        if len(self._history_state.shape) == 1:
+            return self.history_state
+        return self._history_state[-1]
 
     @property
     def joinable(self):

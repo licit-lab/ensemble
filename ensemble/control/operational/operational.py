@@ -181,6 +181,14 @@ class CACC(AbsController):
             )
             vgc.history_state = vgc.ego.dynamics(state, np.array([control]))
             vgc.history_control = np.array([control])
+            r_g = (
+                r_dct.get("g_cacc", np.nan)
+                if data_leader.get("id") != data_ego.get("id")
+                else r_dct.get("g_acc", np.nan)
+            )
+            vgc.history_reference = np.array(
+                [r_dct.get("t", np.nan), r_dct.get("v", np.nan), r_g]
+            )
 
     def single_call_control(
         self,
@@ -209,7 +217,9 @@ class CACC(AbsController):
             T(float): sampling time
         """
         self.ID = c_int(ego["id"])
-        self.HMI_control_mode = c_double(2)
+        self.HMI_control_mode = (
+            c_double(2) if ego["id"] != leader["id"] else c_double(1)
+        )
         if self.HMI_control_mode == c_double(2):
             self.HMI_t_headway = c_double(r_ego["g_cacc"])
         elif self.HMI_control_mode == c_double(1):
@@ -223,7 +233,7 @@ class CACC(AbsController):
         self.MIO_acceleration = c_double(leader["a"])
         self.MIO_datamodeA = c_double(7)
         self.MIO_u_ffA = c_double(leader["u"])
-        self.u_control = c_double(0)
+        self.u_control = c_double(ego["u"])
         return self._update_dll()
 
     def update_value(self, **kwargs):
