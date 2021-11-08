@@ -117,10 +117,11 @@ class GlobalGapCoordinator(Subscriber):
 
     def release_vehicle_gcs(self):
         """Releases all gap coordinators w.r.t publihser"""
-        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+        for vgc in self.iter_group_link(downtoup=True, group=True):
             if (
                 vgc.ego.vehid
-                not in self._publisher._request.get_vehicles_property("vehid")
+                # not in self._publisher._request.get_vehicles_property("vehid")
+                not in [v.vehid for v in self._publisher]
             ):
                 self.release_gapcoordinator(vgc)
 
@@ -156,16 +157,24 @@ class GlobalGapCoordinator(Subscriber):
 
     def update_leaders(self):
         """Updates leaders for all gap coordinators"""
-        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+        for vgc in self.iter_group_link(downtoup=True, group=True):
             self.update_leader(vgc)
 
     def update_states(self):
         """Update platoon state according to current information"""
-        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+        for vgc in self.iter_group_link(downtoup=True, group=True):
             vgc.status = vgc.solve_state()
 
-    def iter_group_link(self, downtoup=True, vgc=False):
-        """Iteratorator by link ordered from largest ttd towards smaller"""
+    def iter_group_link(self, downtoup=True, group=False):
+        """Iteratorator by link ordered from largest ttd towards smaller
+
+        Args:
+            downtoup (bool, optional): Downstream to upstream. Defaults to True.
+            group (bool, optional): Returns without grouping per platoon. Defaults to False.
+
+        Yields:
+            vgc (VehicleGapCoordinator): Vehicle gap coordinator or iterable.
+        """
         vtf = lambda x: x[1].get("vgc").ego.link
         vgcs = sorted(
             self._gcnet.nodes(data=True),
@@ -173,7 +182,7 @@ class GlobalGapCoordinator(Subscriber):
             reverse=downtoup,
         )
         for _, group_gc in groupby(vgcs, vtf):
-            if vgc:
+            if group:
                 for _, gc in group_gc:
                     yield gc.get("vgc")
             else:
@@ -182,7 +191,7 @@ class GlobalGapCoordinator(Subscriber):
     def create_platoon_sets(self):
         """Create all platoons subsets"""
         converter = lambda x: x[1].get("vgc")
-        for vgc in self.iter_group_link(downtoup=True, vgc=True):
+        for vgc in self.iter_group_link(downtoup=True, group=True):
             if not vgc.platoon:
                 if vgc.leader.ego == vgc.ego or vgc.ego in PLT_TYP:
                     # Head
@@ -234,11 +243,10 @@ class GlobalGapCoordinator(Subscriber):
         # Gap Coord (gc) Group by link (Vehicle in same link)
         self.create_platoon_sets()
 
-        
         self.update_states()
 
     @property
-    def nplatoons(self)->int:
+    def nplatoons(self) -> int:
         """Return the number of created platoons"""
         return len(self.platoon_sets.keys())
 
@@ -259,5 +267,5 @@ class GlobalGapCoordinator(Subscriber):
     def apply_cacc(self, time: float):
         """This method intends to apply the cacc over all vehicles within the platoon at specific time step"""
 
-        for vgc in self.iter_group_link_down_to_up(downtoup=True):
+        for vgc in self.iter_group_link(downtoup=True, group=True):
             vgc.evolve_control(self.cacc, time)
