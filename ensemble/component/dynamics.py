@@ -2,7 +2,7 @@
 Dynamics Model
 ==============
 
-This module contains a set of models to explain the truck dynamics. The way in which dynamics are regularly described are: 
+This module contains a set of models to explain the truck dynamics. The way in which dynamics are regularly described are:
 
 .. math::
    x_{k+1} = f(x_k)
@@ -104,6 +104,7 @@ class TruckDynamics(AbsDynamics):
         self.v = c_double(v)
         self.a = c_double(a)
         self.load_library(self.library)
+        self.getAcceleration(0)
 
     def load_library(self, path_library):
         """Loads the truck library into the class"""
