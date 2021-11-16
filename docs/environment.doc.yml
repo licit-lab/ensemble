@@ -16,13 +16,13 @@ dependencies:
   - pytest=6.2.5
   - coverage=6.1.1
   - ipython=7.29.0
-  - symuflow=1.0.0
-  - pytest
-  - coverage
-  - pandoc
-  - sphinx
-  - nbsphinx
-  - sphinx-book-theme
-  - ipykernel
-  - myst-parser
-  - pip
+  - symuflow=1.1.0
+  - pytest=6.2.5
+  - coverage=6.1.1
+  - pandoc=2.16.1
+  - sphinx=4.2.0
+  - nbsphinx=0.8.7
+  - sphinx-book-theme=0.0.41
+  - ipykernel=6.4.2
+  - myst-parser=0.15.2
+  - pip=21.3.1
