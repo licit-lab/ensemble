@@ -49,7 +49,7 @@ dev_requirements = [
 
 setup(
     name="ensemble",
-    version="0.1.0",
+    version="version='1.0.0'",
     description="A command line interface to launch scenarios for the ENSEMBLE project ",
     long_description=LONG_DESCRIPTION + "\n\n" + HISTORY,
     long_description_content_type="text/markdown",
