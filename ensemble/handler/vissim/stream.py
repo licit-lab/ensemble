@@ -1,35 +1,55 @@
 """
 Vissim Stream
 ================
-This module is able to receive the stream of data comming from the Vissim platform and define a parser for a specific vehicle data suitable to perform platooning activities. 
+This module is able to receive the stream of data comming from the Vissim platform and define a parser for a specific vehicle data suitable to perform platooning activities.
 """
 
 # ============================================================================
 # STANDARD  IMPORTS
 # ============================================================================
 
-from typing import List
-from symupy.components import Vehicle, VehicleList
+from typing import Union, Dict, List, Tuple
+from collections import defaultdict
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
 from ensemble.metaclass.stream import DataQuery
-from symupy.utils.parser import response
 import ensemble.tools.constants as ct
+from ensemble.component.vehiclelist import VehicleList
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
 
-vissim_response = List[List]
+vtypes = Union[float, int, str]
+vdata = Tuple[vtypes]
+vmaps = Dict[str, vtypes]
+vlists = List[vmaps]
+response = defaultdict(lambda: False)
+simresponse = List[List]
 
 
 class SimulatorRequest(DataQuery):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # initialize extra things here!
+
+    # =========================================================================
+    # MEMORY HANDLING
+    # =========================================================================
+
+    @property
+    def query(self):
+        """String response from the simulator"""
+        return self._str_response
+
+    @query.setter
+    def query(self, response):
+        self._str_response = response
+        self.update_vehicle_registry()
+        self.dispatch()
 
     @property
     def current_time(self) -> float:
@@ -39,81 +59,92 @@ class SimulatorRequest(DataQuery):
 
     @property
     def current_nbveh(self) -> int:
-        """ Number of vehicles in the network"""
+        """Number of vehicles in the network"""
         # TODO: What is self._str_response?
         return len(self._str_response)
 
-    @property
-    def query(self):
-        """String response from the simulator"""
-        return self._str_response
+    # =========================================================================
+    # METHODS
+    # =========================================================================
 
-    @query.setter
-    def query(self, response: vissim_response):
-        self._str_response = response
-        for c in self._channels:
-            self.dispatch(c)
+    def create_vehicle_registry(self):
+        """Creates a vehicle registry for all vehicles in simulation"""
+        self.vehicle_registry = VehicleList(self)
+
+    def update_vehicle_registry(self):
+        """Updates vehicle registry in case it exists"""
+        if hasattr(self, "vehicle_registry"):
+            self.vehicle_registry.update_list()
+            return
+        self.create_vehicle_registry()
+
+    def get_vehicle_data(self) -> list:
+        """Extracts vehicles information from simulators response
+
+        Args:
+            response (list): List of list with parameters
+
+        Return:
+            listdict (list): List of dictionaries
+
+        """
+        if self.query is not None:
+            if isinstance(self.query, list):
+                return [SimulatorRequest.transform(d) for d in self.query]
+            return [SimulatorRequest.transform(self.query)]
+        return []
 
     def is_vehicle_driven(self, vehid: int) -> bool:
-        """ Returns true if the vehicle state is exposed to a driven state
+        """Returns true if the vehicle state is exposed to a driven state
 
-            Args:
-                vehid (str):
-                    vehicle id
+        Args:
+            vehid (str):
+                vehicle id
 
-            Returns:
-                driven (bool): True if veh is driven
+        Returns:
+            driven (bool): True if veh is driven
         """
-        # if self.is_vehicle_in_network(vehid):
-
-        #     forced = tuple(
-        #         veh.get("driven") == True
-        #         for veh in self.get_vehicle_data()
-        #         if veh.get("vehid") == vehid
-        #     )
-        #     return any(forced)
-        # return False
         return False
 
     @staticmethod
     def transform(veh_data: dict):
-        """ Transform vehicle data from string format to coherent format
+        """Transform vehicle data from string format to coherent format
 
-            Args: 
-                veh_data (dict): vehicle data as received from simulator
+        Args:
+            veh_data (dict): vehicle data as received from simulator
 
-            Returns:
-                t_veh_data (dict): vehicle data with correct formatting 
+        Returns:
+            t_veh_data (dict): vehicle data with correct formatting
 
 
-            Example: 
-                As an example, for an input of the following style ::
+        Example:
+            As an example, for an input of the following style::
 
-                >>> v = {"CoordFrontX":421.31564190349957 
-                            "Acceleration":-0.0
-                            "Pos":16.25355208592856
-                            "No":1,
-                            "CoordFrontY":-979.2497097242955
-                            "Lane\\Link\\No":6,
-                            "VehType":'630',
-                            "Speed":83.93049031871615,
-                            "Lane\\Index":1,
-                        }
-                >>> tv = SimulatorRequest.transform(v)
-                >>> # Transforms into 
-                >>> tv == {
-                >>>     "abscissa": 421.31564190349957,
-                >>>     "acceleration": -0.0,
-                >>>     "distance": 16.25355208592856,
-                >>>     "driven": False,
-                >>>     "elevation": 0.0,
-                >>>     "lane": 1,
-                >>>     "link": "6",
-                >>>     "ordinate": -979.2497097242955,
-                >>>     "speed": 23.314025088532265,
-                >>>     "vehid": 0,
-                >>>     "vehtype": "630",
-                >>> },
+            >>> v = {"CoordFrontX":421.31564190349957
+                        "Acceleration":-0.0
+                        "Pos":16.25355208592856
+                        "No":1,
+                        "CoordFrontY":-979.2497097242955
+                        "Lane\\Link\\No":6,
+                        "VehType":'630',
+                        "Speed":83.93049031871615,
+                        "Lane\\Index":1,
+                    }
+            >>> tv = SimulatorRequest.transform(v)
+            >>> # Transforms into
+            >>> tv == {
+            >>>     "abscissa": 421.31564190349957,
+            >>>     "acceleration": -0.0,
+            >>>     "distance": 16.25355208592856,
+            >>>     "driven": False,
+            >>>     "elevation": 0.0,
+            >>>     "lane": 1,
+            >>>     "link": "6",
+            >>>     "ordinate": -979.2497097242955,
+            >>>     "speed": 23.314025088532265,
+            >>>     "vehid": 0,
+            >>>     "vehtype": "630",
+            >>> },
 
         """
         for key, val in veh_data.items():
@@ -127,41 +158,3 @@ class SimulatorRequest(DataQuery):
         lkey = "@z"
         response[ct.FIELD_DATA_VISSIM[lkey]] = 0
         return dict(response)
-
-    def get_vehicle_data(self) -> list:
-        """ Extracts vehicles information from simulators response
-
-            Args:
-                response (list): List of list with parameters 
-            
-            Return: 
-                listdict (list): List of dictionaries 
-        
-        """
-        if self.query is not None:
-            if isinstance(self.query, list):
-                return [SimulatorRequest.transform(d) for d in self.query]
-            return [SimulatorRequest.transform(self.query)]
-        return []
-
-    # def get_leader_id(self, vehid):
-    #     try:
-    #         downstream_ids = tuple(self.vehicle_downstream_of(vehid))
-    #         dict_pos = self.query_vehicle_data_dict("Pos", *downstream_ids)
-    #         leader_id = min(dict_pos, key=dict_pos.get)
-    #     except IndexError:
-    #         leader_id = -1
-    #     except TypeError:
-    #         leader_id = -1
-    #     return leader_id
-
-    # def get_follower_id(self, vehid):
-    #     try:
-    #         upstream_ids = tuple(self.vehicle_upstream_of(vehid))
-    #         dict_pos = self.query_vehicle_data_dict("Pos", *upstream_ids)
-    #         follower_id = max(dict_pos, key=dict_pos.get)
-    #     except IndexError:
-    #         follower_id = -1
-    #     except TypeError:
-    #         follower_id = -1
-    #     return follower_id

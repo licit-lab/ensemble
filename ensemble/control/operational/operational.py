@@ -8,188 +8,242 @@
 from dataclasses import dataclass, field
 import pandas as pd
 from ctypes import c_double, cdll, c_long, c_int, CDLL, byref
+import numpy as np
 
 # ============================================================================
 # INTERNAL IMPORTS
 # ============================================================================
 
-from ensemble.tools.constants import DEFAULT_CACC_PATH
+from ensemble.tools.constants import DEFAULT_CACC_PATH, DCT_RUNTIME_PARAM
+from ensemble.metaclass.controller import AbsController
+from ensemble.control.operational.reference import ReferenceHeadway
+from ensemble.metaclass.coordinator import AbsSingleGapCoord
+from ensemble.metaclass.dynamics import AbsDynamics
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+TIME_STEP_OP = DCT_RUNTIME_PARAM["sampling_time_operational"]
 
 
 @dataclass
-class CACC:
-    """ This class performs a call to the cacc dynamic shared library. 
+class CACC(AbsController):
+    """Operational layer class  for containing specific library execution
 
-        Args:
-            curr_lead_veh_acceleration (c_double): Leader current acceleration (m/s²).
-            curr_lead_veh_id (c_long): Leader vehicle id (-1 no leader).
-            curr_lead_veh_rel_velocity (c_long): Leader relative speed w.r.t leader.
-            curr_lead_veh_type (c_long): Leader vehicle type.
-            curr_timestep (c_double): Current time step (seconds).
-            curr_ts_length (c_double): Sampling time (seconds).
-            curr_veh_id (c_long): Ego vehicle id.
-            curr_veh_setspeed (c_double): Ego cruise control set speed?
-            curr_veh_type (c_long): Ego vehicle type.
-            curr_veh_controller_in_use (c_long): Control in use 1-ACC ,2-CACC.
-            curr_veh_ACC_h (c_double): ACC headway reference.
-            curr_veh_CACC_h (c_double): CACC headway reference.
-            curr_veh_used_distance_headway (c_double): Ego distance headway (m).
-            curr_veh_used_rel_vel (c_double): Ego relative speed w.r.t leader.
-            curr_veh_velocity (c_double): Ego speed (m/s).
-            curr_veh_autonomous_operational_warning (c_long): From output
-            curr_veh_platooning_max_acceleration (c_double): Max acceleration >0 (m/s²).
-            prev_veh_cc_setpoint (c_double): Desired speed (m/s).
-            prev_veh_cruisecontrol_acceleration (c_double):  From output 
-            prev_veh_distance_headway (c_double): Past distance headway
-            prev_veh_executed_acceleration: Past control output
+    Args:
+        ID(int):
+            EGO Vehicle id
+
+        HMI_control_mode (double):
+            ACC or CACC to be used, from tactical layer	ACC=1; CACC =2
+
+        HMI_t_headway (double):
+            Desired time gap from tactical layer [s]
+
+        HMI_setSpeed (double):
+            Desired speed from tactical layer [m/s]
+
+        EGO_lon_velocity (double):
+            EGO vehicle longitudinal velocity [m/s]
+
+        EGO_lon_acceleration (double):
+            EGO vehicle longitudinal acceleration [m/s^2]
+
+        MIO_dv_limit (Double):
+            Front target relative velocity: target velocity – ego velocity [m/s]
+
+        MIO_lon_distance (Double):
+            Longitudinal distance gap [m]
+
+        MIO_objectID (double):
+                Target ID [int]
+
+        MIO_acceleration (double):
+                Leader's actual current acceleration [m/s^2]
+
+        MIO_datamodeA (double):
+            Data resource. No target = 0, detected with wifi + radar + camera = 7 (choose either 0 or 7)
+
+        MIO_u_ffA (double):
+            Communicated target desired acceleration [m/s^2]
+            Acceleration output of the target’s operational layer, not the output of vehicle model.
+            Also: Leader's desired acceleration. If leader not platoon vehicle or not leader set value to zero.
     """
 
-    # Leader information
-    curr_lead_veh_acceleration: c_double = field(default=c_double(0))
-    curr_lead_veh_id: c_long = field(default=c_long(-1))
-    curr_lead_veh_rel_velocity: c_double = field(default=c_double(0))
-    curr_lead_veh_type: c_long = field(default=c_long(0))
-
-    # Current time info
-    curr_timestep: c_double = field(default=c_double(0))
-    curr_ts_length: c_double = field(default=c_double(1 / 10))  # seconds
-    curr_veh_id: c_long = field(default=c_long(0))
-    curr_veh_setspeed: c_double = field(default=c_double(0))
-    curr_veh_type: c_long = field(default=c_long(1))
-
-    # Control under use: 1-ACC ,2-CACC
-    curr_veh_controller_in_use: c_long = field(default=c_long(2))
-
-    # Reference headways:
-    curr_veh_ACC_h: c_double = field(default=c_double(0))
-    curr_veh_CACC_h: c_double = field(default=c_double(0))
-
-    # Ego headway space
-    curr_veh_used_distance_headway: c_double = field(default=c_double(0))
-
-    # Ego vehicle Dv,v
-    curr_veh_used_rel_vel: c_double = field(default=c_double(0))
-    curr_veh_velocity: c_double = field(default=c_double(0))
-
-    # ? Codes ?
-    curr_veh_autonomous_operational_warning: c_long = field(default=c_long(0))
-
-    # Positive value - symmetric
-    curr_veh_platooning_max_acceleration: c_double = field(
-        default=c_double(2.0)
+    # --------------------------------------------------------------------------
+    ID: c_double = field(
+        default=c_int(1),
+        repr=False,
+    )
+    HMI_control_mode: c_double = field(
+        default=c_double(1),
+        repr=False,
+    )
+    HMI_t_headway: c_double = field(
+        default=c_double(1.4),
+        repr=False,
+    )
+    EGO_lon_velocity: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    EGO_lon_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_dv_limit: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_lon_distance: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_objectID: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_acceleration: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_datamodeA: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    MIO_u_ffA: c_double = field(
+        default=c_double(0),
+        repr=False,
+    )
+    u_control: c_double = field(
+        default=c_double(0),
+        repr=False,
     )
 
-    # Past time info
-    prev_veh_cc_setpoint: c_double = field(default=c_double(0))
-    # Check placeholdeers -> veh_cruisecontrol_acceleration
-    prev_veh_cruisecontrol_acceleration: c_double = field(default=c_double(0))
-    prev_veh_distance_headway: c_double = field(default=c_double(0))
-    # a
-    prev_veh_executed_acceleration: c_double = field(default=c_double(0))
+    def __init__(self, path_library: str = DEFAULT_CACC_PATH):
+        self._path_library = path_library
+        self.load_library(self._path_library)
 
-    # Placeholders
-    veh_autonomous_operational_acceleration: c_double = field(
-        default=c_double(1)
-    )
-    veh_autonomous_operational_mixingmode: c_long = field(default=c_long(1))
-    veh_autonomous_operational_warning: c_double = field(default=c_double(1))
-    veh_cc_setpoint: c_double = field(default=c_double(1))
-    veh_cruisecontrol_acceleration: c_double = field(default=c_double(1))
-    success: c_int = field(default=c_int(0))
-
-    def __post_init__(self):
-        self.load_library()
-
-    def _apply_control(self):
-        self.lib.operational_controller(
-            self.curr_lead_veh_acceleration,
-            self.curr_lead_veh_id,
-            self.curr_lead_veh_rel_velocity,
-            self.curr_lead_veh_type,
-            self.curr_timestep,
-            self.curr_ts_length,
-            self.curr_veh_id,
-            self.curr_veh_setspeed,
-            self.curr_veh_type,
-            self.curr_veh_controller_in_use,
-            self.curr_veh_ACC_h,
-            self.curr_veh_CACC_h,
-            self.curr_veh_used_distance_headway,
-            self.curr_veh_used_rel_vel,
-            self.curr_veh_velocity,
-            self.curr_veh_autonomous_operational_warning,
-            self.curr_veh_platooning_max_acceleration,
-            self.prev_veh_cc_setpoint,
-            self.prev_veh_cruisecontrol_acceleration,
-            self.prev_veh_distance_headway,
-            self.prev_veh_executed_acceleration,
-            byref(self.veh_autonomous_operational_acceleration),
-            byref(self.veh_autonomous_operational_mixingmode),
-            byref(self.veh_autonomous_operational_warning),
-            byref(self.veh_cc_setpoint),
-            byref(self.veh_cruisecontrol_acceleration),
-            byref(self.success),
+    def _update_dll(self):
+        self.lib.combined_acc_cacc_dll(
+            self.ID,
+            self.HMI_control_mode,
+            self.HMI_t_headway,
+            self.HMI_setSpeed,
+            self.EGO_lon_velocity,
+            self.EGO_lon_acceleration,
+            self.MIO_dv_limit,
+            self.MIO_lon_distance,
+            self.MIO_objectID,
+            self.MIO_acceleration,
+            self.MIO_datamodeA,
+            self.MIO_u_ffA,
+            byref(self.u_control),
         )
-        return (
-            self.veh_autonomous_operational_acceleration.value,
-            self.veh_cruisecontrol_acceleration.value,
-        )
+        return self.u_control.value
 
-    def __call__(self, leader, ego, r_ego, t, T):
-        """ Asumes 0 index for lead 1 for follower
-            
-            a: real acceleration
-            x: postition
-            v: speed
-            s: spacing 
-            u: control 
+    def __call__(
+        self,
+        vgc: AbsSingleGapCoord,
+        reference: ReferenceHeadway,
+        t: float,
+        T: float,
+    ):
+        """This performs a multiple step call of the operational layer per vehicle.
 
-            D: delta
-            P: past
+        Args:
+            vgc (AbsSingleGapCoord): vgc vehicle gap coordinator
+            reference (ReferenceHeadway): Reference object
+            t (float): simulation current time
+            T (float): operational time step
+            dynamics (AbsDynamics):  Dynamics object to compute vehicle's model
 
-            Args:
-                leader(dict): vehicle 0 keys, a,x,v,Dv,Pu,Ps
-                ego(dict): vehicle 1, keys, a,x,v,Dv,Pu,Ps
-                r_ego(dict): reference 1 keys, v,vp  
-                t(float): time stamp
-                T(float): sampling time
+        Returns:
+            [type]: [description]
         """
-        self.curr_lead_veh_acceleration = c_double(leader["a"])
-        self.curr_lead_veh_id = c_long(leader["id"])
-        self.curr_lead_veh_rel_velocity = c_double(leader["Dv"])
-        # self.curr_lead_veh_type=c_long(0)
-        self.curr_timestep = c_double(t)
-        self.curr_ts_length = c_double(T)
-        self.curr_veh_id = c_long(ego["id"])
-        self.curr_veh_setspeed = c_double(r_ego["v"])
-        # self.curr_veh_type=c_long(1)
-        # self.curr_veh_controller_in_use=c_long(2)
-        self.curr_veh_ACC_h = c_double(r_ego["s"])
-        self.curr_veh_CACC_h = c_double(r_ego["s"])
-        self.curr_veh_used_distance_headway = c_double(leader["x"] - ego["x"])
-        self.curr_veh_used_rel_vel = c_double(leader["v"] - ego["v"])
-        self.curr_veh_velocity = c_double(ego["v"])
-        # self.curr_veh_autonomous_operational_warning
-        # self.curr_veh_platooning_max_acceleration
-        self.prev_veh_cc_setpoint = c_double(r_ego["Pv"])
-        self.prev_veh_cruisecontrol_acceleration = c_double(ego["Pint"])
-        self.prev_veh_distance_headway = c_double(ego["Ps"])
-        self.prev_veh_executed_acceleration = c_double(ego["Pu"])
-        return self._apply_control()
+
+        for _, r in enumerate(reference):
+            data_leader, data_ego = vgc.get_step_data()
+            r_dct = {"t": r[0], "g_cacc": r[1], "g_acc": r[1], "v": r[2]}
+            control = self.single_call_control(
+                data_leader,
+                data_ego,
+                r_dct,
+                r_dct.get("t", 1),
+                T,
+            )
+            state = np.array(
+                [
+                    data_ego.get("x"),
+                    data_ego.get("v"),
+                    data_ego.get("a"),
+                ]
+            )
+            vgc.history_state = vgc.ego.dynamics(state, np.array([control]))
+            vgc.history_control = np.array([control])
+            r_g = (
+                r_dct.get("g_cacc", np.nan)
+                if data_leader.get("id") != data_ego.get("id")
+                else r_dct.get("g_acc", np.nan)
+            )
+            vgc.history_reference = np.array(
+                [r_dct.get("t", np.nan), r_dct.get("v", np.nan), r_g]
+            )
+
+    def single_call_control(
+        self,
+        leader: dict,
+        ego: dict,
+        r_ego: dict,
+        t: float,
+        T: float,
+    ):
+        """Asumes 0 index for lead 1 for follower
+
+        * a: real acceleration
+        * x: postition
+        * v: speed
+        * s: spacing
+        * u: control
+
+        * D: delta
+        * P: past
+
+        Args:
+            leader(dict): vehicle 0 keys, a,x,v,Dv,Pu,Ps
+            ego(dict): vehicle 1, keys, a,x,v,Dv,Pu,Ps
+            r_ego(dict): reference 1 keys, v,s
+            t(float): current time
+            T(float): sampling time
+        """
+        self.ID = c_int(ego["id"])
+        self.HMI_control_mode = (
+            c_double(2) if ego["id"] != leader["id"] else c_double(1)
+        )
+        if self.HMI_control_mode == c_double(2):
+            self.HMI_t_headway = c_double(r_ego["g_cacc"])
+        elif self.HMI_control_mode == c_double(1):
+            self.HMI_t_headway = c_double(r_ego["g_acc"])
+        self.HMI_setSpeed = c_double(r_ego["v"])
+        self.EGO_lon_velocity = c_double(ego["v"])
+        self.EGO_lon_acceleration = c_double(ego["a"])
+        self.MIO_dv_limit = c_double(leader["v"] - ego["v"])
+        self.MIO_lon_distance = c_double(leader["x"] - ego["x"])
+        self.MIO_objectID = c_double(leader["id"])
+        self.MIO_acceleration = c_double(leader["a"])
+        self.MIO_datamodeA = c_double(7)
+        self.MIO_u_ffA = c_double(leader["u"])
+        self.u_control = c_double(ego["u"])
+        return self._update_dll()
 
     def update_value(self, **kwargs):
         """Update values to compute control"""
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def load_library(self):
-        """Loads the control library into the controller
-        """
-        self.lib = cdll.LoadLibrary(DEFAULT_CACC_PATH)
+    def load_library(self, path_library):
+        """Loads the control library into the controller"""
+        self.lib = cdll.LoadLibrary(path_library)
 
 
 if __name__ == "__main__":

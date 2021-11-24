@@ -1,29 +1,44 @@
 """
-    This module contains a **constants** and **default** parameters. These parameters can be accessed    at any time by whatever of the modules. 
+Constants module
+================
 
-    Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values. 
+    This module contains a **constants** and **default** parameters. These parameters can be accessed    at any time by whatever of the modules.
+
+    Some of the values here will be used to parametrize simulations to multiple platforms and some for specific ones. Specific zones within the source code have been marked to place the corresponding constant values.  Please, use uppercase letters for defining new constant values.
 
     Example:
         To use the ``Constants`` import the module as::
 
             >>> import ensemble.tools.constants as ct
-            >>> ct.BUFFER_STRING # access the buffer size 
+            >>> ct.BUFFER_STRING # access the buffer size
 
 
     ============================  ======================================
      **Variable**                 **Description**
     ----------------------------  --------------------------------------
     ``BUFFER_STRING``              Buffer size
+    ``DEFAULT_PATH_SYMUFLOW``       Default Path Towards SymuVia
     ``DEFAULT_LIB_OSX``            Default OS X library path (SymuVia)
     ``DEFAULT_LIB_LINUX``          Default Linux library path  (SymuVia)
     ``DEFAULT_LIB_WINDOWS``        Default Windows library path (Vissim)
-    ``DCT_SIMULATORS``             Simulator according to SO 
+    ``DCT_SIMULATORS``             Simulator according to SO
     ``DCT_DEFAULT_PATHS``          Available combinations SO/simulator
-    ``DCT_RUNTIME_PARAM``          Runtime default parameters 
-    ``DCT_VEH_PARAM``              Vehicle default parameters 
+    ``DCT_RUNTIME_PARAM``          Runtime default parameters
+    ``DCT_VEH_PARAM``              Vehicle default parameters
     ``DCT_VEH_DATA``               Vehicle data default parameters
     ``DCT_PLT_DATA``               Platoon parameters
     ``DCT_LIB_CACC``               Default CACC library path
+    ``FIELD_DATA``                 Vehicle trajectory data
+    ``FIELD_FORMAT``               Trajectory data types
+    ``HOUR_FORMAT``                Time format
+    ``FIELD_FORMATAGG``            Format aggretations
+    ``DCT_SIMULATION_INFO```       XML Simulation information
+    ``DCT_EXPORT_INFO``            XML Export information
+    ``DCT_TRAFIC_INFO``            XML Traffic information
+    ``DCT_NETWORK_INFO``           XML Network information
+    ``DCT_SCENARIO_INFO``          XML Scenario information
+    ``TP_VEHTYPES``                Vehicle type information
+    ``TP_ACCEL``                   Vehicle acceleration boundaries
     ============================  ======================================
 
 """
@@ -32,46 +47,57 @@
 # STANDARD  IMPORTS
 # ============================================================================
 
+import os
 from datetime import date, datetime, timedelta
+import platform
+import decouple
+from decouple import UndefinedValueError, config, RepositoryIni
 from numpy import array, float64, int32
-import os, platform
-from decouple import config, UndefinedValueError
 from pathlib import Path
+from collections import defaultdict
 
 # ============================================================================
 # SPECIFIC  IMPORTS
 # ============================================================================
 
-from symupy.utils.constants import (
-    DEFAULT_LIB_OSX,
-    FIELD_DATA,
-    FIELD_FORMAT,
-    FIELD_FORMATAGG,
-    BUFFER_STRING,
-    DCT_SIMULATION_INFO,
-    DCT_EXPORT_INFO,
-    DCT_TRAFIC_INFO,
-    DCT_NETWORK_INFO,
-    DCT_SCENARIO_INFO,
-    TP_VEHTYPES,
-    TP_VEHTYPES,
-    TIME_STEP,
-    ENGINE_CONSTANT,
-    WRITE_XML,
-    TRACE_FLOW,
-    LAUNCH_MODE,
-    TOTAL_SIMULATION_STEPS,
-    HOUR_FORMAT,
-)
-
-from ensemble.tools.exceptions import EnsembleAPIWarning
+from ensemble.tools.exceptions import EnsembleAPIWarning, EnsembleAPIError
 
 # ============================================================================
 # CLASS AND DEFINITIONS
 # ============================================================================
+SYSTEM = platform.system()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FILE_DIR = os.path.join(BASE_DIR, "settings.ini")
 
-# Vissim Command
-DEFAULT_LIB_WINDOWS = "Vissim.Vissim-64.10"
+config = decouple.Config(RepositoryIni(FILE_DIR))
+
+# Solving conda (local,RTD)
+RTDPATH = config("RTD_ENV", cast=str)
+CONDA_PREFIX = os.getenv("CONDA_PREFIX", RTDPATH)
+
+PATHS_2_SEARCH = (CONDA_PREFIX,)
+
+# Default names/platform
+DCT_LIBOSNAME = {
+    "Darwin": "libSymuFlow.dylib",
+    "Linux": "libSymuFlow.so",
+    "Windows": "Vissim.Vissim-64.10",
+}
+
+
+def find_path(roots):
+    for root in roots:
+        if (p := Path(root)).is_dir():
+            yield from p.glob(f"**/{DCT_LIBOSNAME[SYSTEM]}")
+
+
+DEFAULT_PATH_SYMUFLOW = DCT_LIBOSNAME[SYSTEM]
+for path in find_path(PATHS_2_SEARCH):
+    DEFAULT_PATH_SYMUFLOW = (
+        path if SYSTEM != "Windows" else DCT_LIBOSNAME[SYSTEM]
+    )
+
+print(f"Default path: {DEFAULT_PATH_SYMUFLOW}")
 
 # *****************************************************************************
 # DEFAULT SIMULATOR/ OS ASSOCIATION
@@ -84,54 +110,191 @@ DCT_SIMULATORS = {
 }
 
 # Feasible Simulator/Platform Paths/Libs
-DEFAULT_PATH_SYMUVIA_OSX = ""
-if platform.system() == "Darwin":
-    try:
-        if Path(DEFAULT_LIB_OSX).exists():
-            DEFAULT_PATH_SYMUVIA_OSX = DEFAULT_LIB_OSX
-        else:
-            DEFAULT_PATH_SYMUVIA_OSX = config("DEFAULT_LIB_OSX")
-    except UndefinedValueError:
-        EnsembleAPIWarning("No Simulator could be defined")
-        DEFAULT_PATH_SYMUVIA_OSX = ""
 
 # Fill candidates
 DCT_DEFAULT_PATHS = {
-    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUVIA_OSX,
-    ("symuvia", "Windows"): DEFAULT_PATH_SYMUVIA_OSX,
-    ("vissim", "Windows"): DEFAULT_LIB_WINDOWS,
-    ("vissim", "Darwin"): DEFAULT_LIB_WINDOWS,
+    ("symuvia", "Darwin"): DEFAULT_PATH_SYMUFLOW,
+    ("symuvia", "Windows"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Windows"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Darwin"): DEFAULT_PATH_SYMUFLOW,
+    ("symuvia", "Linux"): DEFAULT_PATH_SYMUFLOW,
+    ("vissim", "Linux"): DEFAULT_PATH_SYMUFLOW,
 }
 
 # Dynamic Platoon Data
 
 DCT_PLT_DATA = {
     "plt_id": 0,  # Platoon id
-    "headway": [0.0,],  # Inter-vehicle distance List[Float, Float]
-    "plt_brands": [0,],  # Vehicle Platoon brands List[Int, Int]
+    "headway": [
+        0.0,
+    ],  # Inter-vehicle distance List[Float, Float]
+    "plt_brands": [
+        0,
+    ],  # Vehicle Platoon brands List[Int, Int]
     "plt_order": [
         (0, 0),
     ],  # Vehicle id - brand List[Tuple[Int,Int]] head-tail order
 }
 
 DCT_LIB_CACC = {
-    "Windows": "OperationalDLL.dll",
-    "Darwin": "OperationalDLL.dylib",
+    "Windows": "accAndCacc.dll",
+    "Darwin": "accAndCacc.dylib",
+    "Linux": "OperationalDLL.so",
 }
 
+DCT_LIB_TRUCK = {
+    "Windows": "truckDynamics.dll",
+    "Darwin": "truckDynamics.dylib",
+    "Linux": "truckDynamics.so",
+}
+
+ROOTPATH = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+
 DEFAULT_CACC_PATH = os.path.join(
-    os.getcwd(),
+    ROOTPATH,
     "ensemble",
     "libs",
     platform.system().lower(),
     DCT_LIB_CACC[platform.system()],
 )
 
+DEFAULT_TRUCK_PATH = os.path.join(
+    ROOTPATH,
+    "ensemble",
+    "libs",
+    platform.system().lower(),
+    DCT_LIB_TRUCK[platform.system()],
+)
 
-# *****************************************************************************
-# SYMUVIA CONSTANTS
-# *****************************************************************************
 
+# =============================================================================
+# DATA SYMUVIA
+# =============================================================================
+
+# =============================================================================
+# STREAM CONSTANTS
+# =============================================================================
+
+BUFFER_STRING = 1000000
+WRITE_XML = False
+TRACE_FLOW = False
+LAUNCH_MODE = "lite"
+TOTAL_SIMULATION_STEPS = 0
+
+FIELD_DATA = {
+    "abs": "abscissa",
+    "acc": "acceleration",
+    "dst": "distance",
+    "etat_pilotage": "driven",
+    "id": "vehid",
+    "ord": "ordinate",
+    "tron": "link",
+    "type": "vehtype",
+    "vit": "speed",
+    "voie": "lane",
+    "z": "elevation",
+}
+
+FIELD_FORMAT = {
+    "abs": float,
+    "acc": float,
+    "dst": float,
+    "etat_pilotage": bool,
+    "id": int,
+    "ord": float,
+    "tron": str,
+    "type": str,
+    "vit": float,
+    "voie": int,
+    "z": float,
+}
+
+FLOATFORMAT = float64
+INTFORMAT = int32
+
+FIELD_FORMATAGG = {
+    "abscisa": (array, FLOATFORMAT),
+    "acceleration": (array, FLOATFORMAT),
+    "distance": (array, FLOATFORMAT),
+    "vehid": (array, INTFORMAT),
+    "ordinate": (array, FLOATFORMAT),
+    "link": (list, None),
+    "vehtype": (list, None),
+    "speed": (array, FLOATFORMAT),
+    "lane": (array, INTFORMAT),
+    "elevation": (array, FLOATFORMAT),
+}
+
+# =============================================================================
+# XML Data
+# =============================================================================
+
+# DATE/TIME INFORMATION
+HOUR_FORMAT = "%H:%M:%S"
+DELTA_TIME = timedelta(minutes=1)
+TIME_STEP = timedelta(seconds=1).total_seconds()
+TODAY = date.today().strftime("%Y-%m-%d")
+ST_TIME = datetime.now()
+ED_TIME = ST_TIME + DELTA_TIME
+ST_TIME_STR = ST_TIME.strftime("%H:%M:%S")
+ED_TIME_STR = ED_TIME.strftime("%H:%M:%S")
+
+# SIMULATION INFORMATION
+DCT_SIMULATION_INFO = {
+    "id": "simID",
+    "pasdetemps": f"{TIME_STEP}",
+    "debut": f"ST_TIME_STR",
+    "fin": f"ED_TIME_STR",
+    "loipoursuite": "exacte",
+    "comportementflux": "iti",
+    "date": f"today",
+    "titre": "default_simulation",
+    "proc_deceleration": "false",
+    "seed": "1",
+}
+
+# DATA EXPORT INFORMATION
+DCT_EXPORT_INFO = {
+    "trace_route": "false",
+    "trajectoires": "true",
+    "debug": "false",
+    "debug_matrice_OD": "false",
+    "debug_SAS": "false",
+    "csv": "true",
+}
+
+# TAFFIC INFORMATION
+DCT_TRAFIC_INFO = {
+    "id": "trafID",
+    "accbornee": "true",
+    "coeffrelax": "4",
+    "chgtvoie_ghost": "false",
+}
+
+# NETWORK INFORMATION
+DCT_NETWORK_INFO = {"id": "resID"}
+
+# SCENARIO INFORMATION
+DCT_SCENARIO_INFO = {
+    "id": "defaultScenario",
+    "simulation_id": DCT_SIMULATION_INFO.get("id"),
+    "trafic_id": DCT_TRAFIC_INFO.get("id"),
+    "reseau_id": DCT_NETWORK_INFO.get("id"),
+    "dirout": "data",
+    "prefout": "simout_ring_data",
+}
+
+
+TP_VEHTYPES = (
+    {"id": "HDV", "w": "-5", "kx": "0.12", "vx": "25"},
+    {"id": "CAV", "w": "-5", "kx": "0.12", "vx": "25"},
+)
+
+TP_ACCEL = (
+    {"ax": "1.5", "vit_sup": "5.8"},
+    {"ax": "1", "vit_sup": "8"},
+    {"ax": "0.5", "vit_sup": "infini"},
+)
 # *****************************************************************************
 # VISSIM CONSTANTS
 # *****************************************************************************
@@ -174,9 +337,10 @@ FIELD_DATA_VISSIM = {
 
 DCT_RUNTIME_PARAM = {
     "sampling_time": 1,
-    "total_steps": 60,
-    "sampling_time_operational": 1 / 10,
-    "sampling_time_tactical": 5,
+    "total_steps": 60,  # [s]
+    "sampling_time_operational": 1 / 10,  # [s] step
+    "sampling_time_tactical": 60,  # [s] time interval
+    "horizon_tactical": 3600,
 }
 
 # Vehicles Parameters
@@ -208,8 +372,42 @@ DCT_VEH_DATA = {
 
 DCT_PLT_CONST = {
     "max_platoon_length": 7,  # maximum number of vehicles allowed in platoon
-    "max_connection_distance": 100,  # maximum distance for communication(metres)
+    "max_connection_distance": 100,  # maximum distance for communication
+    "platoon_types": ("PLT", "201"),  # platoon vehicle types
+    "max_gap_error": 0.1,  # maximum distance gap error
+    "time_gap": 1.4,  # regular time gap between vehicles,
+    "cruise_speed": 25,  # set_point cruise_speed
 }
 
+# =============================================================================
+# CONTROL
+# =============================================================================
+
+BUFFER_CONTROL = 10  # Amount of control samples stored in memory
+
+# =============================================================================
+# VEHICLE DYNAMICS
+# =============================================================================
+
+DCT_TRUCK_PARAM = {
+    "width": 2.49,
+    "length": 5.92,
+    "mass": 26450.0,
+    "interAxes": 0.75,
+    "engineTau": 0.2,
+}
+
+DCT_XO_DEFAUT = {
+    "x": 0,
+    "v": 25.0,
+    "a": 0,
+}
+
+# =============================================================================
+# COMMUNICATION
+# =============================================================================
+
+RADIOUS_ANT = 500
+
 if __name__ == "__main__":
-    print(os.environ.get("SYMUVIALIB"))
+    print(DEFAULT_PATH_SYMUFLOW)

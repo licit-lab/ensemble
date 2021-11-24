@@ -19,20 +19,23 @@ from bisect import bisect_left
 
 class SortedFrozenSet(Sequence, Set):
     """
-        This is a collection that provides a set of properties to create a sorted frozen set.
+    This is a collection that provides a set of properties to create a sorted frozen set.
 
-        In particular
+    In particular this is
 
-        Args:
-            Sequence (Sequence): Inherits from the `Sequence` collection object.
-            Set (Set): Inherits from the `Set` collection object.
+    Args:
+        Items (Iterable):
+            Inherits from the `Sequence` collection object.
+
+        Key (str):
+            Key to organize the vehicle platoon
     """
 
-    def __init__(self, items=None):
-        self._items = tuple(
+    def __init__(self, items=None, key="vehid"):
+        self._items = list(
             sorted(
                 set(items) if (items is not None) else set(),
-                key=lambda x: x.vehid,
+                key=lambda x: x.__dict__.get(key),
             )
         )
 
@@ -69,7 +72,8 @@ class SortedFrozenSet(Sequence, Set):
         return self._items == rhs._items
 
     def __hash__(self):
-        return hash((type(self), self._items))
+        # This fix is temporary to allow hashing. Be aware that this my impact if you put the vehicle list in a dictionary etc.
+        return hash((type(self), tuple(self._items)))
 
     def __add__(self, rhs):
         if not isinstance(rhs, type(self)):

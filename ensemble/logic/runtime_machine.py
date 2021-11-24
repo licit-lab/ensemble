@@ -25,6 +25,7 @@ from .runtime_states import (
     PostRoutine,
     Terminate,
 )
+from ensemble.tools.screen import log_success
 
 # ============================================================================
 # CLASS AND DEFINITIONS
@@ -39,8 +40,8 @@ END_SEQ = [
 
 
 class RuntimeDevice:
-    """ This class defines the runtime device describing a series of 
-        cyclic states required to be run:
+    """This class defines the runtime device describing a series of
+    cyclic states required to be run:
 
     """
 
@@ -50,29 +51,28 @@ class RuntimeDevice:
         self.cycles = configurator.total_steps
 
     def __enter__(self) -> None:
-        """ Implementation of the state machine         
-        """
+        """Implementation of the state machine"""
         full_seq = chain(START_SEQ, self.cycles * RUNTIME_SEQ, END_SEQ)
 
         ccycle = 0
         for event in full_seq:
-            self.on_event(event)
+            self.next_state(event)
             # Step counted on PreRoutine
             if isinstance(self.state, PostRoutine):
                 ccycle = ccycle + 1
-                click.echo(click.style(f"Step: {ccycle}", fg="cyan", bold=True))
+                log_success(f"Step: {ccycle}")
             if isinstance(self.state, Terminate):
                 break
 
-        self.on_event(event)  # Run Terminate sequence
+        self.next_state(event)  # Run Terminate sequence
 
         return self
 
     def __exit__(self, type, value, traceback) -> bool:
         return False
 
-    def on_event(self, event: str):
-        """ Action to consider on event:
+    def next_state(self, event: str):
+        """Action to consider on event:
 
         * compliance
         * connect
@@ -83,10 +83,8 @@ class RuntimeDevice:
         * push
         * postroutine
         * terminate
-        
-        :param event: 
-        :type event: str 
-        :param configurator:
-        :type configurator: Configurator
+
+        Args:
+            event (str): State to go to
         """
-        self.state = self.state.on_event(event, self.configurator)
+        self.state = self.state.next_state(event, self.configurator)

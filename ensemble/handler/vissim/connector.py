@@ -11,9 +11,9 @@
 # INTERNAL IMPORTS
 # ============================================================================
 
-from .stream import SimulatorRequest
-from .configurator import VissimConfigurator
-from .scenario import VissimScenario
+from ensemble.handler.vissim.stream import SimulatorRequest
+from ensemble.handler.vissim.configurator import VissimConfigurator
+from ensemble.handler.vissim.scenario import VissimScenario
 
 from ensemble.metaclass.connector import AbsConnector
 
@@ -46,9 +46,9 @@ except ModuleNotFoundError:
 
 class VissimConnector(AbsConnector, VissimConfigurator):
     """
-        This models a connector and interactions from the API with the Vissim library.
+    This models a connector and interactions from the API with the Vissim library.
 
-        :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
+    :raises EnsembleAPILoadLibraryError: Raises error when library cannot be loaded
     """
 
     def __init__(self, **kwargs) -> None:
@@ -57,7 +57,7 @@ class VissimConnector(AbsConnector, VissimConfigurator):
         self.load_simulator()
 
     def load_simulator(self) -> None:
-        """ load Vissim COM interface"""
+        """load Vissim COM interface"""
         try:
             lib_vissim = com.gencache.EnsureDispatch(self.library_path)
             log_success("\t Library successfully loaded!")
@@ -75,8 +75,7 @@ class VissimConnector(AbsConnector, VissimConfigurator):
         self.__library = lib_vissim
 
     def load_scenario(self, scenario):
-        """ checks existance and load scenario . Also get simulation parameters
-        """
+        """checks existance and load scenario . Also get simulation parameters"""
         if isinstance(scenario, VissimScenario):
             try:
                 self.__library.LoadNet(
@@ -107,16 +106,16 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     def register_simulation(self, scenarioPath: str) -> None:
         """
-            Register simulation file within the simulator
+        Register simulation file within the simulator
 
-            :param scenarioPath: Path to scenario
-            :type scenarioPath: str
+        :param scenarioPath: Path to scenario
+        :type scenarioPath: str
         """
         self.simulation = VissimScenario(scenarioPath)
 
     def request_answer(self):
         """
-            Request simulator answer and maps the data locally
+        Request simulator answer and maps the data locally
         """
         vehsAttributesNamesVissim = (
             "CoordFrontX",
@@ -137,18 +136,20 @@ class VissimConnector(AbsConnector, VissimConfigurator):
             for item in vehsAttributes
         ]
         self.request.query = vehData  # List[Dicts]
-        self.request.sim_sec = self.sim_sec
+        self.request.sim_sec = self.__library.Simulation.AttValue(
+            "SimSec"
+        )  # self.sim_sec
 
     def run_single_step(self):
-        """ Run simulation next step
+        """Run simulation next step
 
-                :return: None
-                :rtype: None
-                """
+        :return: None
+        :rtype: None
+        """
         self.__library.Simulation.RunSingleStep()
 
     def query_data(self) -> int:
-        """ Run simulation step by step
+        """Run simulation step by step
 
         :return: iteration step
         :rtype: int
@@ -163,19 +164,23 @@ class VissimConnector(AbsConnector, VissimConfigurator):
             self._bContinue = False
             return -1
 
+    def push_data(self):
+        """Pushes data back to the simulator"""
+        pass
+
     # =========================================================================
     # PROTOCOLS
     # =========================================================================
 
     def performConnect(self) -> None:
         """
-             Perform simulation connection
+        Perform simulation connection
         """
         self.load_simulator()
 
     def performInitialize(self, scenario: VissimScenario) -> None:
         """
-            Perform simulation initialization
+        Perform simulation initialization
         """
         self.request = SimulatorRequest()
         self._n_iter = iter(self.get_simulation_steps())
@@ -184,13 +189,13 @@ class VissimConnector(AbsConnector, VissimConfigurator):
 
     def performPreRoutine(self) -> None:
         """
-            Perform simulator preroutine
+        Perform simulator preroutine
         """
         raise NotImplementedError
 
     def performQuery(self) -> None:
         """
-            Perform simulator Query
+        Perform simulator Query
         """
         raise NotImplementedError
 
@@ -199,29 +204,39 @@ class VissimConnector(AbsConnector, VissimConfigurator):
     # =========================================================================
 
     def get_simulation_steps(self) -> range:
-        """ Gets the list of simulation steps starting from 0 to end of simulation in step of simulation resolution"""
+        """Gets the list of simulation steps starting from 0 to end of simulation in step of simulation resolution"""
         return range(0, self.sim_period, self.sim_res)
 
     @property
     def scenariofilename(self):
-        """ Scenario filenamme
-        
-            Returns: 
-                filname (str): Absolute path towards the XML input for SymuVia
+        """Scenario filenamme
+
+        Returns:
+            filname (str): Absolute path towards the XML input for SymuVia
 
         """
         return self.simulation.filename
 
     @property
     def get_vehicle_data(self):
-        """ Returns the query received from the simulator
+        """Returns the query received from the simulator
 
-            :return: Request from the simulator
-            :rtype: dict
+        :return: Request from the simulator
+        :rtype: dict
         """
         return self.request.get_vehicle_data()
 
     @property
     def simulation_step(self):
-        """ Current simulation iteration"""
+        """Current simulation iteration"""
+        return self._c_iter
+
+    @property
+    def do_next(self) -> bool:
+        """Returns true if the simulation shold continue"""
+        return self._bContinue
+
+    @property
+    def simulationstep(self) -> float:
+        """Current simulation step"""
         return self._c_iter

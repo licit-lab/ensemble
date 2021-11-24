@@ -24,30 +24,35 @@ class AbsConnector(metaclass=abc.ABCMeta):
 
     @abc.abstractproperty
     def simulation_step(self):
-        """ Current simulation iteration"""
+        """Current simulation iteration"""
         pass
 
     @abc.abstractproperty
     def get_vehicle_data(self):
-        """ List of dictionaries containing vehicle data"""
+        """List of dictionaries containing vehicle data"""
         pass
 
     @abc.abstractmethod
     def load_simulator(self):
-        """ Method to load the simulation platform """
+        """Method to load the simulation platform"""
         pass
 
     @abc.abstractmethod
     def load_scenario(self, scenario: str):
-        """ Method to load simulation into simulator """
+        """Method to load simulation into simulator"""
         pass
 
     @abc.abstractmethod
     def register_simulation(self, scenarioPath: str):
-        """ Registers a scenario file into the simulator """
+        """Registers a scenario file into the simulator"""
         pass
 
     @abc.abstractmethod
     def request_answer(self):
-        """ Request answer from simulator """
+        """Request answer from simulator"""
+        pass
+
+    @abc.abstractmethod
+    def push_data(self):
+        """Push data back to the simulator"""
         pass

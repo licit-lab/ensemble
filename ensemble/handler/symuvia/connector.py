@@ -1,7 +1,7 @@
 """
 Symuvia Connector
 =================
-This module details the implementation of a ``Simulator`` object in charge of handling the connection between the traffic simulator and this interface. The connection with the traffic simulator is handled by an object called ``Connector`` which establishes a messaging protocol with the traffic simulator. 
+This module details the implementation of a ``Simulator`` object in charge of handling the connection between the traffic simulator and this interface. The connection with the traffic simulator is handled by an object called ``Connector`` which establishes a messaging protocol with the traffic simulator.
 
 Example:
     To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
@@ -12,11 +12,11 @@ Example:
 
 Other parameters can also be send to the simulator in order to provide other configurations:
 
-Example: 
+Example:
     To send make increase the *buffer size* to a specific size:
 
         >>> simulator = Simulator(path, bufferSize = 1000000)
-    
+
     To increase change the flag that traces the flow:
 
         >>> simulator = Simulator(path, traceFlow = True)
@@ -34,12 +34,7 @@ from pathlib import Path
 # INTERNAL IMPORTS
 # ============================================================================
 
-from .stream import SimulatorRequest
-from .configurator import SymuviaConfigurator
-from .scenario import SymuviaScenario
-
 from ensemble.metaclass.connector import AbsConnector
-
 from ensemble.tools.exceptions import (
     EnsembleAPIWarning,
     EnsembleAPILoadFileError,
@@ -48,7 +43,13 @@ from ensemble.tools.exceptions import (
 
 from ensemble.tools.screen import log_verify, log_success, log_error
 
+from .stream import SimulatorRequest
+from .configurator import SymuviaConfigurator
+from .scenario import SymuviaScenario
+
 import ensemble.tools.constants as CT
+
+from ensemble.tools.constants import TIME_STEP
 
 
 # ============================================================================
@@ -57,50 +58,53 @@ import ensemble.tools.constants as CT
 
 
 class SymuviaConnector(SymuviaConfigurator, AbsConnector):
-    """ 
-        Simulator class for containing object to connect and  command a simulation in SymuVia
+    """
+    Simulator class for containing object to connect and  command a simulation in SymuVia
 
-        Example:
-            Call of the default simulator ::
+    Example:
+        Call of the default simulator ::
 
-                >>> from symupy.api import Simulator
-                >>> simulator = Simulator()
+            >>> from ensemble.handler.symuvia import SymuViaConnector
+            >>> simulator = SymuViaConnector()
 
-        :return: Symuvia simulator object with simulation parameters
-        :rtype: Simulator
+    :return: Symuvia simulator object with simulation parameters
+    :rtype: Simulator
 
-        You may also pass suplementary parameters to the object by specifying keys in the call: 
+    You may also pass suplementary parameters to the object by specifying keys in the call:
 
-        Example: 
-            To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
+    Example:
+        To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
-                >>> from symupy.api import Simulator
-                >>> path_symuvia = "path/to/libSymuyVia.dylib"
-                >>> simulator = Simulator(library_path=path_symuvia)
-    
-        This object describes is a configurator manager for the interface between the traffic simulator and the python interface. For more details on the optinal keyword parameters please refer to :py:class:`~symupy.utils.configurator.Configurator` class.
+            >>> from ensemble.handler.symuvia import SymuViaConnector
+            >>> path_symuvia = "path/to/libSymuyVia.dylib"
+            >>> simulator = SymuViaConnector(library_path=path_symuvia)
 
-        :raises SymupyLoadLibraryError: 
-            Error raised whenever the SymuVia library is not found
+    This object describes is a configurator manager for the interface between the traffic simulator and the python interface. For more details on the optinal keyword parameters please refer to :py:class:`~symupy.utils.configurator.Configurator` class.
 
-        :raises SymupyFileLoadError: 
-            Error raised whenever the provided path for an scenario cannot be loaded into the Simulator
+    :raises EnsembleAPILoadFileError:
+        Error raised whenever the SymuVia library is not found
 
-        :raises SymupyVehicleCreationError: 
-            Error raised when a vehicle cannot be created
+    :raises EnsembleAPILoadFileError:
+        Error raised whenever the provided path for an scenario cannot be loaded into the Simulator
 
-        :raises SymupyDriveVehicleError: 
-            Error rased when a vehicle state cannot be imposed
+    :raises EnsembleAPILoadFileError:
+        Error raised when a vehicle cannot be created
 
-        :raises NotImplementedError: 
-            Not implemented functionality 
+    :raises EnsembleAPIDriveVehicleError:
+        Error rased when a vehicle state cannot be imposed
 
-        :return: Simulator manager object 
+    :raises NotImplementedError:
+        Not implemented functionality
 
-        :rtype: Simulator
+    :return: Simulator manager object
+
+    :rtype: Simulator
     """
 
-    def __init__(self, **kwargs,) -> None:
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
         SymuviaConfigurator.__init__(self, **kwargs)
         AbsConnector.__init__(self)
         self.load_simulator()
@@ -110,20 +114,20 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     # ========================================================================
 
     def load_simulator(self) -> None:
-        """ 
-            This is a method to load the shared symuvia library into python. This method
-            is used in the internal simulationp process however it can be also called from 
-            outside like:
+        """
+        This is a method to load the shared symuvia library into python. This method
+        is used in the internal simulationp process however it can be also called from
+        outside like:
 
-            Example:
-                To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
-                    
-                    >>> from ensemble.tools.constants import DEFAULT_LIB_OSX
-                    >>> simulator = Simulator(DEFAULT_LIB_OSX) 
-                    >>> simulator.load_symuvia()
+        Example:
+            To use the ``Simulator`` declare in a string the ``path`` to the simulator ::
 
-            Raises:
-                EnsembleAPILoadLibraryError: When the library cannot be loaded
+                >>> from ensemble.tools.constants import DEFAULT_LIB_OSX
+                >>> simulator = Simulator(DEFAULT_LIB_OSX)
+                >>> simulator.load_symuvia()
+
+        Raises:
+            EnsembleAPILoadLibraryError: When the library cannot be loaded
         """
         try:
             lib_symuvia = cdll.LoadLibrary(self.library_path)
@@ -136,8 +140,7 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
         self.__library = lib_symuvia
 
     def load_scenario(self, scenario: SymuviaScenario):
-        """ checks existance and load scenario into 
-        """
+        """checks existance and load scenario into"""
         if isinstance(scenario, SymuviaScenario):
             try:
                 self.__library.SymLoadNetworkEx(scenario.filename("UTF8"))
@@ -153,16 +156,16 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
 
     def register_simulation(self, scenarioPath: str) -> None:
         """
-            Register simulation file within the simulator
+        Register simulation file within the simulator
 
-            :param scenarioPath: Path to scenario 
-            :type scenarioPath: str
+        :param scenarioPath: Path to scenario
+        :type scenarioPath: str
         """
         self.simulation = SymuviaScenario(scenarioPath)
 
     def request_answer(self):
         """
-            Request simulator answer and maps the data locally
+        Request simulator answer and maps the data locally
         """
         if self.step_launch_mode == "lite":
             self._bContinue = self.__library.SymRunNextStepLiteEx(
@@ -172,10 +175,10 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
         self._bContinue = self.__library.SymRunNextStepEx(
             self.buffer_string, self.write_xml, byref(self.b_end)
         )
-        self.request.query = self.buffer_string
+        self.request.query = self.buffer_string.value
 
     def query_data(self) -> int:
-        """ Run simulation step by step
+        """Run simulation step by step
 
         :return: iteration step
         :rtype: int
@@ -188,19 +191,23 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
             self._bContinue = False
             return -1
 
+    def push_data(self):
+        # TODO: A way to push data into the simulator.
+        pass
+
     # ==========================================================================
     # PROTOCOLS
     # ==========================================================================
 
     def performConnect(self) -> None:
         """
-             Perform simulation connection
+        Perform simulation connection
         """
         self.load_simulator()
 
     def performInitialize(self, scenario: SymuviaScenario) -> None:
         """
-            Perform simulation initialization
+        Perform simulation initialization
         """
         self.request = SimulatorRequest()
         self._n_iter = iter(scenario.get_simulation_steps())
@@ -209,13 +216,13 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
 
     def performPreRoutine(self) -> None:
         """
-            Perform simulator preroutine
+        Perform simulator preroutine
         """
         raise NotImplementedError
 
     def performQuery(self) -> None:
         """
-            Perform simulator Query
+        Perform simulator Query
         """
         raise NotImplementedError
 
@@ -225,10 +232,10 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
 
     @property
     def scenariofilename(self):
-        """ Scenario filenamme
-        
-            Returns: 
-                filname (str): Absolute path towards the XML input for SymuVia
+        """Scenario filenamme
+
+        Returns:
+            filname (str): Absolute path towards the XML input for SymuVia
 
         """
         return self.simulation.filename()
@@ -237,12 +244,27 @@ class SymuviaConnector(SymuviaConfigurator, AbsConnector):
     def get_vehicle_data(self):
         """Returns the query received from the simulator
 
-            :return: Request from the simulator
-            :rtype: dict
+        :return: Request from the simulator
+        :rtype: dict
         """
         return self.request.get_vehicle_data()
 
     @property
     def simulation_step(self):
-        """ Current simulation iteration"""
+        """Current simulation iteration"""
+        return self._c_iter
+
+    @property
+    def time(self):
+        """Current simulation time"""
+        return self.simulation_step * TIME_STEP
+
+    @property
+    def do_next(self) -> bool:
+        """Returns true if the simulation shold continue"""
+        return self._bContinue
+
+    @property
+    def simulationstep(self) -> float:
+        """Current simulation step"""
         return self._c_iter
