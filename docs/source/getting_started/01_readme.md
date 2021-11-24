@@ -1,27 +1,27 @@
-**| [Overview](#overview) | [Download](#download) | [License](#license) | [Contact](#contact) |**
+**| [Overview](#overview) | [Download](#download) | [Install](#install) | [Use](#use) | [License](#license) | [Contact](#contact) |**
 
 # ENSEMBLE Launch
 
-![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green)
+![](https://img.shields.io/badge/platform-VISSIM-blue) ![](https://img.shields.io/badge/platform-SymuVia-green) ![](https://img.shields.io/badge/-Documentation-brightgreen)
 
-![](../_static/logo.png)
+ENSEMBLE Launch is a Command Line Interface implementing Multibrand platooning for ENSEMBLE within traffic simulators. Please find more information in the [documentation](https://ensemble-docs.readthedocs.io/en/latest/)
+
+<img src="docs/source/_static/logo.png" alt="drawing" align="middle" width="200" />
 
 ## Overview
 
-ENSEMBLE is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different platforms.
+[ENSEMBLE](https://platooningensemble.eu) is an effort to pave the way to multibrand truck platooning. The objective of this repository is to provide a simple way to *launch* and *execute* simulations in different traffic simulation platforms.
 
-A model develeopment platform for the Drivermodel which is used within the Eurpean project of Ensemble
+This software application describes a model for the platooning driver model which is used within the European project of [ENSEMBLE](https://platooningensemble.eu).
 
-
-Here we describe how we think the structure of the joint algorithm should be. The two simulators are called and started separately and they both perform different tasks.  Each should be capable of sending and retrieving network and status data. Some Tasks are simulator dependent(e.g. retrieving data) while others are simulator independent(l e.g oop through all vehicles)
-
+[Here](https://ensemble-docs.readthedocs.io/en/latest/getting_started/04_architecture.html) we describe how we think the structure of the cooperation between the specification and the traffic simulation platform is implemented.
 
 ## Download
 
 In order to install run in your command line tool:
 
-```
-git clone https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel.git
+```{bash}
+git clone https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel.git ensemble
 ```
 Or obtain direct download [here](https://ci.tno.nl/gitlab/paco.hamers-tno/ensemble_drivermodel/-/archive/master/ensemble_drivermodel-master.zip).
 
@@ -31,16 +31,26 @@ Or obtain direct download [here](https://ci.tno.nl/gitlab/paco.hamers-tno/ensemb
 **Developer environment**
 
 Be sure to obtain `python` and `pip`.  This repository as a standard python package with support for CLI interfacing to improve the interaction.
+
+Get the dependencies for this repository before installing via `anaconda` (Only MacOSX/Linux)
+
+```
+cd ensemble
+conda env create -f docs/environment.doc.yml
+conda activate ensemble-doc
+```
+
 You can try and test functionalities by installing the package in testing mode.
 
 ```
-cd ensemble_driver_model
+
 pip install -r requirements_dev.txt
 pip install --editable .
 ```
+
 **Note:** Be sure to be in the folder before launching the `pip` instruction
 
-## Basic usage
+## Use
 
 In order to use this tool, first check the help options via:
 
@@ -74,7 +84,7 @@ ensemble launch -s 'file_scenario.inpx' -s 'file_layout.layx' -l 'C:\my\path\to\
 
 ## Documentation
 
-Documentation is available in the `docs` folder. In order to construct the documentation
+Documentation is available [here](https://ensemble-docs.readthedocs.io/en/latest/) or in the `docs` folder. In order to build the documentation
 
 ```
 make docs
@@ -90,4 +100,4 @@ If you run into problems or bugs, please let us know by [creating an issue](http
 
 ## Credits
 
-This package was created with [`Cookiecutter`](https://github.com/audreyr/cookiecutter) and the [`audreyr/cookiecutter-pypackage`](https://github.com/audreyr/cookiecutter-pypackage) project template.
+This package was created with [`Cookiecutter`](https://github.com/audreyr/cookiecutter) and the [`audreyr/cookiecutter-pypackage`](https://github.com/audreyr/cookiecutter-pypackage) project template.****

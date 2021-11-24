@@ -63,6 +63,7 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
+	cp README.md docs/source/getting_started/01_readme.md
 	rm -f docs/source/ensemble.rst
 	rm -f docs/source/ensemble*
 	rm -f docs/source/modules.rst
