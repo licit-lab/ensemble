@@ -24,7 +24,7 @@ requirements = [
     "lxml>=4.3.3",
     "networkx>=2.5",
     "matplotlib>=3.0.0",
-    "pandas>=1.0.0",
+    "pandas>=version='1.0.1'",
     "click>=8.0",
     "python-decouple>=3.3",
 ]
@@ -37,7 +37,7 @@ dev_requirements = [
     "sphinx==3.2.1",
     "recommonmark==0.6.0",
     "pytest==6.1.1",
-    "bump2version==1.0.0",
+    "bump2version==version='1.0.1'",
     "twine==3.2.0",
     "black==19.10b0",
     "pylint==2.6.0",
@@ -49,7 +49,7 @@ dev_requirements = [
 
 setup(
     name="ensemble",
-    version="'1.0.0",
+    version="'version='1.0.1'",
     description="A command line interface to launch scenarios for the ENSEMBLE project ",
     long_description=LONG_DESCRIPTION + "\n\n" + HISTORY,
     long_description_content_type="text/markdown",
