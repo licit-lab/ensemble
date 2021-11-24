@@ -49,7 +49,7 @@ dev_requirements = [
 
 setup(
     name="ensemble",
-    version="version='1.0.0'",
+    version="'1.0.0",
     description="A command line interface to launch scenarios for the ENSEMBLE project ",
     long_description=LONG_DESCRIPTION + "\n\n" + HISTORY,
     long_description_content_type="text/markdown",
@@ -65,9 +65,7 @@ setup(
     classifiers=CLASSIFIERS,
     keywords="ensemble, truck platooning",
     include_package_data=True,
-    package_data={
-        "": ["*.ini", "*.xml", "*.xsd"],
-    },
+    package_data={"": ["*.ini", "*.xml", "*.xsd"],},
     install_requires=requirements,
     entry_points={"console_scripts": ["ensemble=ensemble.cli:main"]},
     extra_require={"dev": dev_requirements},

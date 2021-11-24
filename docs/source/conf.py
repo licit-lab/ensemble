@@ -123,7 +123,7 @@ todo_include_todos = False
 #
 html_theme = "sphinx_book_theme"
 html_logo = "_static/logo.png"
-html_title = f"v{ensemble.__version__}"
+html_title = f"v{release}"
 html_copy_source = True
 html_sourcelink_suffix = ""
 html_favicon = "_static/logo.png"
