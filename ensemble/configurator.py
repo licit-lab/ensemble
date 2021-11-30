@@ -162,7 +162,9 @@ class Configurator:
         """Determines simulation platform to connect"""
         if self.simulation_platform == "symuvia":
             self.connector = SymuviaConnector(
-                library_path=self.library_path, step_launch_mode="traj"
+                library_path=self.library_path,
+                step_launch_mode="traj",
+                write_xml=True,
             )
         else:
             self.connector = VissimConnector(library_path=self.library_path)
