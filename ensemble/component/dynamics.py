@@ -58,13 +58,7 @@ def dynamic_3rd_ego(state: np.ndarray, control: np.ndarray) -> np.ndarray:
         np.ndarray: [3d-array] @ k+1 [position;speed;acceleration]
     """
     K_a = TIME_STEP / TAU
-    A = np.array(
-        [
-            [1, TIME_STEP, 0],
-            [0, 1, TIME_STEP],
-            [0, 0, (1 - K_a)],
-        ]
-    )
+    A = np.array([[1, TIME_STEP, 0], [0, 1, TIME_STEP], [0, 0, (1 - K_a)],])
     B = np.array([[0], [0], [K_a]])
     return A @ state[:3] + B @ control[:1]
 
@@ -163,8 +157,24 @@ class TruckDynamics(AbsDynamics):
 
 @dataclass
 class RegularDynamics(AbsDynamics):
-    def __init__(self):
-        pass
+
+    vehid: c_int = field(repr=True)
+    x: c_double = field(repr=True)
+    a: c_double = field(repr=True)
+    v: c_double = field(repr=True)
+    width: c_double = field(default=c_double(WIDTH), repr=False)
+    length: c_double = field(default=c_double(LENGTH), repr=False)
+    interAxes: c_double = field(default=c_double(INTERAXES), repr=False)
+    mass: c_double = field(default=c_double(MASS), repr=False)
+    library: str = field(default=DEFAULT_TRUCK_PATH, repr=False)
+
+    def __init__(self, vehid: int, x: float, v: float, a: float):
+        self.vehid = c_int(vehid)
+        self.x = c_double(x)
+        self.v = c_double(v)
+        self.a = c_double(a)
+        # self.load_library(self.library)
+        # self.getAcceleration(0)
 
     @property
     def T(self):
@@ -196,10 +206,6 @@ if __name__ == "__main__":
     import os
 
     truck_path = os.path.join(
-        os.getcwd(),
-        "ensemble",
-        "libs",
-        "darwin",
-        "truckDynamics.dylib",
+        os.getcwd(), "ensemble", "libs", "darwin", "truckDynamics.dylib",
     )
     t = TruckDynamics(vehid=0, x=0, a=0, v=25)

@@ -22,7 +22,7 @@ from ensemble.component.vehicle import Vehicle
 
 from ensemble.tools.constants import DCT_PLT_CONST, DCT_XO_DEFAUT
 from ensemble.metaclass.dynamics import AbsDynamics
-from ensemble.component.dynamics import TruckDynamics
+from ensemble.component.dynamics import TruckDynamics, RegularDynamics
 from ensemble.metaclass.stream import DataQuery
 
 # ============================================================================
@@ -96,9 +96,7 @@ class PlatoonVehicle(Vehicle):
     split_request: bool = False
 
     def __init__(
-        self,
-        request: DataQuery,
-        **kwargs,
+        self, request: DataQuery, **kwargs,
     ):
         dynamics = TruckDynamics(
             vehid=kwargs.get("vehid", 0),
